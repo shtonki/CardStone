@@ -1,0 +1,7 @@
+*.exe
+*.exe.config
+*.Cache
+*.manifest
+*.pdb
+/cardstone/obj/Debug/*
+/obj/Debug/*.cs
