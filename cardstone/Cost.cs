@@ -107,7 +107,14 @@ namespace stonekart
 
         public override bool check()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < 5; i++)
+            {
+                if (GameController.getHero().getCurrentMana(i) < colors[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public override void pay()

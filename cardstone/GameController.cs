@@ -81,7 +81,8 @@ namespace stonekart
                     else if (f is CardButton)
                     {
                         CardButton b = (CardButton)f;
-                        Console.writeLine(b.getCard().getId());
+                        Card c = b.getCard();
+                        c.getCost().tryPay();
                     }
                 }
             }
@@ -98,6 +99,10 @@ namespace stonekart
             hero.addMana(c);
         }
 
+        public static Player getHero()
+        {
+            return hero;
+        }
 
         public static void handleEvent(GameEvent e)
         {
