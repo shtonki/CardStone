@@ -17,7 +17,7 @@ namespace stonekart
         private Location location;
 
         private string name;
-        private ManaCost manaCost;
+        private Cost cost;
 
         public Card(CardId c, Location l) : this(c)
         {
@@ -47,7 +47,8 @@ namespace stonekart
                 } break;
             }
 
-            manaCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
+            ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
+            cost = new Cost(mc);
         }
 
         public int getId()
@@ -62,7 +63,7 @@ namespace stonekart
 
         public ManaCost getManaCost()
         {
-            return manaCost;
+            return cost.getManaCost();
         }
 
         public void moveTo(Location l)

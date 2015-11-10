@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -57,7 +58,7 @@ namespace stonekart
             {
                 addMana();
                 handleEvent(new DrawEvent(true));
-                getButton(ACCEPT);
+                mainPhase();
             }
         }
 
@@ -69,7 +70,19 @@ namespace stonekart
                 while (true)
                 {
                     Foo f = getFoo();
-                    
+                    if (f is FooButton)
+                    {
+                        var b = (FooButton)f;
+                        if (b.getType() == ButtonPanel.ACCEPT)
+                        {
+                            return;
+                        }
+                    }
+                    else if (f is CardButton)
+                    {
+                        CardButton b = (CardButton)f;
+                        Console.writeLine(b.getCard().getId());
+                    }
                 }
             }
         }

@@ -1,13 +1,63 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace stonekart
 {
-    public abstract class Cost
+    public class Cost
     {
-        abstract public bool pay();
+        private ManaCost manaCost;
+        private List<Coster> costs;
+
+        public bool tryPay()
+        {
+            if (checkAll())
+            {
+                payAll();
+                return true;
+            }
+            return false;
+        }
+
+        private bool checkAll()
+        {
+            foreach (Coster c in costs)
+            {
+                if (!c.check())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void payAll()
+        {
+            foreach (Coster c in costs)
+            {
+                c.pay();
+            }
+        }
+
+        public Cost(ManaCost c)
+        {
+            manaCost = c;
+            costs = new List<Coster>();
+            costs.Add(manaCost);
+        }
+
+        public ManaCost getManaCost()
+        {
+            return manaCost;
+        }
     }
 
-    public class ManaCost : Cost
+    public abstract class Coster
+    {
+        public abstract bool check();
+        abstract public void pay();
+    }
+
+    public class ManaCost : Coster
     {
         public const int
             WHITE = 0,
@@ -55,7 +105,12 @@ namespace stonekart
             }
         }
 
-        public override bool pay()
+        public override bool check()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void pay()
         {
             throw new NotImplementedException();
         }
