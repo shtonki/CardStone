@@ -13,7 +13,7 @@ namespace stonekart
         static void Main(string[] args)
         {
             //xdddddd
-            System.Windows.Forms.Form.CheckForIllegalCrossThreadCalls = false;
+            Form.CheckForIllegalCrossThreadCalls = false;
             Thread t = new Thread(new ThreadStart(asd));
             t.Start();
             ImageLoader.init();
