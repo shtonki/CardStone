@@ -64,7 +64,7 @@ namespace stonekart
         {
             return manaCost;
         }
-
+        //or:p
         public void moveTo(Location l)
         {
             Pile p = l.getPile();
