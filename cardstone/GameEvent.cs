@@ -10,7 +10,8 @@ namespace stonekart
     abstract class GameEvent
     {
         public const int
-            DRAW = 1;
+            DRAW = 1,
+            CAST = 2;
 
         private int type;
 
@@ -37,6 +38,21 @@ namespace stonekart
         public bool isHeroDraw()
         {
             return h;
+        }
+    }
+
+    class CastEvent : GameEvent
+    {
+        private Card card;
+
+        public CastEvent(Card c) : base(CAST)
+        {
+            card = c;
+        }
+
+        public Card getCard()
+        {
+            return card;
         }
     }
 }

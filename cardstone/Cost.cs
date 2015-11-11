@@ -68,41 +68,21 @@ namespace stonekart
 
         private int[] colors;
 
+        /*
         public ManaCost(params int[] cs)
         {
             colors = cs;
         }
+         */
 
         public ManaCost(int white, int blue, int black, int red, int green)
         {
-            int m = white + blue + black + red + green;
-            colors = new int[m];
-            int c = 0;
-            for (int i = 0; i < white; i++)
-            {
-                colors[c] = WHITE;
-                c++;
-            }
-            for (int i = 0; i < blue; i++)
-            {
-                colors[c] = BLUE;
-                c++;
-            }
-            for (int i = 0; i < black; i++)
-            {
-                colors[c] = BLACK;
-                c++;
-            }
-            for (int i = 0; i < red; i++)
-            {
-                colors[c] = RED;
-                c++;
-            }
-            for (int i = 0; i < green; i++)
-            {
-                colors[c] = GREEN;
-                c++;
-            }
+            colors = new int[5];
+            colors[WHITE] = white;
+            colors[BLUE] = blue;
+            colors[BLACK] = black;
+            colors[RED] = red;
+            colors[GREEN] = green;
         }
 
         public override bool check()
@@ -119,7 +99,10 @@ namespace stonekart
 
         public override void pay()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < 5; i++)
+            {
+                GameController.getHero().spendMana(i, colors[i]);
+            }
         }
 
         public int[] getColors()

@@ -44,6 +44,7 @@ namespace stonekart
                 {
                     name = "Keepo";
                     whiteCost = 1;
+                    blackCost = 2;
                 } break;
             }
 

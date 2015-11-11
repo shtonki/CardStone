@@ -56,6 +56,7 @@ namespace stonekart
         {
             while (true)
             {
+                hero.resetMana();
                 addMana();
                 handleEvent(new DrawEvent(true));
                 mainPhase();
@@ -82,10 +83,18 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        c.getCost().tryPay();
+                        if (c.getCost().tryPay())
+                        {
+                            cast(c);
+                        }
                     }
                 }
             }
+        }
+
+        private static void cast(Card c)
+        {
+            c.moveTo(hero.getGraveyard());
         }
 
         private static void addMana()

@@ -87,11 +87,16 @@ namespace stonekart
                 pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 15, 3);
 
                 int[] mc = card.getManaCost().getColors();
+                int i = 0;
 
-                for (int c = 0; c < mc.Length; c++)
+                for (int c = 0; c < 5; c++)
                 {
-                    pevent.Graphics.DrawEllipse(manaBallPen, 149 - c*18, 5, 13, 13);
-                    pevent.Graphics.FillEllipse(brushes[mc[c]], 149 - c*18, 5, 13, 13);
+                    for (int j = 0; j < mc[c]; j++)
+                    {
+                        pevent.Graphics.DrawEllipse(manaBallPen, 149 - i * 18, 5, 13, 13);
+                        pevent.Graphics.FillEllipse(brushes[c], 149 - i * 18, 5, 13, 13);
+                        i++;
+                    }
                 }
             }
         }

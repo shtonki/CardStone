@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,20 @@ namespace stonekart
         public int getMaxMana(int color)
         {
             return maxMana[color];
+        }
+
+        public void spendMana(int color, int amount)
+        {
+            curMana[color] -= amount;
+            notifyObserver();
+        }
+
+        public void resetMana()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                curMana[i] = maxMana[i];
+            }
         }
 
         public void loadDeck(CardId[] deckList, Location l)
