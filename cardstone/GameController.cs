@@ -9,6 +9,7 @@ namespace stonekart
     class GameController
     {
         private static Player hero, villain;
+        private static Pile stack;
 
         public static void start()
         {
@@ -34,7 +35,16 @@ namespace stonekart
 
         private static void setupEventHandlers()
         {
-            drawEventHandler = new EventHander(GameEvent.DRAW, delegate(GameEvent gevent) { hero.draw(); });
+            drawEventHandler = new EventHander(GameEvent.DRAW, delegate(GameEvent gevent)
+            {
+                hero.draw();
+            });
+
+            castEventHandler = new EventHander(GameEvent.CAST, delegate(GameEvent gevent)
+            {
+                CastEvent e = (CastEvent)gevent;
+                e.getCard().moveTo(new Location(Location.STACK));
+            });
         }
 
         private static void setLocations()
@@ -50,6 +60,8 @@ namespace stonekart
             Location.setPile(Location.FIELD, Location.VILLAINSIDE, villain.getField());
             Location.setPile(Location.GRAVEYARD, Location.VILLAINSIDE, villain.getGraveyard());
             Location.setPile(Location.EXILE, Location.VILLAINSIDE, villain.getExile());
+
+            Location.setPile(Location.STACK, Location.HEROSIDE, stack);
         }
 
         private static void loop()
@@ -58,7 +70,7 @@ namespace stonekart
             {
                 hero.resetMana();
                 addMana();
-                handleEvent(new DrawEvent(true));
+                draw();
                 mainPhase();
             }
         }
@@ -92,9 +104,14 @@ namespace stonekart
             }
         }
 
+        private static void draw()
+        {
+            handleEvent(new DrawEvent(true));
+        }
+
         private static void cast(Card c)
         {
-            c.moveTo(hero.getGraveyard());
+            handleEvent(new CastEvent(c));
         }
 
         private static void addMana()
@@ -116,6 +133,7 @@ namespace stonekart
         public static void handleEvent(GameEvent e)
         {
             drawEventHandler.invoke(e);
+            castEventHandler.invoke(e);
         }
 
         private static Foo f;
@@ -185,7 +203,9 @@ namespace stonekart
             ACCEPT = ButtonPanel.ACCEPT,
             ACCEPTCANCEL = ButtonPanel.ACCEPT | ButtonPanel.CANCEL;
 
-        private static EventHander drawEventHandler;
+        private static EventHander 
+            drawEventHandler, 
+            castEventHandler;
 
         private class EventHander
         {

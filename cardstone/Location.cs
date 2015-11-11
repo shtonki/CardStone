@@ -25,8 +25,8 @@ namespace stonekart
             VILLAINSIDE = 1,
             NOONE = 2;
 
-        private int location;
-        private int side;
+        private byte location;
+        private byte side;
 
         public Location(byte location)
         {
@@ -50,6 +50,16 @@ namespace stonekart
             return getPile(location, side);
         }
 
+        public byte getSide()
+        {
+            return side;
+        }
+
+        public byte getLocation()
+        {
+            return location;
+        }
+
         public static Pile getPile(int location, int side)
         {
             if (location == NOWHERE || side == NOONE) { return null; }
@@ -67,5 +77,6 @@ namespace stonekart
             }
             throw new Exception("I really hope the never happens");
         }
+
     }
 }

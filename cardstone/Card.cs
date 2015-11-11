@@ -78,6 +78,13 @@ namespace stonekart
             moveTo(p);
         }
 
+        public void moveToOwners(byte i)
+        {
+            Pile p = Location.getPile(i, location.getSide());
+            moveTo(p);
+        }
+
+
         public void moveTo(Pile d)
         {
             Pile p = location.getPile();
