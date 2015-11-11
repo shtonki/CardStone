@@ -37,15 +37,16 @@ namespace stonekart
         static CardButton()
         {
             PrivateFontCollection privet = new PrivateFontCollection();
-            //privet.AddFontFile(@"../../res/FONTS/Maiandra GD.tff");
+            try { privet.AddFontFile(@"C:\Users\J-Dawg\cardstone\cardstone\res\FONT\mangalb.ttf"); }
+            catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
-            PTFont = new Font(privet.Families[0].Name,
+            PTFont = new Font(horfamilj[0],
                 16,
                 FontStyle.Bold,
                 GraphicsUnit.Pixel);
 
-            cardNameFont = new Font(horfamilj[0].Name,
+            cardNameFont = new Font(horfamilj[0],
                 30,
                 FontStyle.Bold,
                 GraphicsUnit.Pixel);
