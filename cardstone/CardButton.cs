@@ -12,10 +12,19 @@ namespace stonekart
         public static int WIDTH = 180, HEIGHT = 280;
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
 
-        private static Font cardNameFont;
+        private static Font cardNameFont;/* = new Font(
+            new FontFamily("Comic Sans MS"),
+            14,
+            FontStyle.Regular,
+            GraphicsUnit.Pixel);
+        */
 
-        private static Font PTFont;
-
+        private static Font PTFont;/* = new Font(
+            new FontFamily("Comic Sans MS"), 
+            30, 
+            FontStyle.Bold,
+            GraphicsUnit.Pixel);
+        */
         private static Brush
             whiteBrush = new SolidBrush(Color.White),
             blueBrush = new SolidBrush(Color.Blue),
@@ -23,6 +32,16 @@ namespace stonekart
             redBrush = new SolidBrush(Color.Red),
             greenBrush = new SolidBrush(Color.Green);
 
+        static CardButton()
+        {
+            PrivateFontCollection f = new PrivateFontCollection();
+            f.AddFontFile(@"D:\dev\cardstone\cardstone\res\FONT\Maiandra GD.ttf");
+            
+            var t = f.Families;
+            cardNameFont = new Font(t[0], 12);
+            
+    
+        }
 
         private static Brush[] brushes = new[] {whiteBrush, blueBrush, blackBrush, redBrush, greenBrush};
 
@@ -32,24 +51,6 @@ namespace stonekart
 
         private int id;
         private Card card;
-
-
-        static CardButton()
-        {
-            PrivateFontCollection privet = new PrivateFontCollection();
-            //privet.AddFontFile(@"../../res/FONTS/Maiandra GD.tff");
-            FontFamily[] horfamilj = privet.Families;
-
-            PTFont = new Font(privet.Families[0].Name,
-                16,
-                FontStyle.Bold,
-                GraphicsUnit.Pixel);
-
-            cardNameFont = new Font(horfamilj[0].Name,
-                30,
-                FontStyle.Bold,
-                GraphicsUnit.Pixel);
-        }
 
         public CardButton()
         {
