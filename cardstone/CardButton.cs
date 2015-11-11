@@ -13,13 +13,13 @@ namespace stonekart
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
         
         private static Font cardNameFont = new Font(
-            new FontFamily("Segoe UI Semibold"),
+            new FontFamily("Comic Sans MS"),
             14,
             FontStyle.Regular,
             GraphicsUnit.Pixel);
 
         private static Font PTFont = new Font(
-            new FontFamily("Maiandra GD"), 
+            new FontFamily("Comic Sans MS"), 
             30, 
             FontStyle.Bold,
             GraphicsUnit.Pixel);
