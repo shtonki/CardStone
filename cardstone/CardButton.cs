@@ -46,7 +46,7 @@ namespace stonekart
         {
             PrivateFontCollection privet = new PrivateFontCollection();
 
-            try { privet.AddFontFile(@"../../res/FONT/LifeCraft_Font.ttf"); }
+            try { privet.AddFontFile(@"../../res/FONT/MAGIC.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
