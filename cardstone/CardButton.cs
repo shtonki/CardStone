@@ -46,13 +46,13 @@ namespace stonekart
         {
             PrivateFontCollection privet = new PrivateFontCollection();
 
-            try { privet.AddFontFile(@"../../res/FONT/kenpixel_mini.ttf"); }
+            try { privet.AddFontFile(@"../../res/FONT/LifeCraft_Font.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
             PTFont = new Font(horfamilj[0],
-                12,
-                FontStyle.Bold,
+                14,
+                FontStyle.Regular,
                 GraphicsUnit.Pixel);
 
             cardNameFont = new Font(horfamilj[0],
