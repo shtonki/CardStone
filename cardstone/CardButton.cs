@@ -46,7 +46,7 @@ namespace stonekart
         {
             PrivateFontCollection privet = new PrivateFontCollection();
 
-            try { privet.AddFontFile(@"../../res/FONT/kenvector_future.ttf"); }
+            try { privet.AddFontFile(@"../../res/FONT/kenpixel_mini.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
