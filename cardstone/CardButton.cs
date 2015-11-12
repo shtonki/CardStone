@@ -41,10 +41,7 @@ namespace stonekart
 
         private int id;
         private Card card;
-        //
-        /// <summary>
-        /// ////////////////////////
-        /// </summary>
+
         static CardButton()
         {
             PrivateFontCollection privet = new PrivateFontCollection();
