@@ -113,8 +113,8 @@ namespace stonekart
                 {
                     for (int j = 0; j < mc[c]; j++)
                     {
-                        pevent.Graphics.DrawEllipse(manaBallPen, 149 - i * 18, 5, 13, 13);
-                        pevent.Graphics.FillEllipse(brushes[c], 149 - i * 18, 5, 13, 13);
+                        pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 13, 5, 11, 11);
+                        pevent.Graphics.FillEllipse(brushes[c], 162 - i * 13, 5, 11, 11);
                         i++;
                     }
                 }
