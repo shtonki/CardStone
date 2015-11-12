@@ -32,16 +32,6 @@ namespace stonekart
             redBrush = new SolidBrush(Color.Red),
             greenBrush = new SolidBrush(Color.Green);
 
-        static CardButton()
-        {
-            PrivateFontCollection f = new PrivateFontCollection();
-            f.AddFontFile(@"D:\dev\cardstone\cardstone\res\FONT\Maiandra GD.ttf");
-            
-            var t = f.Families;
-            cardNameFont = new Font(t[0], 12);
-            
-    
-        }
 
         private static Brush[] brushes = new[] {whiteBrush, blueBrush, blackBrush, redBrush, greenBrush};
 
@@ -52,7 +42,6 @@ namespace stonekart
         private int id;
         private Card card;
 
-<<<<<<< HEAD
 
         static CardButton()
         {
@@ -72,8 +61,6 @@ namespace stonekart
                 GraphicsUnit.Pixel);
         }
 
-=======
->>>>>>> 713397f6a322ffbce9f3c099b9bbab6912e33fe8
         public CardButton()
         {
             Visible = true;
