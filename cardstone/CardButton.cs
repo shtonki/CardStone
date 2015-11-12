@@ -46,12 +46,12 @@ namespace stonekart
         {
             PrivateFontCollection privet = new PrivateFontCollection();
 
-            try { privet.AddFontFile(@"../../res/FONT/MAGIC.ttf"); }
+            try { privet.AddFontFile(@"../../res/FONT/centuryGothic.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
             PTFont = new Font(horfamilj[0],
-                14,
+                4,
                 FontStyle.Regular,
                 GraphicsUnit.Pixel);
 
