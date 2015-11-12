@@ -37,14 +37,14 @@ namespace stonekart
                 case CardId.KAPPA:
                 {
                     name = "Kappa";
-                    redCost = 1;
+                    redCost = 6;
                 } break;
 
                 case CardId.KEEPO:
                 {
                     name = "Keepo";
-                    whiteCost = 1;
-                    blackCost = 1;
+                    whiteCost = 3;
+                    blackCost = 3;
                 } break;
             }
 
