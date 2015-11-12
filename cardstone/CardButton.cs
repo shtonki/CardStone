@@ -45,18 +45,18 @@ namespace stonekart
         static CardButton()
         {
             PrivateFontCollection privet = new PrivateFontCollection();
-             
-            try { privet.AddFontFile(@"../../res/FONT/mangalb.ttf"); }
+
+            try { privet.AddFontFile(@"../../res/FONT/kenvector_future.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
             PTFont = new Font(horfamilj[0],
-                16,
+                12,
                 FontStyle.Bold,
                 GraphicsUnit.Pixel);
 
             cardNameFont = new Font(horfamilj[0],
-                30,
+                16,
                 FontStyle.Bold,
                 GraphicsUnit.Pixel);
         }
