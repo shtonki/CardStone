@@ -45,7 +45,8 @@ namespace stonekart
         static CardButton()
         {
             PrivateFontCollection privet = new PrivateFontCollection();
-            try { privet.AddFontFile(@"C:\Users\J-Dawg\cardstone\cardstone\res\FONT\mangalb.ttf"); }
+             
+            try { privet.AddFontFile(@"../../res/FONT/mangalb.ttf"); }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
