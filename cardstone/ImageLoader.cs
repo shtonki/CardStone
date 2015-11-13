@@ -12,7 +12,6 @@ namespace stonekart
         private const string cardArtPath = @"../../res/IMG/card/";
         private const string framePath = @"../../res/IMG/frame/";
 
-        private static Dictionary<CardId, string> loadMap;
         private static Dictionary<CardId, Image> imageMap;
 
         private static Image frame;
@@ -21,11 +20,7 @@ namespace stonekart
         {
             frame = Image.FromFile(framePath + "kappa" + ".png");
 
-            loadMap = new Dictionary<CardId, string>();
             imageMap = new Dictionary<CardId, Image>();
-
-            loadMap.Add(CardId.KAPPA, "kappa");
-            loadMap.Add(CardId.KEEPO, "keepo");
         }
 
         public static Image getCardArt(CardId id)
@@ -34,7 +29,7 @@ namespace stonekart
             {
                 return imageMap[id];
             }
-            Image i = Image.FromFile(cardArtPath + loadMap[id] + ".png");
+            Image i = Image.FromFile(cardArtPath + id + ".png");
             imageMap.Add(id, i);
             return i;
         }

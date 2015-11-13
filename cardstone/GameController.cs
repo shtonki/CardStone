@@ -22,8 +22,8 @@ namespace stonekart
 
             setLocations();
 
-            hero.loadDeck(new[] { CardId.KAPPA, CardId.KAPPA, CardId.KEEPO, CardId.KEEPO, }, new Location(Location.DECK, Location.HEROSIDE));
-            villain.loadDeck(new[] { CardId.KAPPA, CardId.KAPPA, CardId.KEEPO, CardId.KEEPO, }, new Location(Location.DECK, Location.VILLAINSIDE));
+            hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.HEROSIDE));
+            villain.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.VILLAINSIDE));
 
             MainFrame.setObservers(hero, villain);
 

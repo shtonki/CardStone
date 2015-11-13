@@ -73,7 +73,7 @@ namespace stonekart
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
-            Controls.Add(textPanel);
+            //Controls.Add(textPanel);
 
             ready = true;
         }

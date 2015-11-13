@@ -5,3 +5,4 @@
 *.pdb
 /cardstone/obj/Debug/*
 /obj/Debug/*.cs
+pushaT.bat

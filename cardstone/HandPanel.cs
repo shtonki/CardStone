@@ -11,7 +11,7 @@ namespace stonekart
     sealed class HandPanel : Panel, Observer
     {
         //public static int WIDTH = CardButton.WIDTH*6 + 5, HEIGHT = CardButton.HEIGHT + 5;
-        public static int WIDTH = 180*6+5, HEIGHT = 285;
+        public static int WIDTH = 210*6+5, HEIGHT = 285;
 
         private const int NOOFBUTTONS = 20;
         CardButton[] cardButtons;
@@ -34,7 +34,7 @@ namespace stonekart
         {
             Pile p = (Pile)o;
 
-            int padding = CardButton.WIDTH < WIDTH/(1 + p.getCards().Count) ? CardButton.WIDTH : WIDTH/(1+p.getCards().Count);
+            int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.getCards().Count) ? CardButton.WIDTH : WIDTH/(1+p.getCards().Count));
 
             int i = 0;
             for (; i < p.getCards().Count; i++)

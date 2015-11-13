@@ -12,25 +12,14 @@ namespace stonekart
         public static int WIDTH = 180, HEIGHT = 280;
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
 
-        private static Font cardNameFont;/* = new Font(
-            new FontFamily("Comic Sans MS"),
-            14,
-            FontStyle.Regular,
-            GraphicsUnit.Pixel);
-        */
-
-        private static Font PTFont;/* = new Font(
-            new FontFamily("Comic Sans MS"), 
-            30, 
-            FontStyle.Bold,
-            GraphicsUnit.Pixel);
-        */
+        private static Font cardNameFont, archTypeFont, textFont, PTFont;
         private static Brush
             whiteBrush = new SolidBrush(Color.White),
             blueBrush = new SolidBrush(Color.Blue),
             blackBrush = new SolidBrush(Color.Black),
             redBrush = new SolidBrush(Color.Red),
-            greenBrush = new SolidBrush(Color.Green);
+            greenBrush = new SolidBrush(Color.Green), 
+            greyBrush = new SolidBrush(Color.LightSlateGray);
 
 
         private static Brush[] brushes = new[] {whiteBrush, blueBrush, blackBrush, redBrush, greenBrush};
@@ -46,18 +35,32 @@ namespace stonekart
         {
             PrivateFontCollection privet = new PrivateFontCollection();
 
-            try { privet.AddFontFile(@"../../res/FONT/Hoodo.ttf"); }
+            try
+            {
+                //privet.AddFontFile(@"../../res/FONT/mangalb.ttf");
+                privet.AddFontFile(@"../../res/FONT/MatrixBold.ttf");
+            }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             FontFamily[] horfamilj = privet.Families;
 
             PTFont = new Font(horfamilj[0],
-                12,
-                FontStyle.Bold,
+                20,
+                FontStyle.Regular,
                 GraphicsUnit.Pixel);
 
             cardNameFont = new Font(horfamilj[0],
                 16,
-                FontStyle.Bold,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel);
+
+            archTypeFont = new Font(horfamilj[0],
+                13,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel);
+
+            textFont = new Font(horfamilj[0],
+                13,
+                FontStyle.Regular,
                 GraphicsUnit.Pixel);
         }
 
@@ -104,17 +107,23 @@ namespace stonekart
                 pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
                 pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 15, 3);
+
+                pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 4, 5);
+                pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, blackBrush, 15, 165);
+                //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
 
                 int[] mc = card.getManaCost().getColors();
                 int i = 0;
+
+                //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
+                //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
 
                 for (int c = 0; c < 5; c++)
                 {
                     for (int j = 0; j < mc[c]; j++)
                     {
-                        pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 13, 5, 11, 11);
-                        pevent.Graphics.FillEllipse(brushes[c], 162 - i * 13, 5, 11, 11);
+                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
+                        pevent.Graphics.FillEllipse(brushes[c], 159 - i * 15, 7, 11, 11);
                         i++;
                     }
                 }

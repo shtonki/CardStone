@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace stonekart
 
         private string name;
         private Cost cost;
+        private Type type;
+        private Race? race;
+        private SubType? subType;
 
         public Card(CardId c, Location l) : this(c)
         {
@@ -34,19 +38,23 @@ namespace stonekart
 
             switch (cardId)
             {
-                case CardId.KAPPA:
+                case CardId.Kappa:
                 {
                     name = "Kappa";
-                    redCost = 6;
+                    blueCost = 1;
+                    type = Type.Creature;
+                    race = Race.Salamander;
                 } break;
 
-                case CardId.KEEPO:
+                case CardId.FrenziedPiranha:
                 {
-                    name = "Keepo";
-                    whiteCost = 3;
-                    blackCost = 3;
+                    name = "Frenzied Piranha";
+                    blueCost = 2;
+                    type = Type.Creature;
+                    race = Race.Fish;
                 } break;
             }
+
 
             ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
             cost = new Cost(mc);
@@ -102,10 +110,37 @@ namespace stonekart
         {
             return ImageLoader.getFrame();
         }
+
+        public String getArchtypeString()
+        {
+            return type.ToString() + " - " + 
+                (race != null ? race.ToString() + " " : "") + 
+                (subType != null ? subType.ToString() : "");
+        }
     }
     public enum CardId
     {
-        KAPPA,
-        KEEPO,
+        Kappa,
+        FrenziedPiranha,
+    }
+
+    public enum Type
+    {
+        Creature,
+        Instant, 
+        Sorcery,
+        Relic
+    }
+
+    public enum Race
+    {
+        Human,
+        Salamander,
+        Fish
+    }
+
+    public enum SubType
+    {
+        Warrior,
     }
 }
