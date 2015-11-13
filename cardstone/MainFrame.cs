@@ -19,6 +19,7 @@ namespace stonekart
         private static HandPanel handPanel;
         private static PlayerPanel heroPanel;
         private static ButtonPanel buttonPanel;
+        private static CardBox stackPanel;
 
         public static bool ready;
 
@@ -70,10 +71,16 @@ namespace stonekart
             heroPanel = new PlayerPanel();
             heroPanel.Location = new Point(20, 525);
 
+            stackPanel = new CardBox(190, 500);
+            stackPanel.Location = new Point(400, 20);
+
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
-            //Controls.Add(textPanel);
+            Controls.Add(textPanel);
+            Controls.Add(stackPanel);
+
+
 
             ready = true;
         }
@@ -89,10 +96,11 @@ namespace stonekart
             heroPanel.showAddMana();
         }
 
-        public static void setObservers(Player hero, Player villain)
+        public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
             hero.getHand().setObserver(handPanel);
+            stack.setObserver(stackPanel);
         }
 
         public static void handleCommand(string s)

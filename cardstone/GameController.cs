@@ -20,12 +20,14 @@ namespace stonekart
             hero = new Player();
             villain = new Player();
 
+            stack = new Pile();
+
             setLocations();
 
             hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.HEROSIDE));
             villain.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.VILLAINSIDE));
 
-            MainFrame.setObservers(hero, villain);
+            MainFrame.setObservers(hero, villain, stack);
 
             hero.shuffleDeck();
             villain.shuffleDeck();
@@ -43,7 +45,7 @@ namespace stonekart
             castEventHandler = new EventHander(GameEvent.CAST, delegate(GameEvent gevent)
             {
                 CastEvent e = (CastEvent)gevent;
-                e.getCard().moveTo(new Location(Location.STACK));
+                e.getCard().moveTo(new Location(Location.STACK, Location.HEROSIDE));
             });
         }
 
@@ -88,6 +90,7 @@ namespace stonekart
                         var b = (FooButton)f;
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
+                            MainFrame.showButtons(NONE);
                             return;
                         }
                     }
@@ -169,7 +172,7 @@ namespace stonekart
                 Foo f = getFoo();
                 if (f is FooButton)
                 {
-                    MainFrame.showButtons(NOTHING);
+                    MainFrame.showButtons(NONE);
                     return (FooButton)f;
                 }
             }
@@ -199,7 +202,7 @@ namespace stonekart
         }
 
         private const int
-            NOTHING = ButtonPanel.NOTHING,
+            NONE = ButtonPanel.NOTHING,
             ACCEPT = ButtonPanel.ACCEPT,
             ACCEPTCANCEL = ButtonPanel.ACCEPT | ButtonPanel.CANCEL;
 

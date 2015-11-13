@@ -69,7 +69,7 @@ namespace stonekart
             Visible = true;
             id = idCtr++;
             Size = SHOW;
-
+            /*
             MouseEnter += (sender, args) =>
             {
                 prevIndex = Parent.Controls.GetChildIndex(this);
@@ -80,7 +80,7 @@ namespace stonekart
             {
                 Parent.Controls.SetChildIndex(this, prevIndex);
             };
-
+            */
             Click += (sender, args) =>
             {
                 GameController.fooPressed(this);
@@ -107,26 +107,35 @@ namespace stonekart
                 pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
                 pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-
-                pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 4, 5);
-                pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, blackBrush, 15, 165);
-                //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
-
-                int[] mc = card.getManaCost().getColors();
-                int i = 0;
-
-                //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
-                //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
-
-                for (int c = 0; c < 5; c++)
+                try
                 {
-                    for (int j = 0; j < mc[c]; j++)
+
+                    //pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 4, 5);
+                    //pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, blackBrush, 15, 165);
+                    //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
+
+                    int[] mc = card.getManaCost().getColors();
+                    int i = 0;
+
+                    //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
+                    //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
+
+                    for (int c = 0; c < 5; c++)
                     {
-                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
-                        pevent.Graphics.FillEllipse(brushes[c], 159 - i * 15, 7, 11, 11);
-                        i++;
+                        for (int j = 0; j < mc[c]; j++)
+                        {
+                            pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
+                            pevent.Graphics.FillEllipse(brushes[c], 159 - i * 15, 7, 11, 11);
+                            i++;
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.writeLine(e);
+                    throw;
+                }
+                 
             }
         }
 
