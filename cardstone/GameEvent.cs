@@ -24,6 +24,7 @@ namespace stonekart
         {
             return type;
         }
+
     }
 
     class DrawEvent : GameEvent

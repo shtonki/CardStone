@@ -68,13 +68,6 @@ namespace stonekart
 
         private int[] colors;
 
-        /*
-        public ManaCost(params int[] cs)
-        {
-            colors = cs;
-        }
-         */
-
         public ManaCost(int white, int blue, int black, int red, int green)
         {
             colors = new int[5];

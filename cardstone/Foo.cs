@@ -8,5 +8,6 @@ namespace stonekart
 {
     interface Foo
     {
+
     }
 }
