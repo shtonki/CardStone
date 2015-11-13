@@ -31,7 +31,7 @@ namespace stonekart
             accept = new FooButton(ACCEPT);
             accept.Size = HIDE;
             accept.BackColor = Color.GhostWhite;
-            accept.Text = getMeme();
+            accept.Text = "Accept";
             accept.Font = new Font(new FontFamily("Comic Sans MS"), 12);
             accept.Location = new Point(40, 100);
             accept.Click += (sender, args) =>
@@ -54,22 +54,6 @@ namespace stonekart
             Controls.Add(cancel);
 
 
-        }
-
-
-        public string getMeme()
-        {
-            Random rng = new Random();
-            switch (rng.Next(0, 5))
-            {
-                case 0: return "trollface";
-                case 1: return "pepe";
-                case 2: return "anger man";
-                case 3: return "trololol guy";
-                case 4: return "derpina";
-                case 5: return "kappa prida";
-            }
-            return "404 meme not found";
         }
 
         public void showButtons(int i)
