@@ -57,12 +57,15 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Cost.cs" />
+    <Compile Include="FieldPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GameEvent.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Foo.cs" />
     <Compile Include="GameController.cs" />
-    <Compile Include="HandPanel.cs">
+    <Compile Include="CardPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainFrame.cs">

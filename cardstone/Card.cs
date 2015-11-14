@@ -92,6 +92,10 @@ namespace stonekart
             moveTo(p);
         }
 
+        public bool isCastable()
+        {
+            return location.getLocation() == Location.HAND;
+        }
 
         public void moveTo(Pile d)
         {

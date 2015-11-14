@@ -11,9 +11,11 @@ namespace stonekart
     {
         public const int
             DRAW = 1,
-            CAST = 2;
+            CAST = 2,
+            MOVE = 4;
 
         private int type;
+        protected Card card;
 
         public GameEvent(int type)
         {
@@ -23,6 +25,11 @@ namespace stonekart
         public int getType()
         {
             return type;
+        }
+
+        public Card getCard()
+        {
+            return card;
         }
 
     }
@@ -44,8 +51,6 @@ namespace stonekart
 
     class CastEvent : GameEvent
     {
-        private Card card;
-
         public CastEvent(Card c) : base(CAST)
         {
             card = c;
@@ -54,6 +59,13 @@ namespace stonekart
         public Card getCard()
         {
             return card;
+        }
+    }
+
+    class MoveEvent : GameEvent
+    {
+        public MoveEvent() : base(MOVE)
+        {
         }
     }
 }

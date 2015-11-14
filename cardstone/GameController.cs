@@ -24,8 +24,8 @@ namespace stonekart
 
             setLocations();
 
-            hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.HEROSIDE));
-            villain.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.FrenziedPiranha, CardId.FrenziedPiranha, }, new Location(Location.DECK, Location.VILLAINSIDE));
+            hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
+            villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
 
             MainFrame.setObservers(hero, villain, stack);
 
@@ -81,6 +81,28 @@ namespace stonekart
         {
             while (true)
             {
+                if (castOrPass())
+                {
+                    
+                }
+                else
+                {
+                    if (stack.Count > 0)
+                    {
+                        resolve(stack.peek());                       
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static bool castOrPass()
+        {
+            while (true)
+            {
                 MainFrame.showButtons(ACCEPT);
                 while (true)
                 {
@@ -91,16 +113,17 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.showButtons(NONE);
-                            return;
+                            return false;
                         }
                     }
                     else if (f is CardButton)
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        if (c.getCost().tryPay())
+                        if (c.isCastable() && c.getCost().tryPay())
                         {
                             cast(c);
+                            return true;
                         }
                     }
                 }
@@ -115,6 +138,11 @@ namespace stonekart
         private static void cast(Card c)
         {
             handleEvent(new CastEvent(c));
+        }
+
+        private static void resolve(Card c)
+        {
+            
         }
 
         private static void addMana()
@@ -214,19 +242,19 @@ namespace stonekart
         {
             public delegate void eventHandler(GameEvent e);
             private int types;
-            private eventHandler func;
+            private eventHandler main, pre, post;
 
             public EventHander(int types, eventHandler e)
             {
                 this.types = types;
-                func = e;
+                main = e;
             }
 
             public void invoke(GameEvent e)
             {
                 if ((types & e.getType()) != 0)
                 {
-                    func(e);
+                    main(e);
                 }
             }
         }
