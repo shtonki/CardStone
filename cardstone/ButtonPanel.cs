@@ -52,8 +52,6 @@ namespace stonekart
 
             Controls.Add(accept);
             Controls.Add(cancel);
-
-
         }
 
         public void showButtons(int i)
