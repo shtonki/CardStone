@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    sealed class HandPanel : Panel, Observer
+    sealed class CardPanel : Panel, Observer
     {
         //public static int WIDTH = CardButton.WIDTH*6 + 5, HEIGHT = CardButton.HEIGHT + 5;
         public static int WIDTH = 210*6+5, HEIGHT = 285;
@@ -16,7 +16,7 @@ namespace stonekart
         private const int NOOFBUTTONS = 20;
         CardButton[] cardButtons;
 
-        public HandPanel()
+        public CardPanel()
         {
             BackColor = Color.Pink;
             Size = new Size(WIDTH, HEIGHT);

@@ -16,9 +16,11 @@ namespace stonekart
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
         private static TextBox inputBox, outputBox;
-        private static HandPanel handPanel;
+        private static CardPanel cardPanel;
         private static PlayerPanel heroPanel;
         private static ButtonPanel buttonPanel;
+        private static CardBox stackPanel;
+        private static FieldPanel fieldPanel;
 
         public static bool ready;
 
@@ -31,7 +33,7 @@ namespace stonekart
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            handPanel = new HandPanel();
+            cardPanel = new CardPanel();
 
             inputBox = new TextBox();
             inputBox.KeyDown += (sender, args) =>
@@ -61,7 +63,7 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
 
-            handPanel.Location = new Point(400, 640);
+            cardPanel.Location = new Point(400, 640);
             textPanel.Location = new Point(1550, 500);
 
             buttonPanel = new ButtonPanel();
@@ -70,10 +72,18 @@ namespace stonekart
             heroPanel = new PlayerPanel();
             heroPanel.Location = new Point(20, 525);
 
+            stackPanel = new CardBox(190, 500);
+            stackPanel.Location = new Point(400, 20);
+
+            fieldPanel = new FieldPanel();
+            fieldPanel.Location = new Point(600, 20);
+
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
-            Controls.Add(handPanel);
-            //Controls.Add(textPanel);
+            Controls.Add(cardPanel);
+            Controls.Add(textPanel);
+            Controls.Add(stackPanel);
+            Controls.Add(fieldPanel);
 
             ready = true;
         }
@@ -89,10 +99,11 @@ namespace stonekart
             heroPanel.showAddMana();
         }
 
-        public static void setObservers(Player hero, Player villain)
+        public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
-            hero.getHand().setObserver(handPanel);
+            hero.getHand().setObserver(cardPanel);
+            stack.setObserver(stackPanel);
         }
 
         public static void handleCommand(string s)

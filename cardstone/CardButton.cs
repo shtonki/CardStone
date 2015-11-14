@@ -12,17 +12,7 @@ namespace stonekart
         public static int WIDTH = 180, HEIGHT = 280;
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
 
-        private static Font cardNameFont, archTypeFont, textFont, PTFont;
-        private static Brush
-            whiteBrush = new SolidBrush(Color.White),
-            blueBrush = new SolidBrush(Color.Blue),
-            blackBrush = new SolidBrush(Color.Black),
-            redBrush = new SolidBrush(Color.Red),
-            greenBrush = new SolidBrush(Color.Green), 
-            greyBrush = new SolidBrush(Color.LightSlateGray);
-
-
-        private static Brush[] brushes = new[] {whiteBrush, blueBrush, blackBrush, redBrush, greenBrush};
+        private static FontFamily fontFamilyA;
 
         private static int idCtr = 0;
 
@@ -33,16 +23,16 @@ namespace stonekart
 
         static CardButton()
         {
-            PrivateFontCollection privet = new PrivateFontCollection();
+            var a = new PrivateFontCollection();
 
             try
             {
                 //privet.AddFontFile(@"../../res/FONT/mangalb.ttf");
-                privet.AddFontFile(@"../../res/FONT/MatrixBold.ttf");
+                a.AddFontFile(@"../../res/FONT/MatrixBold.ttf");
             }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
-            FontFamily[] horfamilj = privet.Families;
-
+            fontFamilyA = a.Families[0];
+            /*
             PTFont = new Font(horfamilj[0],
                 20,
                 FontStyle.Regular,
@@ -62,6 +52,7 @@ namespace stonekart
                 13,
                 FontStyle.Regular,
                 GraphicsUnit.Pixel);
+             */
         }
 
         public CardButton()
@@ -69,7 +60,7 @@ namespace stonekart
             Visible = true;
             id = idCtr++;
             Size = SHOW;
-
+            /*
             MouseEnter += (sender, args) =>
             {
                 prevIndex = Parent.Controls.GetChildIndex(this);
@@ -80,7 +71,7 @@ namespace stonekart
             {
                 Parent.Controls.SetChildIndex(this, prevIndex);
             };
-
+            */
             Click += (sender, args) =>
             {
                 GameController.fooPressed(this);
@@ -97,36 +88,65 @@ namespace stonekart
             Size = v ? SHOW : HIDE;
         }
 
-        private static Pen manaBallPen = new Pen(blackBrush, 4);
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
             if (card != null)
             {
+                Brush b = new SolidBrush(Color.Black);
+                Font cardNameFont = new Font(fontFamilyA,
+                16,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel),
+
+                archTypeFont = new Font(fontFamilyA,
+                13,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel),
+
+                PTFont = new Font(fontFamilyA,
+                30,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel);
+
                 pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
                 pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-
-                pevent.Graphics.DrawString(card.getName(), cardNameFont, blackBrush, 4, 5);
-                pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, blackBrush, 15, 165);
-                //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
-
-                int[] mc = card.getManaCost().getColors();
-                int i = 0;
-
-                //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
-                //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
-
-                for (int c = 0; c < 5; c++)
+                try
                 {
-                    for (int j = 0; j < mc[c]; j++)
+                    //Brush b = (Brush)blackBrush.Clone();
+                    pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
+                    pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
+                    //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
+                    pevent.Graphics.DrawString("2", PTFont, b, 4, 250);
+                    pevent.Graphics.DrawString("2", PTFont, b, 154, 250);
+
+
+                    int[] mc = card.getManaCost().getColors();
+                    int i = 0;
+
+                    //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
+                    //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
+
+                    Pen manaBallPen = new Pen(b, 4);
+
+                    for (int c = 0; c < 5; c++)
                     {
-                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
-                        pevent.Graphics.FillEllipse(brushes[c], 159 - i * 15, 7, 11, 11);
-                        i++;
+                        for (int j = 0; j < mc[c]; j++)
+                        {
+                            pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
+                            pevent.Graphics.FillEllipse(b, 159 - i * 15, 7, 11, 11);
+                            i++;
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.writeLine(e);
+                    //throw;
+                }
+                 
             }
         }
 
