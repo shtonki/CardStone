@@ -133,6 +133,34 @@ namespace stonekart
 
                     for (int c = 0; c < 5; c++)
                     {
+                        switch (c)
+                        {
+                            case 0:
+                            {
+                                b = new SolidBrush(Color.White);
+                            } break;
+
+                            case 1:
+                            {
+                                b = new SolidBrush(Color.Blue);
+                            } break;
+
+                            case 2:
+                            {
+                                b = new SolidBrush(Color.Black);
+                            } break;
+                            
+                            case 3:
+                            {
+                                b = new SolidBrush(Color.Red);
+                            } break;
+                            
+                            case 4:
+                            {
+                                b = new SolidBrush(Color.Green);
+                            } break;
+
+                        }
                         for (int j = 0; j < mc[c]; j++)
                         {
                             pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
@@ -154,6 +182,27 @@ namespace stonekart
         {
             card = (Card)o;
             Visible = card != null;
+        }
+    }
+
+    class SnapCardButton : CardButton, Observer
+    {
+        private bool snapped;
+        private Point def, att;
+
+        public void notifyObserver(Observable o)
+        {
+            base.notifyObserver(o);
+
+            Card c = (Card)o;
+            Location = c.isAttacking() ? att : def;
+        }
+
+        public void setLocation(int x, int y)
+        {
+            def = new Point(x, y);
+            att = new Point(x, y - 40);
+            Location = def;
         }
     }
 }

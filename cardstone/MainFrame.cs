@@ -16,11 +16,11 @@ namespace stonekart
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
         private static TextBox inputBox, outputBox;
-        private static CardPanel cardPanel;
+        private static CardPanel handPanel;
         private static PlayerPanel heroPanel;
         private static ButtonPanel buttonPanel;
         private static CardBox stackPanel;
-        private static FieldPanel fieldPanel;
+        private static FieldPanel heroFieldPanel, villainFieldPanel;
 
         public static bool ready;
 
@@ -33,7 +33,6 @@ namespace stonekart
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            cardPanel = new CardPanel();
 
             inputBox = new TextBox();
             inputBox.KeyDown += (sender, args) =>
@@ -63,7 +62,9 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
 
-            cardPanel.Location = new Point(400, 640);
+            handPanel = new CardPanel();
+            handPanel.Location = new Point(400, 750);
+
             textPanel.Location = new Point(1550, 500);
 
             buttonPanel = new ButtonPanel();
@@ -75,15 +76,19 @@ namespace stonekart
             stackPanel = new CardBox(190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            fieldPanel = new FieldPanel();
-            fieldPanel.Location = new Point(600, 20);
+            heroFieldPanel = new FieldPanel();
+            heroFieldPanel.Location = new Point(600, 330);
+
+            villainFieldPanel = new FieldPanel();
+            villainFieldPanel.Location = new Point(600, 10);
 
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
-            Controls.Add(cardPanel);
+            Controls.Add(handPanel);
             Controls.Add(textPanel);
             Controls.Add(stackPanel);
-            Controls.Add(fieldPanel);
+            Controls.Add(heroFieldPanel);
+            Controls.Add(villainFieldPanel);
 
             ready = true;
         }
@@ -102,8 +107,9 @@ namespace stonekart
         public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
-            hero.getHand().setObserver(cardPanel);
+            hero.getHand().setObserver(handPanel);
             stack.setObserver(stackPanel);
+            hero.getField().setObserver(heroFieldPanel);
         }
 
         public static void handleCommand(string s)

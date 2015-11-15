@@ -120,6 +120,7 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
+                        c.flipAttacking();
                         if (c.isCastable() && c.getCost().tryPay())
                         {
                             cast(c);
@@ -142,7 +143,7 @@ namespace stonekart
 
         private static void resolve(Card c)
         {
-            
+            c.moveToOwners(Location.FIELD);
         }
 
         private static void addMana()
