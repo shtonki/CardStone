@@ -5,44 +5,42 @@ namespace stonekart
 {
     class FieldPanel : Panel, Foo, Observer
     {
-        private CardButton[] buttons;
+        private SnapCardButton[] buttons;
         private const int BUTTONS = 10;
 
         public FieldPanel()
         {
             BackColor = Color.IndianRed;
-            Size = new Size(900, 300);
+            Size = new Size(900, 320);
 
-            buttons = new CardButton[BUTTONS];
+            buttons = new SnapCardButton[BUTTONS];
 
             for (int i = 0; i < BUTTONS; i++)
             {
-                buttons[i] = new CardButton();
-                buttons[i].Location = new Point(5 + 183 * i, 5);
+                buttons[i] = new SnapCardButton();
+                buttons[i].setLocation(5 + 183 * i, 38);
                 Controls.Add(buttons[i]);
+                buttons[i].setVisible(false);
             }
         }
 
 
         public void notifyObserver(Observable o)
         {
-            /*
             Pile p = (Pile)o;
 
             int i = 0;
             for (; i < p.getCards().Count; i++)
             {
-                p.getCards()[i].setObserver(cardButtons[i]);
-                cardButtons[i].Location = new Point(padding * i, 0);
-                cardButtons[i].setVisible(true);
-                cardButtons[i].Invalidate();
+                p.getCards()[i].setObserver(buttons[i]);
+                buttons[i].setVisible(true);
+                buttons[i].Invalidate();
             }
 
-            for (; i < NOOFBUTTONS; i++)
+            for (; i < BUTTONS; i++)
             {
-                cardButtons[i].setVisible(false);
+                buttons[i].setVisible(false);
             }
-             */
         }
     }
 }

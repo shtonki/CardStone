@@ -16,6 +16,7 @@ namespace stonekart
         private int id;
         private CardId cardId;
         private Location location;
+        private bool attacking;
 
         private string name;
         private Cost cost;
@@ -60,6 +61,19 @@ namespace stonekart
             cost = new Cost(mc);
         }
 
+
+        public void setAttacking(bool a)
+        {
+            attacking = a;
+            notifyObserver();
+        }
+
+        public void flipAttacking()
+        {
+            setAttacking(!attacking);
+        }
+
+
         public int getId()
         {
             return id;
@@ -73,6 +87,11 @@ namespace stonekart
         public ManaCost getManaCost()
         {
             return cost.getManaCost();
+        }
+
+        public bool isCastable()
+        {
+            return location.getLocation() == Location.HAND;
         }
 
         public Cost getCost()
@@ -92,11 +111,6 @@ namespace stonekart
             moveTo(p);
         }
 
-        public bool isCastable()
-        {
-            return location.getLocation() == Location.HAND;
-        }
-
         public void moveTo(Pile d)
         {
             Pile p = location.getPile();
@@ -104,6 +118,12 @@ namespace stonekart
             d.add(this);
             location = d.getLocation();
         }
+
+        public bool isAttacking()
+        {
+            return attacking;
+        }
+
 
         public Image getArt()
         {
