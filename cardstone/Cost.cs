@@ -8,21 +8,21 @@ namespace stonekart
         private ManaCost manaCost;
         private List<Coster> costs;
 
-        public bool tryPay()
+        public bool tryPay(Player p)
         {
-            if (checkAll())
+            if (checkAll(p))
             {
-                payAll();
+                payAll(p);
                 return true;
             }
             return false;
         }
 
-        private bool checkAll()
+        private bool checkAll(Player p)
         {
             foreach (Coster c in costs)
             {
-                if (!c.check())
+                if (!c.check(p))
                 {
                     return false;
                 }
@@ -30,11 +30,11 @@ namespace stonekart
             return true;
         }
 
-        private void payAll()
+        private void payAll(Player p)
         {
             foreach (Coster c in costs)
             {
-                c.pay();
+                c.pay(p);
             }
         }
 
@@ -53,8 +53,8 @@ namespace stonekart
 
     public abstract class Coster
     {
-        public abstract bool check();
-        abstract public void pay();
+        public abstract bool check(Player p);
+        abstract public void pay(Player p);
     }
 
     public class ManaCost : Coster
@@ -78,11 +78,11 @@ namespace stonekart
             colors[GREEN] = green;
         }
 
-        public override bool check()
+        public override bool check(Player p)
         {
             for (int i = 0; i < 5; i++)
             {
-                if (GameController.getHero().getCurrentMana(i) < colors[i])
+                if (p.getCurrentMana(i) < colors[i])
                 {
                     return false;
                 }
@@ -90,11 +90,11 @@ namespace stonekart
             return true;
         }
 
-        public override void pay()
+        public override void pay(Player p)
         {
             for (int i = 0; i < 5; i++)
             {
-                GameController.getHero().spendMana(i, colors[i]);
+                p.spendMana(i, colors[i]);
             }
         }
 

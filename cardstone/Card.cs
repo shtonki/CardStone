@@ -23,6 +23,9 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
+        private Effect resolveEffect;
+
+        private int? power, toughness;
 
         public Card(CardId c, Location l) : this(c)
         {
@@ -42,23 +45,33 @@ namespace stonekart
                 case CardId.Kappa:
                 {
                     name = "Kappa";
-                    blueCost = 1;
+                    blueCost = 2;
+                    power = 1;
+                    toughness = 3;
                     type = Type.Creature;
                     race = Race.Salamander;
                 } break;
 
-                case CardId.FrenziedPiranha:
+                case CardId.BearCavalary:
                 {
-                    name = "Frenzied Piranha";
-                    blueCost = 2;
+                    name = "Bear Cavalary";
+                    greenCost = 2;
                     type = Type.Creature;
-                    race = Race.Fish;
+                    race = Race.Bear;
+                    subType = SubType.Warrior;
+                    power = 2;
+                    toughness = 3;
                 } break;
             }
 
 
             ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
             cost = new Cost(mc);
+
+            if ((power == null) != (toughness == null))
+            {
+                throw new Exception("bad thing b0ss");
+            }
         }
 
 
@@ -129,6 +142,20 @@ namespace stonekart
             return type == Type.Instant;
         }
 
+        public bool hasPT()
+        {
+            return power != null;
+        }
+
+        public int getPower()
+        {
+            return power.GetValueOrDefault();
+        }
+
+        public int getToughness()
+        {
+            return toughness.GetValueOrDefault();
+        }
 
         public Image getArt()
         {
@@ -151,7 +178,8 @@ namespace stonekart
     public enum CardId
     {
         Kappa,
-        FrenziedPiranha,
+        //FrenziedPiranha,
+        BearCavalary,
     }
 
     public enum Type
@@ -166,7 +194,8 @@ namespace stonekart
     {
         Human,
         Salamander,
-        Fish
+        Fish,
+        Bear
     }
 
     public enum SubType

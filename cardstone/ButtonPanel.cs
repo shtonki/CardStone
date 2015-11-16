@@ -34,7 +34,7 @@ namespace stonekart
             textLabel.Size = new Size(280, 40);
             textLabel.Location = new Point(10, 10);
             textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
-
+            
             accept = new FooButton(ACCEPT);
             accept.Size = HIDE;
             accept.BackColor = Color.GhostWhite;

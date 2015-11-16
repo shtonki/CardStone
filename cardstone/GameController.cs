@@ -24,7 +24,7 @@ namespace stonekart
 
             setLocations();
 
-            hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
+            hero.loadDeck(new[] { CardId.BearCavalary, CardId.BearCavalary, CardId.BearCavalary, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
             villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
 
             MainFrame.setObservers(hero, villain, stack);
@@ -134,7 +134,7 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay())
+                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay(hero))
                         {
                             cast(c);
                             return true;

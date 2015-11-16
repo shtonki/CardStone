@@ -88,6 +88,8 @@ namespace stonekart
             Size = v ? SHOW : HIDE;
         }
 
+        private const int w = 33;
+
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
@@ -113,68 +115,76 @@ namespace stonekart
                 pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
                 pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                try
+                
+                //Brush b = (Brush)blackBrush.Clone();
+                pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
+                pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
+                //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
+
+
+
+                int[] mc = card.getManaCost().getColors();
+                int i = 0;
+
+
+                Pen manaBallPen = new Pen(b, 4);
+
+                    
+
+                for (int c = 0; c < 5; c++)
                 {
-                    //Brush b = (Brush)blackBrush.Clone();
-                    pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
-                    pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
-                    //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
-                    pevent.Graphics.DrawString("2", PTFont, b, 4, 250);
-                    pevent.Graphics.DrawString("2", PTFont, b, 154, 250);
-
-
-                    int[] mc = card.getManaCost().getColors();
-                    int i = 0;
-
-                    //pevent.Graphics.DrawEllipse(manaBallPen, 162 - i * 15, 7, 11, 11);
-                    //pevent.Graphics.FillEllipse(greyBrush, 158 , 6, 14, 14);
-
-                    Pen manaBallPen = new Pen(b, 4);
-
-                    for (int c = 0; c < 5; c++)
+                    switch (c)
                     {
-                        switch (c)
+                        case 0:
                         {
-                            case 0:
-                            {
-                                b = new SolidBrush(Color.White);
-                            } break;
+                            b = new SolidBrush(Color.White);
+                        } break;
 
-                            case 1:
-                            {
-                                b = new SolidBrush(Color.Blue);
-                            } break;
-
-                            case 2:
-                            {
-                                b = new SolidBrush(Color.Black);
-                            } break;
-                            
-                            case 3:
-                            {
-                                b = new SolidBrush(Color.Red);
-                            } break;
-                            
-                            case 4:
-                            {
-                                b = new SolidBrush(Color.Green);
-                            } break;
-
-                        }
-                        for (int j = 0; j < mc[c]; j++)
+                        case 1:
                         {
-                            pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 11, 11);
-                            pevent.Graphics.FillEllipse(b, 159 - i * 15, 7, 11, 11);
-                            i++;
-                        }
+                            b = new SolidBrush(Color.Blue);
+                        } break;
+
+                        case 2:
+                        {
+                            b = new SolidBrush(Color.Black);
+                        } break;
+                            
+                        case 3:
+                        {
+                            b = new SolidBrush(Color.Red);
+                        } break;
+                            
+                        case 4:
+                        {
+                            b = new SolidBrush(Color.Green);
+                        } break;
+
+                    }
+                    for (int j = 0; j < mc[c]; j++)
+                    {
+                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 10, 10);
+                        pevent.Graphics.FillEllipse(b, 159 - i * 15, 7, 10, 10);
+                        i++;
                     }
                 }
-                catch (Exception e)
+
+                if (card.hasPT())
                 {
-                    Console.writeLine(e);
-                    //throw;
+                    Brush p = new SolidBrush(Color.Silver);
+                    b = new SolidBrush(Color.Black);
+
+                    pevent.Graphics.FillEllipse(p, -w, 280 - w, 2 * w, 2 * w);
+                    pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
+                    pevent.Graphics.DrawString(card.getPower().ToString(), PTFont, b, 4, 250);
+                    pevent.Graphics.DrawString(card.getToughness().ToString(), PTFont, b, 154, 250);
                 }
-                 
+
+                /*
+                pevent.Graphics.FillEllipse(new SolidBrush(Color.LightSlateGray), 158 - i * 15, 5, 14, 14);
+                Font gcFont = new Font(fontFamilyA, 18, FontStyle.Regular, GraphicsUnit.Pixel);
+                pevent.Graphics.DrawString("2", gcFont, new SolidBrush(Color.Black), 159 - i * 15, 2);
+                 */
             }
         }
 
