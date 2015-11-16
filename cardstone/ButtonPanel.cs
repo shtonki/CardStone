@@ -23,10 +23,17 @@ namespace stonekart
             HIDE = new Size(0, 0),
             SHOW = new Size(90, 30);
 
+        private Label textLabel;
+
         public ButtonPanel()
         {
             BackColor = Color.CornflowerBlue;
             Size = new Size(300, 200);
+
+            textLabel = new Label();
+            textLabel.Size = new Size(280, 40);
+            textLabel.Location = new Point(10, 10);
+            textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
 
             accept = new FooButton(ACCEPT);
             accept.Size = HIDE;
@@ -50,8 +57,21 @@ namespace stonekart
                 buttonPressed(cancel);
             };
 
+            Controls.Add(textLabel);
             Controls.Add(accept);
             Controls.Add(cancel);
+
+            
+        }
+
+        public void setText(string s)
+        {
+            if (s == null)
+            {
+                return;
+            }
+
+            textLabel.Text = s;
         }
 
         public void showButtons(int i)

@@ -21,6 +21,7 @@ namespace stonekart
         private static ButtonPanel buttonPanel;
         private static CardBox stackPanel;
         private static FieldPanel heroFieldPanel, villainFieldPanel;
+        private static TurnPanel turnPanel;
 
         public static bool ready;
 
@@ -55,6 +56,7 @@ namespace stonekart
             FlowLayoutPanel textPanel = new FlowLayoutPanel();
             textPanel.FlowDirection = FlowDirection.LeftToRight;
             textPanel.Size = new Size(200, 440);
+            textPanel.Location = new Point(1550, 100);
 
             Button c = new CardButton();
             Button d = new CardButton();
@@ -63,9 +65,8 @@ namespace stonekart
             textPanel.Controls.Add(inputBox);
 
             handPanel = new CardPanel();
-            handPanel.Location = new Point(400, 750);
+            handPanel.Location = new Point(400, 660);
 
-            textPanel.Location = new Point(1550, 500);
 
             buttonPanel = new ButtonPanel();
             buttonPanel.Location = new Point(20, 300);
@@ -82,6 +83,9 @@ namespace stonekart
             villainFieldPanel = new FieldPanel();
             villainFieldPanel.Location = new Point(600, 10);
 
+            turnPanel = new TurnPanel();
+            turnPanel.Location = new Point(325, 200);
+
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
@@ -89,10 +93,16 @@ namespace stonekart
             Controls.Add(stackPanel);
             Controls.Add(heroFieldPanel);
             Controls.Add(villainFieldPanel);
+            Controls.Add(turnPanel);
 
             ready = true;
         }
 
+
+        public static void setMessage(String s)
+        {
+            buttonPanel.setText(s);
+        }
 
         public static void showButtons(int i)
         {
@@ -103,6 +113,12 @@ namespace stonekart
         {
             heroPanel.showAddMana();
         }
+
+        public static void advanceStep()
+        {
+            turnPanel.advanceStep();
+        }
+
 
         public static void setObservers(Player hero, Player villain, Pile stack)
         {

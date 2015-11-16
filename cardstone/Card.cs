@@ -68,7 +68,7 @@ namespace stonekart
             notifyObserver();
         }
 
-        public void flipAttacking()
+        public void toggleAttacking()
         {
             setAttacking(!attacking);
         }
@@ -124,6 +124,11 @@ namespace stonekart
             return attacking;
         }
 
+        public bool isInstant()
+        {
+            return type == Type.Instant;
+        }
+
 
         public Image getArt()
         {
@@ -141,6 +146,7 @@ namespace stonekart
                 (race != null ? race.ToString() + " " : "") + 
                 (subType != null ? subType.ToString() : "");
         }
+
     }
     public enum CardId
     {

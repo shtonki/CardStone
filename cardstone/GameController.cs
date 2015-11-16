@@ -70,18 +70,32 @@ namespace stonekart
         {
             while (true)
             {
+                //refill step
                 hero.resetMana();
                 addMana();
+                MainFrame.advanceStep();
+
+                //draw step
                 draw();
-                mainPhase();
+                givePriority(false);
+                MainFrame.advanceStep();
+
+                //main phase 1
+                givePriority(true);
+                MainFrame.advanceStep();
+
+                //attackers
+                choseAttackers();
+                givePriority(false);
+                MainFrame.advanceStep();
             }
         }
 
-        private static void mainPhase()
+        private static void givePriority(bool main)
         {
             while (true)
             {
-                if (castOrPass())
+                if (castOrPass(main))
                 {
                     
                 }
@@ -99,7 +113,7 @@ namespace stonekart
             }
         }
 
-        private static bool castOrPass()
+        private static bool castOrPass(bool main)
         {
             while (true)
             {
@@ -120,12 +134,38 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        c.flipAttacking();
-                        if (c.isCastable() && c.getCost().tryPay())
+                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay())
                         {
                             cast(c);
                             return true;
                         }
+                    }
+                }
+            }
+        }
+
+        private static void choseAttackers()
+        {
+            while (true)
+            {
+                MainFrame.showButtons(ACCEPT);
+                while (true)
+                {
+                    Foo f = getFoo();
+                    if (f is FooButton)
+                    {
+                        var b = (FooButton)f;
+                        if (b.getType() == ButtonPanel.ACCEPT)
+                        {
+                            MainFrame.showButtons(NONE);
+                            return;
+                        }
+                    }
+                    else if (f is CardButton)
+                    {
+                        CardButton b = (CardButton)f;
+                        Card c = b.getCard();
+                        c.toggleAttacking();
                     }
                 }
             }
