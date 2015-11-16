@@ -62,6 +62,14 @@ namespace stonekart
                     power = 2;
                     toughness = 3;
                 } break;
+
+                case CardId.LightningBolt:
+                {
+                    name = "Lightning Bolt";
+                    redCost = 1;
+                    type = Type.Instant;
+                    //Effect = 
+                } break;
             }
 
 
@@ -180,6 +188,7 @@ namespace stonekart
         Kappa,
         //FrenziedPiranha,
         BearCavalary,
+        LightningBolt,
     }
 
     public enum Type
