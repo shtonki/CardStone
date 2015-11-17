@@ -99,6 +99,12 @@ namespace stonekart
         }
 
 
+        public static void clear()
+        {
+            setMessage("");
+            showButtons(ButtonPanel.NOTHING);
+        }
+
         public static void setMessage(String s)
         {
             buttonPanel.setText(s);

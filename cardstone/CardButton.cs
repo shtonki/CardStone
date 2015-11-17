@@ -27,8 +27,8 @@ namespace stonekart
 
             try
             {
-                //privet.AddFontFile(@"../../res/FONT/mangalb.ttf");
-                a.AddFontFile(@"../../res/FONT/MatrixBold.ttf");
+                //privet.AddFontFile(@"res/FONT/mangalb.ttf");
+                a.AddFontFile(@"res/FONT/MatrixBold.ttf");
             }
             catch(Exception e) { System.Console.WriteLine(e.Message); }
             fontFamilyA = a.Families[0];

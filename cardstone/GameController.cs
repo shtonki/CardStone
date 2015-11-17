@@ -72,22 +72,50 @@ namespace stonekart
             {
                 //refill step
                 hero.resetMana();
+                unTop(hero);
                 addMana();
-                MainFrame.advanceStep();
+                givePriority(false);
+                advanceStep();
 
                 //draw step
                 draw();
                 givePriority(false);
-                MainFrame.advanceStep();
+                advanceStep();
 
                 //main phase 1
                 givePriority(true);
-                MainFrame.advanceStep();
+                advanceStep();
+
+                //startCombat
+                givePriority(false);
+                advanceStep();
 
                 //attackers
                 choseAttackers();
                 givePriority(false);
-                MainFrame.advanceStep();
+                advanceStep();
+
+                //blockers
+                choseBlockers();
+                givePriority(false);
+                advanceStep();
+
+                //combatDamage
+                combatDamage();
+                givePriority(false);
+                advanceStep();
+
+                //endCombat
+                givePriority(false);
+                advanceStep();
+
+                //main2
+                givePriority(true);
+                advanceStep();
+
+                //end
+                givePriority(false);
+                advanceStep();
             }
         }
 
@@ -113,8 +141,14 @@ namespace stonekart
             }
         }
 
+        private static void advanceStep()
+        {
+            MainFrame.advanceStep();
+        }
+
         private static bool castOrPass(bool main)
         {
+            MainFrame.setMessage("You have priority");
             while (true)
             {
                 MainFrame.showButtons(ACCEPT);
@@ -126,7 +160,7 @@ namespace stonekart
                         var b = (FooButton)f;
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
-                            MainFrame.showButtons(NONE);
+                            MainFrame.clear();
                             return false;
                         }
                     }
@@ -136,6 +170,7 @@ namespace stonekart
                         Card c = b.getCard();
                         if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay(hero))
                         {
+                            MainFrame.clear();
                             cast(c);
                             return true;
                         }
@@ -163,11 +198,30 @@ namespace stonekart
                     }
                     else if (f is CardButton)
                     {
+
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        c.toggleAttacking();
+                        if (c.canAttack()) { c.toggleAttacking(); }
                     }
                 }
+            }
+        }
+
+        private static void choseBlockers()
+        {
+            
+        }
+
+        private static void combatDamage()
+        {
+            
+        }
+
+        private static void unTop(Player p)
+        {
+            foreach (Card c in p.getField().getCards())
+            {
+                c.unTop();
             }
         }
 

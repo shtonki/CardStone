@@ -7,3 +7,5 @@
 /obj/Debug/*.cs
 pushaT.bat
 *.suo
+bin/Debug/settings
+stonekart.v12.suo

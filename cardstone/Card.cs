@@ -26,6 +26,7 @@ namespace stonekart
         private Effect resolveEffect;
 
         private int? power, toughness;
+        private bool summoningSick;
 
         public Card(CardId c, Location l) : this(c)
         {
@@ -120,6 +121,13 @@ namespace stonekart
             return cost;
         }
 
+
+        public void unTop()
+        {
+            setAttacking(false);
+            summoningSick = false;
+        }
+
         public void moveTo(Location l)
         {
             Pile p = l.getPile();
@@ -138,7 +146,9 @@ namespace stonekart
             if (p != null) { p.remove(this); }
             d.add(this);
             location = d.getLocation();
+            summoningSick = true;
         }
+
 
         public bool isAttacking()
         {
@@ -164,6 +174,12 @@ namespace stonekart
         {
             return toughness.GetValueOrDefault();
         }
+        
+        public bool canAttack()
+        {
+            return !summoningSick;
+        }
+
 
         public Image getArt()
         {
