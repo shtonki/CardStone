@@ -195,6 +195,11 @@ namespace stonekart
             turnPanel.advanceStep();
         }
 
+        public static void setMessage(string s)
+        {
+            buttonPanel.
+        }
+
         public static void showButtons(int i)
         {
             buttonPanel.showButtons(i);
