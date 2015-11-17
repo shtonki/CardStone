@@ -23,8 +23,13 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
+        private Effect resolveEffect;
 
-        public Card(CardId c, Location l) : this(c)
+        private int? power, toughness;
+        private bool summoningSick;
+
+        public Card(CardId c, Location l)
+            : this(c)
         {
             location = l;
         }
@@ -40,25 +45,43 @@ namespace stonekart
             switch (cardId)
             {
                 case CardId.Kappa:
-                {
-                    name = "Kappa";
-                    blueCost = 1;
-                    type = Type.Creature;
-                    race = Race.Salamander;
-                } break;
+                    {
+                        name = "Kappa";
+                        blueCost = 2;
+                        power = 1;
+                        toughness = 3;
+                        type = Type.Creature;
+                        race = Race.Salamander;
+                    } break;
 
-                case CardId.FrenziedPiranha:
-                {
-                    name = "Frenzied Piranha";
-                    blueCost = 2;
-                    type = Type.Creature;
-                    race = Race.Fish;
-                } break;
+                case CardId.BearCavalary:
+                    {
+                        name = "Bear Cavalary";
+                        greenCost = 2;
+                        type = Type.Creature;
+                        race = Race.Bear;
+                        subType = SubType.Warrior;
+                        power = 2;
+                        toughness = 3;
+                    } break;
+
+                case CardId.LightningBolt:
+                    {
+                        name = "Lightning Bolt";
+                        redCost = 1;
+                        type = Type.Instant;
+                        //Effect = 
+                    } break;
             }
 
 
             ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
             cost = new Cost(mc);
+
+            if ((power == null) != (toughness == null))
+            {
+                throw new Exception("bad thing b0ss");
+            }
         }
 
 
@@ -68,7 +91,7 @@ namespace stonekart
             notifyObserver();
         }
 
-        public void flipAttacking()
+        public void toggleAttacking()
         {
             setAttacking(!attacking);
         }
@@ -99,6 +122,13 @@ namespace stonekart
             return cost;
         }
 
+
+        public void unTop()
+        {
+            setAttacking(false);
+            summoningSick = false;
+        }
+
         public void moveTo(Location l)
         {
             Pile p = l.getPile();
@@ -117,11 +147,38 @@ namespace stonekart
             if (p != null) { p.remove(this); }
             d.add(this);
             location = d.getLocation();
+            summoningSick = true;
         }
+
 
         public bool isAttacking()
         {
             return attacking;
+        }
+
+        public bool isInstant()
+        {
+            return type == Type.Instant;
+        }
+
+        public bool hasPT()
+        {
+            return power != null;
+        }
+
+        public int getPower()
+        {
+            return power.GetValueOrDefault();
+        }
+
+        public int getToughness()
+        {
+            return toughness.GetValueOrDefault();
+        }
+
+        public bool canAttack()
+        {
+            return !summoningSick;
         }
 
 
@@ -137,21 +194,24 @@ namespace stonekart
 
         public String getArchtypeString()
         {
-            return type.ToString() + " - " + 
-                (race != null ? race.ToString() + " " : "") + 
+            return type.ToString() + " - " +
+                (race != null ? race.ToString() + " " : "") +
                 (subType != null ? subType.ToString() : "");
         }
+
     }
     public enum CardId
     {
         Kappa,
-        FrenziedPiranha,
+        //FrenziedPiranha,
+        BearCavalary,
+        LightningBolt,
     }
 
     public enum Type
     {
         Creature,
-        Instant, 
+        Instant,
         Sorcery,
         Relic
     }
@@ -160,7 +220,8 @@ namespace stonekart
     {
         Human,
         Salamander,
-        Fish
+        Fish,
+        Bear
     }
 
     public enum SubType

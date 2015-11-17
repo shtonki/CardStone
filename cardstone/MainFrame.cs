@@ -31,6 +31,7 @@ namespace stonekart
         private static ButtonPanel buttonPanel;
         private static CardBox stackPanel;
         private static FieldPanel heroFieldPanel, villainFieldPanel;
+        private static TurnPanel turnPanel;
 
         
         public MainFrame()
@@ -105,15 +106,14 @@ namespace stonekart
             villainFieldPanel = new FieldPanel();
             villainFieldPanel.Location = new Point(600, 10);
 
-<<<<<<< Updated upstream
-            Controls.Add(buttonPanel);
-            Controls.Add(heroPanel);
-            Controls.Add(handPanel);
-            Controls.Add(textPanel);
-            Controls.Add(stackPanel);
-            Controls.Add(heroFieldPanel);
-            Controls.Add(villainFieldPanel);
-=======
+            gamePanel.Controls.Add(buttonPanel);
+            gamePanel.Controls.Add(heroPanel);
+            gamePanel.Controls.Add(handPanel);
+            gamePanel.Controls.Add(textPanel);
+            gamePanel.Controls.Add(stackPanel);
+            gamePanel.Controls.Add(heroFieldPanel);
+            gamePanel.Controls.Add(villainFieldPanel);
+            
             turnPanel = new TurnPanel();
             turnPanel.Location = new Point(325, 200);
 
@@ -135,7 +135,6 @@ namespace stonekart
             loginPanel = new Panel();
             loginPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             loginPanel.BackColor = Color.DarkRed;
->>>>>>> Stashed changes
 
 
             Panel panel = new Panel();
@@ -190,6 +189,11 @@ namespace stonekart
             }
         }
 
+
+        public static void advanceStep()
+        {
+            turnPanel.advanceStep();
+        }
 
         public static void showButtons(int i)
         {

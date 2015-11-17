@@ -82,7 +82,7 @@ namespace stonekart
         {
             for (int i = 0; i < 5; i++)
             {
-                if (GameController.getHero().getCurrentMana(i) < colors[i])
+                if (GameController.currentGame.getHero().getCurrentMana(i) < colors[i])
                 {
                     return false;
                 }
@@ -94,7 +94,7 @@ namespace stonekart
         {
             for (int i = 0; i < 5; i++)
             {
-                GameController.getHero().spendMana(i, colors[i]);
+                GameController.currentGame.getHero().spendMana(i, colors[i]);
             }
         }
 

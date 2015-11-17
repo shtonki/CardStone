@@ -83,13 +83,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-<<<<<<< Updated upstream
-=======
     <Compile Include="Settings.cs" />
     <Compile Include="TurnPanel.cs">
       <SubType>Component</SubType>
     </Compile>
->>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
