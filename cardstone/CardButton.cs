@@ -30,7 +30,7 @@ namespace stonekart
                 //privet.AddFontFile(@"res/FONT/mangalb.ttf");
                 a.AddFontFile(@"res/FONT/MatrixBold.ttf");
             }
-            catch(Exception e) { System.Console.WriteLine(e.Message); }
+            catch (Exception e) { System.Console.WriteLine(e.Message); }
             fontFamilyA = a.Families[0];
             /*
             PTFont = new Font(horfamilj[0],
@@ -74,7 +74,7 @@ namespace stonekart
             */
             Click += (sender, args) =>
             {
-                GameController.fooPressed(this);
+                GameController.currentGame.fooPressed(this);
             };
         }
 
@@ -92,7 +92,7 @@ namespace stonekart
 
         protected override void OnPaint(PaintEventArgs pevent)
         {
-            base.OnPaint(pevent);
+            //base.OnPaint(pevent);
             if (card != null)
             {
                 Brush b = new SolidBrush(Color.Black);
@@ -115,7 +115,7 @@ namespace stonekart
                 pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
                 pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                
+
                 //Brush b = (Brush)blackBrush.Clone();
                 pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
@@ -129,36 +129,36 @@ namespace stonekart
 
                 Pen manaBallPen = new Pen(b, 4);
 
-                    
+
 
                 for (int c = 0; c < 5; c++)
                 {
                     switch (c)
                     {
                         case 0:
-                        {
-                            b = new SolidBrush(Color.White);
-                        } break;
+                            {
+                                b = new SolidBrush(Color.White);
+                            } break;
 
                         case 1:
-                        {
-                            b = new SolidBrush(Color.Blue);
-                        } break;
+                            {
+                                b = new SolidBrush(Color.Blue);
+                            } break;
 
                         case 2:
-                        {
-                            b = new SolidBrush(Color.Black);
-                        } break;
-                            
+                            {
+                                b = new SolidBrush(Color.Black);
+                            } break;
+
                         case 3:
-                        {
-                            b = new SolidBrush(Color.Red);
-                        } break;
-                            
+                            {
+                                b = new SolidBrush(Color.Red);
+                            } break;
+
                         case 4:
-                        {
-                            b = new SolidBrush(Color.Green);
-                        } break;
+                            {
+                                b = new SolidBrush(Color.Green);
+                            } break;
 
                     }
                     for (int j = 0; j < mc[c]; j++)

@@ -1,5 +1,4 @@
-﻿
-namespace stonekart
+﻿namespace stonekart
 {
     class Effect
     {

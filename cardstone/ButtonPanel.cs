@@ -19,7 +19,7 @@ namespace stonekart
             CANCEL = 1,
             ACCEPT = 2;
 
-        private static Size 
+        private static Size
             HIDE = new Size(0, 0),
             SHOW = new Size(90, 30);
 
@@ -34,7 +34,7 @@ namespace stonekart
             textLabel.Size = new Size(280, 40);
             textLabel.Location = new Point(10, 10);
             textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
-            
+
             accept = new FooButton(ACCEPT);
             accept.Size = HIDE;
             accept.BackColor = Color.GhostWhite;
@@ -61,7 +61,7 @@ namespace stonekart
             Controls.Add(accept);
             Controls.Add(cancel);
 
-            
+
         }
 
         public void setText(string s)
@@ -82,7 +82,7 @@ namespace stonekart
 
         private void buttonPressed(FooButton b)
         {
-            GameController.fooPressed(b);
+            GameController.currentGame.fooPressed(b);
         }
     }
 

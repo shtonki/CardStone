@@ -4,10 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cardstone
+namespace stonekart
 {
-    class Network
+    static class Network
     {
+        private static ServerConnection serverConnection;
+
+        public static void connect()
+        {
+            serverConnection = new ServerConnection();
+        }
+
+        public static bool login(string name)
+        {
+            if (serverConnection.handshake(name))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
 
@@ -34,19 +52,19 @@ namespace cardstone
             {
                 case "handshakeok":
                     {
-                        Console.WriteLine("Connected");
+                        System.Console.WriteLine("Connected");
                         return true;
                     }
 
                 case "error":
                     {
-                        Console.WriteLine(ss[1]);
+                        System.Console.WriteLine(ss[1]);
                         return false;
                     } break;
 
                 default:
                     {
-                        Console.WriteLine("Uknown return {0}", s);
+                        System.Console.WriteLine("Uknown return {0}", s);
                     } break;
             }
 

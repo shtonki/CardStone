@@ -73,7 +73,7 @@ namespace stonekart
         private static void manaButtonPressed(int i, ManaButton b)
         {
             if (b.getState() == ManaButton.HIDDEN) { return; }
-            GameController.fooPressed(b);
+            GameController.currentGame.fooPressed(b);
         }
 
         public void showAddMana()
