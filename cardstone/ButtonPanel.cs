@@ -64,7 +64,7 @@ namespace stonekart
 
         private void buttonPressed(FooButton b)
         {
-            GameController.fooPressed(b);
+            GameController.currentGame.fooPressed(b);
         }
     }
 

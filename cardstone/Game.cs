@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
+using System.Windows.Forms;
+
 
 namespace stonekart
 {
-    static class GameController
+    class Game
     {
-<<<<<<< Updated upstream
-        private static Player hero, villain;
-        private static Pile stack;
+        private Player hero, villain;
+        private Pile stack;
 
-        public static void start()
+        public Game()
         {
-            Thread.Sleep(100);
-
             setupEventHandlers();
 
             hero = new Player();
@@ -24,8 +21,14 @@ namespace stonekart
             stack = new Pile();
 
             setLocations();
+        }
 
-            hero.loadDeck(new[] { CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
+        public void start()
+        {
+            //Thread.Sleep(100);
+
+
+            hero.loadDeck(new[] { CardId.BearCavalary, CardId.BearCavalary, CardId.BearCavalary, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
             villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
 
             MainFrame.setObservers(hero, villain, stack);
@@ -36,7 +39,7 @@ namespace stonekart
             loop();
         }
 
-        private static void setupEventHandlers()
+        private void setupEventHandlers()
         {
             drawEventHandler = new EventHander(GameEvent.DRAW, delegate(GameEvent gevent)
             {
@@ -50,7 +53,7 @@ namespace stonekart
             });
         }
 
-        private static void setLocations()
+        private void setLocations()
         {
             Location.setPile(Location.HAND, Location.HEROSIDE, hero.getHand());
             Location.setPile(Location.DECK, Location.HEROSIDE, hero.getDeck());
@@ -67,22 +70,64 @@ namespace stonekart
             Location.setPile(Location.STACK, Location.HEROSIDE, stack);
         }
 
-        private static void loop()
+        private void loop()
         {
             while (true)
             {
+                //refill step
                 hero.resetMana();
+                unTop(hero);
                 addMana();
+                givePriority(false);
+                advanceStep();
+
+                //draw step
                 draw();
-                mainPhase();
+                givePriority(false);
+                advanceStep();
+
+                //main phase 1
+                givePriority(true);
+                advanceStep();
+
+                //startCombat
+                givePriority(false);
+                advanceStep();
+
+                //attackers
+                choseAttackers();
+                givePriority(false);
+                advanceStep();
+
+                //blockers
+                choseBlockers();
+                givePriority(false);
+                advanceStep();
+
+                //combatDamage
+                combatDamage();
+                givePriority(false);
+                advanceStep();
+
+                //endCombat
+                givePriority(false);
+                advanceStep();
+
+                //main2
+                givePriority(true);
+                advanceStep();
+
+                //end
+                givePriority(false);
+                advanceStep();
             }
         }
 
-        private static void mainPhase()
+        private void givePriority(bool main)
         {
             while (true)
             {
-                if (castOrPass())
+                if (castOrPass(main))
                 {
                     
                 }
@@ -100,7 +145,45 @@ namespace stonekart
             }
         }
 
-        private static bool castOrPass()
+        private void advanceStep()
+        {
+            MainFrame.advanceStep();
+        }
+
+        private bool castOrPass(bool main)
+        {
+            MainFrame.setMessage("You have priority");
+            while (true)
+            {
+                MainFrame.showButtons(ACCEPT);
+                while (true)
+                {
+                    Foo f = getFoo();
+                    if (f is FooButton)
+                    {
+                        var b = (FooButton)f;
+                        if (b.getType() == ButtonPanel.ACCEPT)
+                        {
+                            MainFrame.clear();
+                            return false;
+                        }
+                    }
+                    else if (f is CardButton)
+                    {
+                        CardButton b = (CardButton)f;
+                        Card c = b.getCard();
+                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay(hero))
+                        {
+                            MainFrame.clear();
+                            cast(c);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void choseAttackers()
         {
             while (true)
             {
@@ -114,40 +197,54 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.showButtons(NONE);
-                            return false;
+                            return;
                         }
                     }
                     else if (f is CardButton)
                     {
+
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        c.flipAttacking();
-                        if (c.isCastable() && c.getCost().tryPay())
-                        {
-                            cast(c);
-                            return true;
-                        }
+                        if (c.canAttack()) { c.toggleAttacking(); }
                     }
                 }
             }
         }
 
-        private static void draw()
+        private void choseBlockers()
+        {
+            
+        }
+
+        private void combatDamage()
+        {
+            
+        }
+
+        private void unTop(Player p)
+        {
+            foreach (Card c in p.getField().getCards())
+            {
+                c.unTop();
+            }
+        }
+
+        private void draw()
         {
             handleEvent(new DrawEvent(true));
         }
 
-        private static void cast(Card c)
+        private void cast(Card c)
         {
             handleEvent(new CastEvent(c));
         }
 
-        private static void resolve(Card c)
+        private void resolve(Card c)
         {
             c.moveToOwners(Location.FIELD);
         }
 
-        private static void addMana()
+        private void addMana()
         {
             MainFrame.showAddMana();
             int c;
@@ -158,21 +255,21 @@ namespace stonekart
             hero.addMana(c);
         }
 
-        public static Player getHero()
+        public Player getHero()
         {
             return hero;
         }
 
-        public static void handleEvent(GameEvent e)
+        public void handleEvent(GameEvent e)
         {
             drawEventHandler.invoke(e);
             castEventHandler.invoke(e);
         }
 
-        private static Foo f;
-        private static AutoResetEvent e = new AutoResetEvent(false);
+        private Foo f;
+        private AutoResetEvent e = new AutoResetEvent(false);
 
-        private static Foo getFoo()
+        private Foo getFoo()
         {
             e.WaitOne();
             if (f == null) { throw new Exception("this should never happen kappa"); }
@@ -182,7 +279,7 @@ namespace stonekart
             return r;
         }
 
-        private static Card getCard()
+        private Card getCard()
         {
             while (true)
             {
@@ -194,7 +291,7 @@ namespace stonekart
             }
         }
 
-        private static FooButton getButton(int i)
+        private FooButton getButton(int i)
         {
             MainFrame.showButtons(i);
             while (true)
@@ -208,7 +305,7 @@ namespace stonekart
             }
         }
 
-        private static int getManaColor()
+        private int getManaColor()
         {
             while (true)
             {
@@ -220,12 +317,7 @@ namespace stonekart
             }
         }
 
-        public static void handleCommand(string s)
-        {
-            
-        }
-
-        public static void fooPressed(Foo foo)
+        public void fooPressed(Foo foo)
         {
             f = foo;
             e.Set();
@@ -260,10 +352,6 @@ namespace stonekart
                 }
             }
         }
-=======
-        public static Game currentGame { get; private set; }
-
-
->>>>>>> Stashed changes
     }
+
 }

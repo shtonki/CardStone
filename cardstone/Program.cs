@@ -12,11 +12,15 @@ namespace stonekart
     {
         static void Main(string[] args)
         {
+            Settings.loadSettings();
+
             Form.CheckForIllegalCrossThreadCalls = false;
             Thread t = new Thread(new ThreadStart(asd));
             t.Start();
+            
             ImageLoader.init();
-            GameController.start();
+            
+            GameController.currentGame.start();
         }
 
         private static void asd()

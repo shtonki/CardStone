@@ -74,7 +74,7 @@ namespace stonekart
             */
             Click += (sender, args) =>
             {
-                GameController.fooPressed(this);
+                GameController.currentGame.fooPressed(this);
             };
         }
 
@@ -90,7 +90,7 @@ namespace stonekart
 
         protected override void OnPaint(PaintEventArgs pevent)
         {
-            base.OnPaint(pevent);
+            //base.OnPaint(pevent);
             if (card != null)
             {
                 Brush b = new SolidBrush(Color.Black);

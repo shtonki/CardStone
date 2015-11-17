@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +17,14 @@ namespace stonekart
     {
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
+
+        private static Panel loginPanel;
+
+        private static TextBox usernameBox;
+
+
+        private static Panel gamePanel;
+
         private static TextBox inputBox, outputBox;
         private static CardPanel handPanel;
         private static PlayerPanel heroPanel;
@@ -22,8 +32,7 @@ namespace stonekart
         private static CardBox stackPanel;
         private static FieldPanel heroFieldPanel, villainFieldPanel;
 
-        public static bool ready;
-
+        
         public MainFrame()
         {
             InitializeComponent();
@@ -33,6 +42,20 @@ namespace stonekart
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
+
+
+            setupMainMenuPanel();
+            setupGamePanel();
+            
+
+            Controls.Add(gamePanel);
+            Controls.Add(loginPanel);
+        }
+
+        private static void setupGamePanel()
+        {
+            gamePanel = new Panel();
+            gamePanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
 
             inputBox = new TextBox();
             inputBox.KeyDown += (sender, args) =>
@@ -82,6 +105,7 @@ namespace stonekart
             villainFieldPanel = new FieldPanel();
             villainFieldPanel.Location = new Point(600, 10);
 
+<<<<<<< Updated upstream
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
@@ -89,8 +113,81 @@ namespace stonekart
             Controls.Add(stackPanel);
             Controls.Add(heroFieldPanel);
             Controls.Add(villainFieldPanel);
+=======
+            turnPanel = new TurnPanel();
+            turnPanel.Location = new Point(325, 200);
 
-            ready = true;
+            gamePanel.Controls.Add(buttonPanel);
+            gamePanel.Controls.Add(heroPanel);
+            gamePanel.Controls.Add(handPanel);
+            gamePanel.Controls.Add(textPanel);
+            gamePanel.Controls.Add(stackPanel);
+            gamePanel.Controls.Add(heroFieldPanel);
+            gamePanel.Controls.Add(villainFieldPanel);
+            gamePanel.Controls.Add(turnPanel);
+
+            gamePanel.Visible = false;
+        }
+
+
+        private static void setupMainMenuPanel()
+        {
+            loginPanel = new Panel();
+            loginPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            loginPanel.BackColor = Color.DarkRed;
+>>>>>>> Stashed changes
+
+
+            Panel panel = new Panel();
+            panel.Size = new Size(700, 400);
+            panel.BackColor = Color.Silver;
+            panel.Location = new Point((FRAMEWIDTH - 700)/2, 200);
+
+            Label usernameLabel = new Label();
+            usernameLabel.Size = new Size(400, 50);
+            usernameLabel.Location = new Point(280, 50);
+            usernameLabel.Font = new Font(new FontFamily("Comic Sans MS"), 20);
+            usernameLabel.Text = "Username";
+
+
+            usernameBox = new TextBox();
+            usernameBox.Font = new Font(new FontFamily("Comic Sans MS"), 30);
+            usernameBox.Size = new Size(400, 5);
+            usernameBox.Location = new Point(150, 100);
+            usernameBox.TextAlign = HorizontalAlignment.Center;
+
+            usernameBox.KeyDown += (sender, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    login();
+                }
+            };
+            
+            Button b = new Button();
+            b.Location = new Point(300, 220);
+            b.Size = new Size(100, 50);
+            b.Font = new Font(new FontFamily("Comic Sans MS"), 20);
+            b.Text = "Login";
+            b.Click += (sender, args) =>
+            {
+                login();
+            };
+
+            panel.Controls.Add(usernameLabel);
+            panel.Controls.Add(usernameBox);
+            panel.Controls.Add(b);
+
+
+            loginPanel.Controls.Add(panel);
+        }
+
+        private static void login()
+        {
+            if (Network.login(usernameBox.Text))
+            {
+                loginPanel.Visible = false;
+            }
         }
 
 
@@ -115,7 +212,6 @@ namespace stonekart
         public static void handleCommand(string s)
         {
             Console.writeLine("] " + s);
-            GameController.handleCommand(s);
         }
 
         public static void printLine(string sgfs)
