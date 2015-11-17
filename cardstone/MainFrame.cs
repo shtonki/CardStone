@@ -19,6 +19,8 @@ namespace stonekart
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
 
+        private static Panel mainMenuPanel;
+
         private static Panel loginPanel;
 
         private static TextBox usernameBox;
@@ -51,10 +53,11 @@ namespace stonekart
             
 
             Controls.Add(gamePanel);
-            Controls.Add(loginPanel);
+            Controls.Add(mainMenuPanel);
 
-            loginPanel.Visible = true;
+            mainMenuPanel.Visible = true;
 
+            Network.connect();
         }
 
         private static void setupGamePanel()
@@ -133,18 +136,17 @@ namespace stonekart
             gamePanel.Visible = false;
         }
 
-
         private static void setupMainMenuPanel()
         {
+            mainMenuPanel = new Panel();
+            mainMenuPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            mainMenuPanel.BackColor = Color.DarkRed;
+
+
             loginPanel = new Panel();
-            loginPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-            loginPanel.BackColor = Color.DarkRed;
-
-
-            Panel panel = new Panel();
-            panel.Size = new Size(700, 400);
-            panel.BackColor = Color.Silver;
-            panel.Location = new Point((FRAMEWIDTH - 700)/2, 200);
+            loginPanel.Size = new Size(700, 400);
+            loginPanel.BackColor = Color.Silver;
+            loginPanel.Location = new Point((FRAMEWIDTH - 700)/2, 200);
 
             Label usernameLabel = new Label();
             usernameLabel.Size = new Size(400, 50);
@@ -177,25 +179,25 @@ namespace stonekart
                 login();
             };
 
-            panel.Controls.Add(usernameLabel);
-            panel.Controls.Add(usernameBox);
-            panel.Controls.Add(b);
+            loginPanel.Controls.Add(usernameLabel);
+            loginPanel.Controls.Add(usernameBox);
+            loginPanel.Controls.Add(b);
 
-            loginPanel.Controls.Add(panel);
+            mainMenuPanel.Controls.Add(loginPanel);
 
-            loginPanel.Visible = false;
+            mainMenuPanel.Visible = false;
         }
 
         private static void login()
         {
-
-            GameController.newGame();
-            loginPanel.Visible = false;
-            gamePanel.Visible = true;
-            return;
-
             if (Network.login(usernameBox.Text))
             {
+                var s = Network.getFriends();
+                foreach (var x in s)
+                {
+                    System.Console.WriteLine(x);
+                }
+
                 loginPanel.Visible = false;
             }
         }

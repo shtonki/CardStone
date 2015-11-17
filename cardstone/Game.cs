@@ -187,6 +187,7 @@ namespace stonekart
 
         private void choseAttackers()
         {
+            MainFrame.setMessage("Choose attackers");
             while (true)
             {
                 MainFrame.showButtons(ACCEPT);
@@ -198,7 +199,7 @@ namespace stonekart
                         var b = (FooButton)f;
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
-                            MainFrame.showButtons(NONE);
+                            MainFrame.clear();
                             return;
                         }
                     }

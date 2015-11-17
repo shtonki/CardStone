@@ -10,6 +10,8 @@ namespace stonekart
     {
         private static ServerConnection serverConnection;
 
+        private static string[] friends;
+
         public static void connect()
         {
             serverConnection = new ServerConnection();
@@ -17,6 +19,10 @@ namespace stonekart
 
         public static bool login(string name)
         {
+            if (name.Length < 2)
+            {
+                return false;
+            }
             if (serverConnection.handshake(name))
             {
                 return true;
@@ -25,6 +31,16 @@ namespace stonekart
             {
                 return false;
             }
+        }
+
+        public static string[] getFriends()
+        {
+            if (friends != null) { return friends; }
+
+            string s = serverConnection.requestFriends();
+            string[] ss = s.Split(':');
+            if (ss[0] != "friend") { throw new Exception("v bad"); }
+            return ss[1].Split(',');
         }
     }
 
@@ -69,6 +85,12 @@ namespace stonekart
             }
 
             return true;
+        }
+
+        public string requestFriends()
+        {
+            sendString("friend:" + name);
+            return waitForString();
         }
     }
 
