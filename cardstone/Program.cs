@@ -19,8 +19,9 @@ namespace stonekart
             t.Start();
             
             ImageLoader.init();
-            
-            GameController.currentGame.start();
+
+            GameController.newGame();
+
         }
 
         private static void asd()

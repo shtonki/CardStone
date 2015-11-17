@@ -9,8 +9,8 @@ namespace stonekart
 {
     class ImageLoader
     {
-        private const string cardArtPath = @"../../res/IMG/card/";
-        private const string framePath = @"../../res/IMG/frame/";
+        private const string cardArtPath = @"res/IMG/card/";
+        private const string framePath = @"res/IMG/frame/";
 
         private static Dictionary<CardId, Image> imageMap;
 

@@ -56,10 +56,13 @@
     <Compile Include="CardButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Connection.cs" />
     <Compile Include="Cost.cs" />
+    <Compile Include="Effect.cs" />
     <Compile Include="FieldPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Game.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />
@@ -74,6 +77,7 @@
     <Compile Include="MainFrame.Designer.cs">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </Compile>
+    <Compile Include="Network.cs" />
     <Compile Include="Observable.cs" />
     <Compile Include="Observer.cs" />
     <Compile Include="Pile.cs" />

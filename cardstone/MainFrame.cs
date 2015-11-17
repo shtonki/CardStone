@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,8 @@ namespace stonekart
 
             Controls.Add(gamePanel);
             Controls.Add(loginPanel);
+
+            gamePanel.Visible = true;
         }
 
         private static void setupGamePanel()
@@ -87,7 +90,7 @@ namespace stonekart
             textPanel.Controls.Add(inputBox);
 
             handPanel = new CardPanel();
-            handPanel.Location = new Point(400, 750);
+            handPanel.Location = new Point(400, 660);
 
             textPanel.Location = new Point(1550, 500);
 
@@ -177,12 +180,22 @@ namespace stonekart
             panel.Controls.Add(usernameBox);
             panel.Controls.Add(b);
 
-
             loginPanel.Controls.Add(panel);
+
+            loginPanel.Visible = false;
+        }
+
+        public static void memesx()
+        {
+            loginPanel.Visible = false;
+            gamePanel.Visible = true;
         }
 
         private static void login()
         {
+            GameController.newGame();
+
+            return;
             if (Network.login(usernameBox.Text))
             {
                 loginPanel.Visible = false;
@@ -197,7 +210,13 @@ namespace stonekart
 
         public static void setMessage(string s)
         {
-            buttonPanel.
+            buttonPanel.setText(s);
+        }
+
+        public static void clear()
+        {
+            setMessage("");
+            showButtons(ButtonPanel.NOTHING);
         }
 
         public static void showButtons(int i)

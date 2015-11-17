@@ -11,8 +11,10 @@ namespace stonekart
         private Player hero, villain;
         private Pile stack;
 
-        public Game()
+        public Game(Connection cn)
         {
+            Thread.Sleep(100);
+
             setupEventHandlers();
 
             hero = new Player();
@@ -21,20 +23,20 @@ namespace stonekart
             stack = new Pile();
 
             setLocations();
+
+            MainFrame.setObservers(hero, villain, stack);
         }
 
         public void start()
         {
-            //Thread.Sleep(100);
-
 
             hero.loadDeck(new[] { CardId.BearCavalary, CardId.BearCavalary, CardId.BearCavalary, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
             villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
 
-            MainFrame.setObservers(hero, villain, stack);
 
             hero.shuffleDeck();
             villain.shuffleDeck();
+
 
             loop();
         }
