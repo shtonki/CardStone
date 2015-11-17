@@ -53,7 +53,8 @@ namespace stonekart
             Controls.Add(gamePanel);
             Controls.Add(loginPanel);
 
-            gamePanel.Visible = true;
+            loginPanel.Visible = true;
+
         }
 
         private static void setupGamePanel()
@@ -185,17 +186,14 @@ namespace stonekart
             loginPanel.Visible = false;
         }
 
-        public static void memesx()
-        {
-            loginPanel.Visible = false;
-            gamePanel.Visible = true;
-        }
-
         private static void login()
         {
-            GameController.newGame();
 
+            GameController.newGame();
+            loginPanel.Visible = false;
+            gamePanel.Visible = true;
             return;
+
             if (Network.login(usernameBox.Text))
             {
                 loginPanel.Visible = false;

@@ -20,7 +20,6 @@ namespace stonekart
             
             ImageLoader.init();
 
-            GameController.newGame();
 
         }
 

@@ -20,7 +20,6 @@ namespace stonekart
         private static void newGameT()
         {
             currentGame = new Game(null);
-            MainFrame.memesx();
             currentGame.start();
             
         }
