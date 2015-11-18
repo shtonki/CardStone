@@ -9,6 +9,7 @@ namespace stonekart
 {
     public class FontLoader
     {
+        /*
         public const int
             COMICSANS = 0,
             WINGDINGS = 1;
@@ -35,6 +36,7 @@ namespace stonekart
                               GraphicsUnit.Pixel);
             return f;
         }
+         */
     }
 }
 
