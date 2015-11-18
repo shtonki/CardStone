@@ -62,9 +62,13 @@
     <Compile Include="FieldPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="FriendPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+=======
+    <Compile Include="FontLoader.cs" />
+>>>>>>> 7c9fa71787d66acf9b0f7d04b6e02ac7dc7730d3
     <Compile Include="Game.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="ImageLoader.cs" />
