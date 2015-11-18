@@ -20,7 +20,6 @@ namespace stonekart
             t.Start();
             
             ImageLoader.init();
-            FontLoader.init();
 
         }
 
