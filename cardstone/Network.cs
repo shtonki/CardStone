@@ -40,7 +40,8 @@ namespace stonekart
             string s = serverConnection.requestFriends();
             string[] ss = s.Split(':');
             if (ss[0] != "friend") { throw new Exception("v bad"); }
-            return ss[1].Split(',');
+            return ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
+            
         }
     }
 

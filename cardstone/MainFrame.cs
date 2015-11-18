@@ -19,6 +19,9 @@ namespace stonekart
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
 
+        private static MainFrame frame;
+
+
         private static Panel mainMenuPanel;
 
         private static Panel loginPanel;
@@ -36,10 +39,18 @@ namespace stonekart
         private static FieldPanel heroFieldPanel, villainFieldPanel;
         private static TurnPanel turnPanel;
 
+
+        private static FriendPanel friendPanel;
+
+
+        private static Panel activePanel;
+        private static Panel popupPanel;
         
         public MainFrame()
         {
             InitializeComponent();
+
+            frame = this;
 
             FormClosed += (sender, args) => { Environment.Exit(0); };
 
@@ -51,11 +62,30 @@ namespace stonekart
             setupMainMenuPanel();
             setupGamePanel();
             
+            friendPanel = new FriendPanel();
+            friendPanel.Location = new Point(10, 880);
+
+            Button toGame = new Button();
+            toGame.Click += (sender, args) =>
+            {
+                transitionTo(gamePanel);
+            };
+
+            this.Click += (sender, args) =>
+            {
+                System.Console.WriteLine("xd");
+            };
 
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
+            Controls.Add(friendPanel);
+            Controls.Add(toGame);
 
-            mainMenuPanel.Visible = true;
+            //toGame.BringToFront();
+            friendPanel.BringToFront();
+            friendPanel.Visible = false;
+
+            transitionTo(mainMenuPanel);
 
             Network.connect();
         }
@@ -195,13 +225,49 @@ namespace stonekart
                 var s = Network.getFriends();
                 foreach (var x in s)
                 {
-                    System.Console.WriteLine(x);
+                    System.Console.WriteLine("XD: " + x);
                 }
 
+                friendPanel.addFriends(s);
+
                 loginPanel.Visible = false;
+                friendPanel.Visible = true;
             }
         }
 
+
+        public static void showPopupPanel(Panel p)
+        {
+            if (popupPanel != null) { closePopupPanel(); }
+
+            popupPanel = p;
+            popupPanel.Visible = true;
+            //System.Console.WriteLine((MousePosition.X - frame.Location.X) + " " + MousePosition.Y);
+            popupPanel.Location = new Point((MousePosition.X - frame.Location.X - p.Size.Width/2), (MousePosition.Y - frame.Location.Y - p.Size.Height));
+            frame.Controls.Add(popupPanel);
+            popupPanel.BringToFront();
+
+
+
+            popupPanel.MouseLeave += (sender, args) =>
+            {
+                closePopupPanel();
+            };
+        }
+
+        public static void closePopupPanel()
+        {
+            frame.Controls.Remove(popupPanel);
+            popupPanel.Visible = false;
+            popupPanel = null;
+        }
+
+        private static void transitionTo(Panel p)
+        {
+            if (activePanel != null) { activePanel.Visible = false; }
+            p.Visible = true;
+            activePanel = p;
+        }
 
         public static void advanceStep()
         {
