@@ -9,7 +9,7 @@ namespace stonekart
 {
     public class FontLoader
     {
-        
+
         public const int
             COMICSANS = 0,
             WINGDINGS = 1;
@@ -22,7 +22,7 @@ namespace stonekart
 
             a.AddFontFile(@"res/FONT/COMICSANS.ttf");
             a.AddFontFile(@"res/FONT/WINGDINGS.ttf");
-        
+
             fontFamilies[COMICSANS] = a.Families[0];
             fontFamilies[WINGDINGS] = a.Families[1];
         } //
@@ -35,7 +35,7 @@ namespace stonekart
                               GraphicsUnit.Pixel);
             return f;
         }
-        
+
     }
 }
 
