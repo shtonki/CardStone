@@ -18,7 +18,7 @@ namespace stonekart
         public static void init()
         {
             var a = new PrivateFontCollection();
-
+            //font families = new Fontfamily typ (något något);
             a.AddFontFile(@"res/FONT/COMICSANS.ttf");
             a.AddFontFile(@"res/FONT/WINGDINGS.ttf");
 
