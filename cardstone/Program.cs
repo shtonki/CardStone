@@ -15,6 +15,8 @@ namespace stonekart
         {
             Settings.loadSettings();
 
+            //FontLoader.init();
+
             Form.CheckForIllegalCrossThreadCalls = false;
             Thread t = new Thread(new ThreadStart(asd));
             t.Start();
