@@ -22,8 +22,6 @@ namespace stonekart
             t.Start();
             
             ImageLoader.init();
-            BoomBox.init();
-            BoomBox.play(BoomBox.MACARENA);
             FontLoader.init();
         }
 
