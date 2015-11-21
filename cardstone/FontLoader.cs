@@ -15,20 +15,10 @@ namespace stonekart
             MANGALB = 1,
             MAIANDRA = 2;
 
-        private static FontFamily[] fontFamilies = new FontFamily[2];
+        private static FontFamily[] fontFamilies = new FontFamily[3];
 
         public static void init()
         {
-<<<<<<< HEAD
-            //var a = new PrivateFontCollection();
-
-            //a.AddFontFile(@"res/FONT/COMICSANS.ttf");
-            //a.AddFontFile(@"res/FONT/WINGDINGS.ttf");
-
-            //fontFamilies[COMICSANS] = a.Families[0];
-            //fontFamilies[WINGDINGS] = a.Families[1];
-        } //
-=======
             var a = new PrivateFontCollection();
             
             a.AddFontFile(@"res/FONT/mplantin.ttf");
@@ -39,7 +29,6 @@ namespace stonekart
             fontFamilies[MANGALB] = a.Families[1];
             fontFamilies[MAIANDRA] = a.Families[2];
         } 
->>>>>>> de9db7d06e070f31eabf2bd57b810562a38d2a57
 
         public static Font getFont(int baseFont, int size)
         {

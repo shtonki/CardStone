@@ -107,8 +107,8 @@ namespace stonekart
 
         public GameConnection()
         {
-            setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("other player disconnected"); });
-            start();
+            //setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("other player disconnected"); });
+            //start();
         }
 
         public virtual bool asHomePlayer()
@@ -150,5 +150,6 @@ namespace stonekart
         {
             System.Console.WriteLine(s);
         }
+
     }
 }

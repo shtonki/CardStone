@@ -46,12 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-=======
-    <Compile Include="..\..\Desktop\BoomBox.cs">
-      <Link>BoomBox.cs</Link>
-    </Compile>
->>>>>>> de9db7d06e070f31eabf2bd57b810562a38d2a57
     <Compile Include="ButtonPanel.cs">
       <SubType>Component</SubType>
     </Compile>
