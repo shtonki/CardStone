@@ -45,33 +45,44 @@ namespace stonekart
             switch (cardId)
             {
                 case CardId.Kappa:
-                    {
-                        name = "Kappa";
-                        blueCost = 2;
-                        power = 1;
-                        toughness = 3;
-                        type = Type.Creature;
-                        race = Race.Salamander;
-                    } break;
+                {
+                    name = "Kappa";
+                    blueCost = 2;
+                    power = 1;
+                    toughness = 3;
+                    type = Type.Creature;
+                    race = Race.Salamander;
+                } break;
 
                 case CardId.BearCavalary:
-                    {
-                        name = "Bear Cavalary";
-                        greenCost = 2;
-                        type = Type.Creature;
-                        race = Race.Bear;
-                        subType = SubType.Warrior;
-                        power = 2;
-                        toughness = 3;
-                    } break;
+                {
+                    name = "Bear Cavalary";
+                    greenCost = 2;
+                    type = Type.Creature;
+                    race = Race.Bear;
+                    subType = SubType.Warrior;
+                    power = 2;
+                    toughness = 3;
+                } break;
 
                 case CardId.LightningBolt:
-                    {
-                        name = "Lightning Bolt";
-                        redCost = 1;
-                        type = Type.Instant;
-                        //Effect = 
-                    } break;
+                {
+                    name = "Lightning Bolt";
+                    redCost = 1;
+                    type = Type.Instant;
+                    //Effect = 
+                } break;
+
+                case CardId.SolemnAberration:
+                {
+                    name = "Solemn Aberration";
+                    blackCost = 1;
+                    type = Type.Creature;
+                    race = Race.Zombie;
+                    power = 2;
+                    toughness = 2;
+                    //todo can't block
+                } break;
             }
 
 
@@ -194,8 +205,8 @@ namespace stonekart
 
         public String getArchtypeString()
         {
-            return type.ToString() + " - " +
-                (race != null ? race.ToString() + " " : "") +
+            return type.ToString() +
+                (race != null ? " - " + race.ToString() + " " : "") +
                 (subType != null ? subType.ToString() : "");
         }
 
@@ -206,6 +217,7 @@ namespace stonekart
         //FrenziedPiranha,
         BearCavalary,
         LightningBolt,
+        SolemnAberration,
     }
 
     public enum Type
@@ -221,11 +233,13 @@ namespace stonekart
         Human,
         Salamander,
         Fish,
-        Bear
+        Bear,
+        Zombie
     }
 
     public enum SubType
     {
         Warrior,
+        Wizard,
     }
 }

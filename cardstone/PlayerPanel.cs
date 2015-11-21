@@ -21,7 +21,7 @@ namespace stonekart
                 manaButtons[i] = new ManaButton[6];
             }
 
-            Size = new Size(300, 400);
+            Size = new Size(300, 350);
             BackColor = Color.Aquamarine;
 
             for (int i = 0; i < 5; i++)
@@ -64,6 +64,15 @@ namespace stonekart
                     };
 
                     Controls.Add(b);
+
+                    Font f = new Font(new FontFamily("Comic Sans MS"), 20);
+
+                    Label l = new Label();
+                    l.AutoSize = true;
+                    l.Text = "5";
+                    l.Font = f;
+                    l.Location = new Point(10, 300);
+                    Controls.Add(l);
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Windows.Forms;
@@ -8,17 +9,24 @@ namespace stonekart
 {
     class Game
     {
-        private Player hero, villain;
+        private Player hero, villain, homePlayer, awayPlayer;
         private Pile stack;
 
-        public Game(Connection cn)
+        private GameConnection connection;
+
+        private KappaMan kappa;
+
+        public Game(GameConnection cn)
         {
-            Thread.Sleep(100);
+            connection = cn;
+
 
             setupEventHandlers();
 
             hero = new Player();
             villain = new Player();
+            homePlayer = cn.asHomePlayer() ? hero : villain;
+            awayPlayer = cn.asHomePlayer() ? villain : hero;
 
             stack = new Pile();
 
@@ -30,29 +38,37 @@ namespace stonekart
         public void start()
         {
 
-            hero.loadDeck(new[] { CardId.BearCavalary, CardId.BearCavalary, CardId.BearCavalary, CardId.Kappa, CardId.Kappa, }, new Location(Location.DECK, Location.HEROSIDE));
+            hero.loadDeck(new[] { CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, }, new Location(Location.DECK, Location.HEROSIDE));
             villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
 
 
             hero.shuffleDeck();
             villain.shuffleDeck();
 
+            gameStart();
+        }
+
+        private void gameStart()
+        {
+            hero.draw(4);
 
             loop();
         }
 
         private void setupEventHandlers()
         {
-            drawEventHandler = new EventHander(GameEvent.DRAW, delegate(GameEvent gevent)
+            kappa = new KappaMan();
+
+            kappa.addHandler(new EventHandler(GameEvent.DRAW, delegate(GameEvent gevent)
             {
                 hero.draw();
-            });
+            }));
 
-            castEventHandler = new EventHander(GameEvent.CAST, delegate(GameEvent gevent)
+            kappa.addHandler(new EventHandler(GameEvent.CAST, delegate(GameEvent gevent)
             {
                 CastEvent e = (CastEvent)gevent;
                 e.getCard().moveTo(new Location(Location.STACK, Location.HEROSIDE));
-            });
+            }));
         }
 
         private void setLocations()
@@ -97,7 +113,7 @@ namespace stonekart
                 advanceStep();
 
                 //attackers
-                choseAttackers();
+                handleEvent(new DeclareAttackersEvent(choseAttackers()));
                 givePriority(false);
                 advanceStep();
 
@@ -167,6 +183,7 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.clear();
+                            pass();
                             return false;
                         }
                     }
@@ -185,7 +202,7 @@ namespace stonekart
             }
         }
 
-        private void choseAttackers()
+        private Card[] choseAttackers()
         {
             MainFrame.setMessage("Choose attackers");
             while (true)
@@ -200,7 +217,14 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.clear();
-                            return;
+
+                            List<Card> cs = new List<Card>();
+                            foreach (Card c in hero.getField().getCards())
+                            {
+                                if (c.isAttacking()) { cs.Add(c); }
+                            }
+
+                            return cs.ToArray();
                         }
                     }
                     else if (f is CardButton)
@@ -234,7 +258,12 @@ namespace stonekart
 
         private void draw()
         {
-            handleEvent(new DrawEvent(true));
+            handleEvent(new DrawEvent(hero == homePlayer));
+        }
+
+        private void pass()
+        {
+            handleEvent(new PassEvent());
         }
 
         private void cast(Card c)
@@ -245,6 +274,7 @@ namespace stonekart
         private void resolve(Card c)
         {
             c.moveToOwners(Location.FIELD);
+            handleEvent(new ResolveCardEvent(c));
         }
 
         private void addMana()
@@ -256,6 +286,7 @@ namespace stonekart
                 c = getManaColor();
             } while (hero.getMaxMana(c) == 6);
             hero.addMana(c);
+            handleEvent(new GainManaOrbEvent(c));
         }
 
         public Player getHero()
@@ -265,8 +296,9 @@ namespace stonekart
 
         public void handleEvent(GameEvent e)
         {
-            drawEventHandler.invoke(e);
-            castEventHandler.invoke(e);
+            kappa.handle(e);
+
+            connection.sendString(e.toNetworkString());
         }
 
         private Foo f;
@@ -331,28 +363,29 @@ namespace stonekart
             ACCEPT = ButtonPanel.ACCEPT,
             ACCEPTCANCEL = ButtonPanel.ACCEPT | ButtonPanel.CANCEL;
 
-        private static EventHander 
-            drawEventHandler, 
-            castEventHandler;
 
-        private class EventHander
+        private class KappaMan
         {
-            public delegate void eventHandler(GameEvent e);
-            private int types;
-            private eventHandler main, pre, post;
+            private EventHandler[] xds;
 
-            public EventHander(int types, eventHandler e)
+            public KappaMan()
             {
-                this.types = types;
-                main = e;
+                xds = new EventHandler[100];
             }
 
-            public void invoke(GameEvent e)
+            public void addHandler(EventHandler e)
             {
-                if ((types & e.getType()) != 0)
+                xds[e.type] = e;
+            }
+
+            public void handle(GameEvent e)
+            {
+                if (xds[e.getType()] == null)
                 {
-                    main(e);
+                    return;
                 }
+
+                xds[e.getType()].invoke(e);
             }
         }
     }

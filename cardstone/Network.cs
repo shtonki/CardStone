@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +26,10 @@ namespace stonekart
             }
             if (serverConnection.handshake(name))
             {
+                string s = serverConnection.requestFriends();
+                string[] ss = s.Split(':');
+                if (ss[0] != "friend") { throw new Exception("v bad"); }
+                friends =  ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
                 return true;
             }
             else
@@ -35,13 +40,7 @@ namespace stonekart
 
         public static string[] getFriends()
         {
-            if (friends != null) { return friends; }
-
-            string s = serverConnection.requestFriends();
-            string[] ss = s.Split(':');
-            if (ss[0] != "friend") { throw new Exception("v bad"); }
-            return ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
-            
+            return friends;
         }
     }
 
@@ -53,7 +52,7 @@ namespace stonekart
         public ServerConnection()
             : base("46.239.124.155")
         {
-
+            setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("server krashed"); });
         }
 
         public bool handshake(string n)
@@ -88,6 +87,11 @@ namespace stonekart
             return true;
         }
 
+        public void gotString(byte[] bs)
+        {
+            System.Console.WriteLine(bs);
+        }
+
         public string requestFriends()
         {
             sendString("friend:" + name);
@@ -95,5 +99,56 @@ namespace stonekart
         }
     }
 
+    class GameConnection : Connection
+    {
+        public GameConnection(Socket s) : base(s)
+        {
+        }
 
+        public GameConnection()
+        {
+            setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("other player disconnected"); });
+            start();
+        }
+
+        public virtual bool asHomePlayer()
+        {
+            return false;
+        }
+
+        private void gotString(byte[] bs)
+        {
+            System.Console.WriteLine(bs);
+        }
+
+        public void sendGameEvent(GameEvent e)
+        {
+            sendString(e.toNetworkString());
+        }
+
+        public new virtual void sendString(string s) 
+        {
+            base.sendString(s);
+        }
+
+    }
+
+    class DummyConnection : GameConnection
+    {
+        public DummyConnection()
+        {
+
+        }
+
+        public override bool asHomePlayer()
+        {
+            return true;
+        }
+
+
+        public override void sendString(String s)
+        {
+            System.Console.WriteLine(s);
+        }
+    }
 }

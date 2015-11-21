@@ -4,18 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace stonekart
 {
-
-    abstract class GameEvent
+    public abstract class GameEvent
     {
         public const int
             DRAW = 1,
             CAST = 2,
-            MOVE = 4;
+            PASS = 3,
+            GAINMANA = 4,
+            DECLAREATTACKERS = 5,
+            RESOLVECARD = 6;
 
         private int type;
-        protected Card card;
 
         public GameEvent(int type)
         {
@@ -27,30 +29,35 @@ namespace stonekart
             return type;
         }
 
-        public Card getCard()
+
+        public string toNetworkString()
         {
-            return card;
+            return "event:" + type + ':' + getCruftString();
         }
+
+        protected abstract string getCruftString();
 
     }
 
     class DrawEvent : GameEvent
     {
-        private bool h;
+        private bool homePlayer;
 
-        public DrawEvent(bool hero) : base(DRAW)
+        public DrawEvent(bool homePlayer) : base(DRAW)
         {
-            h = hero;
+            this.homePlayer = homePlayer;
         }
 
-        public bool isHeroDraw()
+        protected override string getCruftString()
         {
-            return h;
+            return homePlayer ? "home" : "away";
         }
     }
 
     class CastEvent : GameEvent
     {
+        private Card card;
+
         public CastEvent(Card c) : base(CAST)
         {
             card = c;
@@ -60,12 +67,78 @@ namespace stonekart
         {
             return card;
         }
+
+        protected override string getCruftString()
+        {
+            return card.getId().ToString();
+        }
     }
 
-    class MoveEvent : GameEvent
+    class PassEvent : GameEvent
     {
-        public MoveEvent() : base(MOVE)
+        public PassEvent() : base(PASS)
         {
+        }
+
+        protected override string getCruftString()
+        {
+            return "";
+        }
+    }
+
+    class GainManaOrbEvent : GameEvent
+    {
+        private int color;
+
+        public GainManaOrbEvent(int color) : base(GAINMANA)
+        {
+            this.color = color;
+        }
+
+        protected override string getCruftString()
+        {
+            return color.ToString();
+        }
+    }
+
+    class DeclareAttackersEvent : GameEvent
+    {
+        private Card[] attackers;
+
+        public DeclareAttackersEvent(Card[] c) : base(DECLAREATTACKERS)
+        {
+            attackers = c;
+        }
+
+        protected override string getCruftString()
+        {
+            if (attackers.Length == 0) { return ""; }
+
+            StringBuilder s = new StringBuilder();
+            int i = 0;
+
+            for (; i < attackers.Length - 1; i++)
+            {
+                s.Append(attackers[i].getId() + ",");
+            }
+            s.Append(attackers[i].getId());
+
+            return s.ToString();
+        }
+    }
+
+    class ResolveCardEvent : GameEvent
+    {
+        private Card card;
+
+        public ResolveCardEvent(Card c) : base(RESOLVECARD)
+        {
+            card = c;
+        }
+
+        protected override string getCruftString()
+        {
+            return card.getId().ToString();
         }
     }
 }

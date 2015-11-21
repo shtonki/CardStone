@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,9 @@ namespace stonekart
             
             ImageLoader.init();
             FontLoader.init();
-            Thread.Sleep(100);  //yeah nah
+
+            MainFrame.x.WaitOne();
+
             GameController.start();
         }
 

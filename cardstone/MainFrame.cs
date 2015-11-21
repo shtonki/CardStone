@@ -18,6 +18,7 @@ namespace stonekart
     {
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
+        public static ManualResetEvent x = new ManualResetEvent(false);
 
         private static MainFrame frame;
 
@@ -34,7 +35,7 @@ namespace stonekart
 
         private static TextBox inputBox, outputBox;
         private static CardPanel handPanel;
-        private static PlayerPanel heroPanel;
+        private static PlayerPanel heroPanel, villainPanel;
         private static ButtonPanel buttonPanel;
         private static CardBox stackPanel;
         private static FieldPanel heroFieldPanel, villainFieldPanel;
@@ -77,11 +78,12 @@ namespace stonekart
             Controls.Add(friendPanel);
 
             friendPanel.BringToFront();
-            friendPanel.Visible = false;
+            friendPanel.Hide();
 
             transitionTo(mainMenuPanel);
 
             //Network.connect();
+            x.Set();
         }
 
         private static void setupGamePanel()
@@ -111,9 +113,6 @@ namespace stonekart
             textPanel.FlowDirection = FlowDirection.LeftToRight;
             textPanel.Size = new Size(200, 440);
 
-            Button c = new CardButton();
-            Button d = new CardButton();
-
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
 
@@ -123,10 +122,13 @@ namespace stonekart
             textPanel.Location = new Point(1550, 500);
 
             buttonPanel = new ButtonPanel();
-            buttonPanel.Location = new Point(20, 300);
+            buttonPanel.Location = new Point(20, 370);
 
             heroPanel = new PlayerPanel();
             heroPanel.Location = new Point(20, 525);
+
+            villainPanel = new PlayerPanel();
+            villainPanel.Location = new Point(20, 10);
 
             stackPanel = new CardBox(190, 500);
             stackPanel.Location = new Point(400, 20);
@@ -156,6 +158,7 @@ namespace stonekart
             gamePanel.Controls.Add(heroFieldPanel);
             gamePanel.Controls.Add(villainFieldPanel);
             gamePanel.Controls.Add(turnPanel);
+            gamePanel.Controls.Add(villainPanel);
 
             //gamePanel.Visible = false;
             gamePanel.Size = new Size(0, 0);
@@ -190,7 +193,7 @@ namespace stonekart
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    loginClick();
+                    loginWithName(usernameBox.Text);
                 }
             };
             
@@ -201,7 +204,7 @@ namespace stonekart
             b.Text = "Login";
             b.Click += (sender, args) =>
             {
-                loginClick();
+                loginWithName(usernameBox.Text);
             };
 
             Button c = new Button();
@@ -244,8 +247,16 @@ namespace stonekart
 
         public static void login()
         {
-            loginPanel.Show();
-            waitForLogin.WaitOne();
+            if (Settings.username == null)
+            {
+                loginPanel.Show();
+                waitForLogin.WaitOne();
+            }
+            else
+            {
+                loginWithName(Settings.username);
+            }
+
             loginPanel.Hide();
             kappaPanel.Show();
         }
@@ -256,20 +267,23 @@ namespace stonekart
         }
 
         private static AutoResetEvent waitForLogin = new AutoResetEvent(false);
-        private static void loginClick()
+
+        private static void loginWithName(string x)
         {
-            if (Network.login(usernameBox.Text))
+            if (!Network.login(x))
             {
-                var s = Network.getFriends();
-
-                friendPanel.addFriends(s);
-
-                loginPanel.Visible = false;
-                friendPanel.Visible = true;
-                waitForLogin.Set();
+                System.Console.WriteLine("soeiroj");
+                return;
             }
-        }
+            System.Console.WriteLine(x);
+            var s = Network.getFriends();
 
+            friendPanel.addFriends(s);
+
+            loginPanel.Hide();
+            friendPanel.Show();
+            waitForLogin.Set();
+        }
 
         public static void showPopupPanel(Control p)
         {

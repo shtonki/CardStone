@@ -59,6 +59,7 @@
     <Compile Include="Connection.cs" />
     <Compile Include="Cost.cs" />
     <Compile Include="Effect.cs" />
+    <Compile Include="EventHandler.cs" />
     <Compile Include="FieldPanel.cs">
       <SubType>Component</SubType>
     </Compile>

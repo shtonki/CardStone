@@ -26,7 +26,7 @@ namespace stonekart
         private static void newGameT()
         {
             MainFrame.transitionToGame();
-            currentGame = new Game(null);
+            currentGame = new Game(new DummyConnection());
             currentGame.start();
             
         }

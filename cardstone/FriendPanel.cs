@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class FriendPanel : Panel
+    class FriendPanel : SPanel
     {
         public List<string> friendList { get; set; }
 

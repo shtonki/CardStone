@@ -12,6 +12,11 @@ class Connection
     private DataReceived receivedCallback;
     private ConnectionClosed closedCallback;
 
+    public Connection()
+    {
+        
+    }
+
     public Connection(Socket s)
     {
         socket = s;
@@ -28,7 +33,7 @@ class Connection
         closedCallback = c;
     }
 
-    public void Start()
+    public void start()
     {
         Thread t = new Thread(mine);
         t.Start();
@@ -78,7 +83,7 @@ class Connection
                 receivedCallback(this, r);
             }
         }
-        catch (System.Net.Sockets.SocketException)
+        catch (SocketException)
         {
             closedCallback(this);
         }

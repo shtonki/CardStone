@@ -28,7 +28,7 @@ namespace stonekart
         public ButtonPanel()
         {
             BackColor = Color.CornflowerBlue;
-            Size = new Size(300, 200);
+            Size = new Size(300, 140);
 
             textLabel = new Label();
             textLabel.Size = new Size(280, 40);

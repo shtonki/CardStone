@@ -34,7 +34,17 @@ namespace stonekart
 
         public void draw()
         {
-            deck.peek().moveTo(hand);
+            draw(1);
+        }
+
+        public void draw(int c)
+        {
+            for (int i = 0; i < c; i++)
+            {
+                deck.peek().moveTo(hand);
+            }
+
+            notifyObserver();
         }
 
         public void shuffleDeck()
