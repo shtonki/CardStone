@@ -33,6 +33,20 @@ namespace stonekart
                     System.Console.WriteLine(v);
                 }
             };
+            friendCount.Click += (sender, args) =>
+            {
+                Label p = new Label();
+                p.Size = new Size(150, 250);
+                p.BackColor = Color.DarkGreen;
+                MainFrame.showPopupPanel(p);
+                String s = "";
+                foreach (string x in friendList)
+                {
+                    s += x + '\n';
+                }
+                p.Font = new Font(new FontFamily("Comic Sans MS"), 20);
+                p.Text = s;
+            };
 
             addFriendButton = new Button();
             addFriendButton.Size = new Size(70, 70);

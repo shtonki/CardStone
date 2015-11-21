@@ -18,13 +18,13 @@ namespace stonekart
 
         public static void init()
         {
-            var a = new PrivateFontCollection();
+            //var a = new PrivateFontCollection();
 
-            a.AddFontFile(@"res/FONT/COMICSANS.ttf");
-            a.AddFontFile(@"res/FONT/WINGDINGS.ttf");
+            //a.AddFontFile(@"res/FONT/COMICSANS.ttf");
+            //a.AddFontFile(@"res/FONT/WINGDINGS.ttf");
 
-            fontFamilies[COMICSANS] = a.Families[0];
-            fontFamilies[WINGDINGS] = a.Families[1];
+            //fontFamilies[COMICSANS] = a.Families[0];
+            //fontFamilies[WINGDINGS] = a.Families[1];
         } //
 
         public static Font getFont(int baseFont, int size)

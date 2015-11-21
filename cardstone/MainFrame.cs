@@ -24,7 +24,8 @@ namespace stonekart
 
         private static Panel mainMenuPanel;
 
-        private static Panel loginPanel;
+        private static SPanel loginPanel;
+        private static SPanel kappaPanel;
 
         private static TextBox usernameBox;
 
@@ -44,7 +45,7 @@ namespace stonekart
 
 
         private static Panel activePanel;
-        private static Panel popupPanel;
+        private static Control popupPanel;
         
         public MainFrame()
         {
@@ -55,7 +56,7 @@ namespace stonekart
             FormClosed += (sender, args) => { Environment.Exit(0); };
 
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            //FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
 
 
@@ -65,11 +66,6 @@ namespace stonekart
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
 
-            Button toGame = new Button();
-            toGame.Click += (sender, args) =>
-            {
-                transitionTo(gamePanel);
-            };
 
             this.Click += (sender, args) =>
             {
@@ -79,15 +75,13 @@ namespace stonekart
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
             Controls.Add(friendPanel);
-            Controls.Add(toGame);
 
-            //toGame.BringToFront();
             friendPanel.BringToFront();
             friendPanel.Visible = false;
 
             transitionTo(mainMenuPanel);
 
-            Network.connect();
+            //Network.connect();
         }
 
         private static void setupGamePanel()
@@ -163,7 +157,8 @@ namespace stonekart
             gamePanel.Controls.Add(villainFieldPanel);
             gamePanel.Controls.Add(turnPanel);
 
-            gamePanel.Visible = false;
+            //gamePanel.Visible = false;
+            gamePanel.Size = new Size(0, 0);
         }
 
         private static void setupMainMenuPanel()
@@ -172,11 +167,11 @@ namespace stonekart
             mainMenuPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             mainMenuPanel.BackColor = Color.DarkRed;
 
-
-            loginPanel = new Panel();
+            loginPanel = new SPanel();
             loginPanel.Size = new Size(700, 400);
             loginPanel.BackColor = Color.Silver;
-            loginPanel.Location = new Point((FRAMEWIDTH - 700)/2, 200);
+            loginPanel.Location = new Point((FRAMEWIDTH - 700) / 2, 200);
+            loginPanel.Hide();
 
             Label usernameLabel = new Label();
             usernameLabel.Size = new Size(400, 50);
@@ -195,7 +190,7 @@ namespace stonekart
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    login();
+                    loginClick();
                 }
             };
             
@@ -206,37 +201,77 @@ namespace stonekart
             b.Text = "Login";
             b.Click += (sender, args) =>
             {
-                login();
+                loginClick();
+            };
+
+            Button c = new Button();
+            c.Location = new Point(300, 320);
+            c.Size = new Size(100, 50);
+            c.Font = new Font(new FontFamily("Comic Sans MS"), 20);
+            c.Text = "Nyet";
+            c.Click += (sender, args) =>
+            {
+                asd();
+            };
+
+            kappaPanel = new SPanel();
+            kappaPanel.BackColor = Color.DarkKhaki;
+            kappaPanel.Size = new Size(200, 200);
+            kappaPanel.Location = new Point(400, 400);
+            kappaPanel.Hide();
+
+            Button d = new Button();
+            d.Location = new Point(20, 20);
+            d.Text = "pls";
+            kappaPanel.Controls.Add(d);
+            d.Click += (a,aa) =>
+            {
+                GameController.newGame();
             };
 
             loginPanel.Controls.Add(usernameLabel);
             loginPanel.Controls.Add(usernameBox);
             loginPanel.Controls.Add(b);
+            loginPanel.Controls.Add(c);
+            
 
+            mainMenuPanel.Controls.Add(kappaPanel);
             mainMenuPanel.Controls.Add(loginPanel);
 
-            mainMenuPanel.Visible = false;
+            //mainMenuPanel.Visible = false;
+            mainMenuPanel.Size = new Size(0, 0);
         }
 
-        private static void login()
+        public static void login()
+        {
+            loginPanel.Show();
+            waitForLogin.WaitOne();
+            loginPanel.Hide();
+            kappaPanel.Show();
+        }
+
+        private static void asd()
+        {
+            waitForLogin.Set();
+        }
+
+        private static AutoResetEvent waitForLogin = new AutoResetEvent(false);
+        private static void loginClick()
         {
             if (Network.login(usernameBox.Text))
             {
                 var s = Network.getFriends();
-                foreach (var x in s)
-                {
-                    System.Console.WriteLine("XD: " + x);
-                }
 
                 friendPanel.addFriends(s);
 
                 loginPanel.Visible = false;
                 friendPanel.Visible = true;
+                waitForLogin.Set();
             }
         }
 
 
-        public static void showPopupPanel(Panel p)
+        public static void showPopupPanel(Control p)
         {
             if (popupPanel != null) { closePopupPanel(); }
 
@@ -264,9 +299,19 @@ namespace stonekart
 
         private static void transitionTo(Panel p)
         {
-            if (activePanel != null) { activePanel.Visible = false; }
-            p.Visible = true;
+            if (activePanel != null) { activePanel.Size = new Size(0,0); }
             activePanel = p;
+            p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+        }
+
+        public static void transitionToGame()
+        {
+            transitionTo(gamePanel);
+        }
+
+        public static void transitionToMainMenu()
+        {
+            transitionTo(mainMenuPanel);
         }
 
         public static void advanceStep()
@@ -312,6 +357,22 @@ namespace stonekart
         {
             if (outputBox == null) { return; }
             outputBox.AppendText(sgfs + Environment.NewLine);
+        }
+    }
+
+    class SPanel : Panel
+    {
+        private Size xd;
+
+        public new void Hide()
+        {
+            xd = Size;
+            Size = new Size(0, 0);
+        }
+
+        public new void Show()
+        {
+            Size = xd;
         }
     }
 

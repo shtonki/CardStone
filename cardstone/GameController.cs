@@ -11,6 +11,12 @@ namespace stonekart
     {
         public static Game currentGame { get; private set; }
 
+        public static void start()
+        {
+            Network.connect();
+            MainFrame.login();
+        }
+
         public static void newGame()
         {
             Thread t = new Thread(newGameT);
@@ -19,6 +25,7 @@ namespace stonekart
 
         private static void newGameT()
         {
+            MainFrame.transitionToGame();
             currentGame = new Game(null);
             currentGame.start();
             

@@ -23,6 +23,8 @@ namespace stonekart
             
             ImageLoader.init();
             FontLoader.init();
+            Thread.Sleep(100);  //yeah nah
+            GameController.start();
         }
 
         private static void asd()
