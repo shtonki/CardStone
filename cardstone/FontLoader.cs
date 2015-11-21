@@ -20,7 +20,6 @@ namespace stonekart
         public static void init()
         {
             var a = new PrivateFontCollection();
-
             
             a.AddFontFile(@"res/FONT/mplantin.ttf");
             a.AddFontFile(@"res/FONT/mangalb.ttf");
@@ -28,7 +27,7 @@ namespace stonekart
 
             fontFamilies[MPLATIN] = a.Families[0];
             fontFamilies[MANGALB] = a.Families[1];
-            fontFamilies[MAIANDRA] = a.Families[1];
+            fontFamilies[MAIANDRA] = a.Families[2];
         } 
 
         public static Font getFont(int baseFont, int size)
