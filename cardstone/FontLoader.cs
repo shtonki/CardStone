@@ -15,7 +15,7 @@ namespace stonekart
             MANGALB = 1,
             MAIANDRA = 2;
 
-        private static FontFamily[] fontFamilies = new FontFamily[2];
+        private static FontFamily[] fontFamilies = new FontFamily[3];
 
         public static void init()
         {
