@@ -11,6 +11,7 @@ namespace stonekart
     class FriendPanel : SPanel
     {
         public List<string> friendList { get; set; }
+        private static Dictionary<string, ConversationPanel> conv = new Dictionary<string, ConversationPanel>(); 
 
         private Label friendCount;
         private Button addFriendButton;
@@ -38,7 +39,6 @@ namespace stonekart
                 Label p = new Label();
                 p.Size = new Size(150, 250);
                 p.BackColor = Color.DarkGreen;
-                MainFrame.showPopupPanel(p);
                 String s = "";
                 foreach (string x in friendList)
                 {
@@ -77,7 +77,92 @@ namespace stonekart
                 addFriend(v);
             }
 
-            friendCount.Text = friendList.Count.ToString();
+            friendCount.Invoke(new Action(() =>
+            {
+                friendCount.Text = friendList.Count.ToString();
+            }));
+        }
+
+        public void getWhisper(string from, string message)
+        {
+            if (conv.ContainsKey(from))
+            {
+                conv[from].appendMessage(from + ": " + message + "\n");
+                return;
+            }
+
+            var p = new ConversationPanel(from);
+            openConversation(from, p);
+            MainFrame.showWindow(p);
+
+            p.appendMessage(from + ": " + message + "\n");
+        }
+
+        public static void closeConversation(string s)
+        {
+            conv.Remove(s);
+        }
+
+        public static void openConversation(string s, ConversationPanel p)
+        {
+            if (conv.ContainsKey(s)) { throw new Exception("no buendo"); }
+            conv.Add(s, p);
+        }
+
+        public static void sendMessage(ConversationPanel conversation, string message)
+        {
+            conversation.appendMessage("you: " + message + "\n");
+        }
+
+        internal class ConversationPanel : Panel
+        {
+            public string partner { get; private set; }
+
+            private RichTextBox l;
+
+            public ConversationPanel(string p)
+            {
+                partner = p;
+
+                Size = new Size(200, 233);
+
+                l = new RichTextBox();
+                l.Multiline = true;
+                l.WordWrap = true;
+                l.Size = new Size(200, 200);
+                l.ReadOnly = true;
+
+
+                l.Font = new Font(new FontFamily("Comic Sans MS"), 14);
+
+                var i = new TextBox();
+                i.Size = new Size(200, 50);
+                i.Location = new Point(0, 200);
+                i.Font = new Font(new FontFamily("Comic Sans MS"), 14);
+                i.KeyDown += (sender, args) =>
+                {
+                    if (args.KeyCode != Keys.Enter) { return; }
+
+                    sendMessage(this, i.Text);
+                    i.Clear();
+                };
+
+                Controls.Add(l);
+                Controls.Add(i);
+
+                Disposed += (sender, args) =>
+                {
+                    closeConversation(partner);
+                };
+            }
+
+            public void appendMessage(string s)
+            {
+                Invoke(new Action(() =>
+                {
+                    l.AppendText(s);
+                }));
+            }
         }
     }
 }

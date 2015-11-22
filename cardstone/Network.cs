@@ -69,6 +69,7 @@ namespace stonekart
                 case "handshakeok":
                     {
                         System.Console.WriteLine("Connected");
+                        start();
                         return true;
                     }
 
@@ -89,12 +90,25 @@ namespace stonekart
 
         public void gotString(byte[] bs)
         {
-            System.Console.WriteLine(bs);
+            string[] ss = Encoding.UTF8.GetString(bs).Split(':');
+
+            switch (ss[0])
+            {
+                case "told":
+                    {
+                        MainFrame.getTell(ss[1], ss[2]);
+                } break;
+
+                default:
+                {
+                    System.Console.WriteLine('\'' + ss[0] + '\'');
+                } break;
+            }
         }
 
         public string requestFriends()
         {
-            sendString("friend:" + name);
+            sendString("friend");
             return waitForString();
         }
     }

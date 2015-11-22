@@ -85,7 +85,8 @@ namespace stonekart
 
         public void setVisible(bool v)
         {
-            Size = v ? SHOW : HIDE;
+            if (InvokeRequired) { Invoke(new Action(() => { Size = v ? SHOW : HIDE; })); }
+            else { Size = v ? SHOW : HIDE; }
         }
 
         private const int w = 33;
@@ -191,7 +192,14 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             card = (Card)o;
-            Visible = card != null;
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { Visible = card != null; }));
+            }
+            else
+            {
+                Visible = card != null;       
+            }
         }
     }
 
@@ -205,7 +213,7 @@ namespace stonekart
             base.notifyObserver(o);
 
             Card c = (Card)o;
-            Location = c.isAttacking() ? att : def;
+            Invoke(new Action(() => { Location = c.isAttacking() ? att : def; }));
         }
 
         public void setLocation(int x, int y)

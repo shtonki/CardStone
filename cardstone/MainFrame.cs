@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -254,6 +255,7 @@ namespace stonekart
             }
             else
             {
+                Thread.Sleep(100);
                 loginWithName(Settings.username);
             }
 
@@ -313,9 +315,21 @@ namespace stonekart
 
         private static void transitionTo(Panel p)
         {
-            if (activePanel != null) { activePanel.Size = new Size(0,0); }
-            activePanel = p;
-            p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            if (frame.InvokeRequired)
+            {
+                frame.Invoke(new Action(() =>
+                {
+                    if (activePanel != null) { activePanel.Size = new Size(0, 0); }
+                    activePanel = p;
+                    p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+                }));
+            }
+            else
+            {
+                if (activePanel != null) { activePanel.Size = new Size(0, 0); }
+                activePanel = p;
+                p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            }
         }
 
         public static void transitionToGame()
@@ -354,6 +368,38 @@ namespace stonekart
             heroPanel.showAddMana();
         }
 
+        public static void showWindow(Panel p)
+        {
+            if (frame.InvokeRequired)
+            {
+                frame.Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        var v = new WindowedPanel(p);
+                        frame.Controls.Add(v);
+                        v.BringToFront();
+                    }
+                    catch (Exception e)
+                    {
+                        System.Console.WriteLine(e.ToString());
+                    }
+                }));
+            }
+            else
+            {
+                var v = new WindowedPanel(p);
+                frame.Controls.Add(v);
+                v.BringToFront();
+            }
+        }
+
+        public static void getTell(string user, string message)
+        {
+            friendPanel.getWhisper(user, message);
+        }
+
+
         public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
@@ -380,13 +426,96 @@ namespace stonekart
 
         public new void Hide()
         {
-            xd = Size;
-            Size = new Size(0, 0);
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() =>
+                {
+                    xd = Size;
+                    Size = new Size(0, 0);
+                }));
+            }
+            else
+            {
+                xd = Size;
+                Size = new Size(0, 0);
+            }
         }
 
         public new void Show()
         {
-            Size = xd;
+            Invoke(new Action(() =>
+            {
+                Size = xd;
+            }));
+        }
+    }
+
+    class WindowedPanel : Panel
+    {
+        private bool dragging, drawContent = true;
+        private Size xd;
+
+        public WindowedPanel(Panel content)
+        {
+            Size = content.Size + new Size(0, 20);
+            content.Location = new Point(0, 20);
+
+            Panel bar = new Panel();
+            bar.Size = new Size(Size.Width - 20, 20);
+            bar.Location = new Point(0, 0);
+            bar.BackColor = Color.DarkOrchid;
+
+            Button x = new Button();
+            x.Size = new Size(20, 20);
+            x.Location = new Point(Size.Width - 20, 0);
+            x.BackColor = Color.Red;
+
+            Button t = new Button();
+            t.Size = new Size(20, 20);
+            t.Location = new Point(Size.Width - 40, 0);
+            t.BackColor = Color.Orange;
+
+            x.Click += (a, b) =>
+            {
+                Parent.Controls.Remove(this);
+                content.Dispose();
+            };
+
+            t.Click += (a, b) =>
+            {
+                drawContent = !drawContent;
+
+                if (drawContent)
+                {
+                    Size = content.Size + new Size(0, 20);
+                }
+                else
+                {
+                    Size = new Size(Size.Width, 20);
+                }
+            };
+
+            bar.MouseDown += (sender, args) =>
+            {
+                dragging = true;
+                xd = new Size(args.X, args.Y);
+            };
+
+            bar.MouseUp += (asd, sdf) =>
+            {
+                dragging = false;
+            };
+
+            bar.MouseMove += (sender, args) =>
+            {
+                if (!dragging) { return; }
+                Location = Location - xd + new Size(args.X, args.Y);
+            };
+
+            Controls.Add(x);
+            Controls.Add(t);
+            Controls.Add(bar);
+            Controls.Add(content);
         }
     }
 
