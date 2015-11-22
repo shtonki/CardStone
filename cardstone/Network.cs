@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace stonekart
 {
     static class Network
     {
         private static ServerConnection serverConnection;
+        private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
 
         private static string[] friends;
 
@@ -30,6 +33,7 @@ namespace stonekart
                 string[] ss = s.Split(':');
                 if (ss[0] != "friend") { throw new Exception("v bad"); }
                 friends =  ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
+                serverConnection.start();
                 return true;
             }
             else
@@ -42,12 +46,53 @@ namespace stonekart
         {
             return friends;
         }
+
+        public static void sendTell(string user, string message)
+        {
+            serverConnection.sendString("tell:" + user + ':' + message);
+        }
+
+        public static void addFriend(string s)
+        {
+            serverConnection.sendString("friend:" + s);
+        }
+
+        public static void removeFriend(string s)
+        {
+            serverConnection.sendString("unfriend:" + s);
+        }
+
+        public static void challenge(string s)
+        {
+            serverConnection.sendString("challenge:" + s);
+        }
+
+        public static void addGameConnection(string s, GameConnection c)
+        {
+            System.Console.WriteLine("adding " + s);
+            gameConnections.Add(s, c);
+        }
+
+        public static void receiveGameMessage(string user, string content)
+        {
+            if (!gameConnections.ContainsKey(user))
+            {
+                System.Console.WriteLine("game message from a dead man " + user);
+                return;
+            }
+            gameConnections[user].receiveGameMessage(content);
+        }
+
+        public static void sendRaw(string s)
+        {
+            serverConnection.sendString(s);
+        }
     }
 
 
     class ServerConnection : Connection
     {
-        private string name;
+        public string name { get; private set; }
 
         public ServerConnection()
             : base("46.239.124.155")
@@ -68,8 +113,7 @@ namespace stonekart
             {
                 case "handshakeok":
                     {
-                        System.Console.WriteLine("Connected");
-                        start();
+                        System.Console.WriteLine("Connected as " + n);
                         return true;
                     }
 
@@ -90,18 +134,31 @@ namespace stonekart
 
         public void gotString(byte[] bs)
         {
-            string[] ss = Encoding.UTF8.GetString(bs).Split(':');
+            string s = Encoding.UTF8.GetString(bs);
+            string[] ss = s.Split(':');
 
             switch (ss[0])
             {
                 case "told":
-                    {
+                {
                         MainFrame.getTell(ss[1], ss[2]);
+                } break;
+
+                case "startgame":
+                {
+                    GameConnection c = new GameConnection(ss[1]);
+                    Network.addGameConnection(ss[1], c);
+                    GameController.newGame(c);
+                } break;
+
+                case "game":
+                {
+                    Network.receiveGameMessage(ss[1], s.Substring(ss[0].Length + ss[1].Length + 2));
                 } break;
 
                 default:
                 {
-                    System.Console.WriteLine('\'' + ss[0] + '\'');
+                    System.Console.WriteLine('\'' + s + '\'');
                 } break;
             }
         }
@@ -113,16 +170,19 @@ namespace stonekart
         }
     }
 
-    class GameConnection : Connection
+    class GameConnection
     {
-        public GameConnection(Socket s) : base(s)
-        {
-        }
+        public string villainName;
+        protected Queue<string> eventQueue;
+        private Semaphore smf;
+        private AutoResetEvent mre;
 
-        public GameConnection()
+        public GameConnection(string s)
         {
-            //setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("other player disconnected"); });
-            //start();
+            villainName = s;
+            eventQueue = new Queue<string>();
+            mre = new AutoResetEvent(false);
+            smf = new Semaphore(1, 1);
         }
 
         public virtual bool asHomePlayer()
@@ -130,26 +190,43 @@ namespace stonekart
             return false;
         }
 
-        private void gotString(byte[] bs)
+        public void receiveGameMessage(string message)
         {
-            System.Console.WriteLine(bs);
+            smf.WaitOne();
+            eventQueue.Enqueue(message);
+            mre.Set();
+            smf.Release();
         }
 
-        public void sendGameEvent(GameEvent e)
+        private void send(string head, string content)
         {
-            sendString(e.toNetworkString());
+            Network.sendRaw(head + ':' + villainName + ':');
         }
 
-        public new virtual void sendString(string s) 
+        public virtual void sendGameEvent(GameEvent e)
         {
-            base.sendString(s);
+            send("game", e.toString());
+        }
+
+        public virtual GameEvent getNextGameEvent()
+        {
+            if (eventQueue.Count == 0)
+            {
+                mre.WaitOne();
+            }
+
+            smf.WaitOne();
+            string r = eventQueue.Dequeue();
+            smf.Release();
+
+            return GameEvent.fromString(r);
         }
 
     }
 
     class DummyConnection : GameConnection
     {
-        public DummyConnection()
+        public DummyConnection() : base("")
         {
 
         }
@@ -159,11 +236,9 @@ namespace stonekart
             return true;
         }
 
-
-        public override void sendString(String s)
+        public override void sendGameEvent(GameEvent e)
         {
-            System.Console.WriteLine(s);
+            System.Console.WriteLine(e.toString());
         }
-
     }
 }

@@ -12,10 +12,9 @@ namespace stonekart
     {
         private ManaButton[][] manaButtons = new ManaButton[5][];
         private Player player;
-
+        private static int x = 0;
         public PlayerPanel()
         {
-
             for (int i = 0; i < 5; i++)
             {
                 manaButtons[i] = new ManaButton[6];

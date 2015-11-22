@@ -45,20 +45,21 @@ namespace stonekart
 
         private static FriendPanel friendPanel;
 
-
         private static Panel activePanel;
-        private static Control popupPanel;
         
         public MainFrame()
         {
             InitializeComponent();
 
             frame = this;
+            //frame.
+
+            Application.AddMessageFilter(new GlobalMouseHandler());
 
             FormClosed += (sender, args) => { Environment.Exit(0); };
 
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-            //FormBorderStyle = FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
 
 
@@ -68,11 +69,6 @@ namespace stonekart
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
 
-
-            this.Click += (sender, args) =>
-            {
-                System.Console.WriteLine("xd");
-            };
 
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
@@ -230,7 +226,7 @@ namespace stonekart
             kappaPanel.Controls.Add(d);
             d.Click += (a,aa) =>
             {
-                GameController.newGame();
+                GameController.newGame(new DummyConnection());
             };
 
             loginPanel.Controls.Add(usernameLabel);
@@ -277,40 +273,13 @@ namespace stonekart
                 System.Console.WriteLine("soeiroj");
                 return;
             }
-            System.Console.WriteLine(x);
             var s = Network.getFriends();
 
-            friendPanel.addFriends(s);
+            friendPanel.setFriends(s);
 
             loginPanel.Hide();
             friendPanel.Show();
             waitForLogin.Set();
-        }
-
-        public static void showPopupPanel(Control p)
-        {
-            if (popupPanel != null) { closePopupPanel(); }
-
-            popupPanel = p;
-            popupPanel.Visible = true;
-            //System.Console.WriteLine((MousePosition.X - frame.Location.X) + " " + MousePosition.Y);
-            popupPanel.Location = new Point((MousePosition.X - frame.Location.X - p.Size.Width/2), (MousePosition.Y - frame.Location.Y - p.Size.Height));
-            frame.Controls.Add(popupPanel);
-            popupPanel.BringToFront();
-
-
-
-            popupPanel.MouseLeave += (sender, args) =>
-            {
-                closePopupPanel();
-            };
-        }
-
-        public static void closePopupPanel()
-        {
-            frame.Controls.Remove(popupPanel);
-            popupPanel.Visible = false;
-            popupPanel = null;
         }
 
         private static void transitionTo(Panel p)
@@ -368,15 +337,16 @@ namespace stonekart
             heroPanel.showAddMana();
         }
 
-        public static void showWindow(Panel p)
+        public static WindowedPanel showWindow(Control p, string barTitle)
         {
+            WindowedPanel v = null;
             if (frame.InvokeRequired)
             {
                 frame.Invoke(new Action(() =>
                 {
                     try
                     {
-                        var v = new WindowedPanel(p);
+                        v = new WindowedPanel(p, barTitle);
                         frame.Controls.Add(v);
                         v.BringToFront();
                     }
@@ -388,11 +358,19 @@ namespace stonekart
             }
             else
             {
-                var v = new WindowedPanel(p);
+                v = new WindowedPanel(p, barTitle);
                 frame.Controls.Add(v);
                 v.BringToFront();
             }
+
+            return v;
         }
+
+        public static WindowedPanel showWindow(Control p)
+        {
+            return showWindow(p, "");
+        }
+
 
         public static void getTell(string user, string message)
         {
@@ -450,20 +428,24 @@ namespace stonekart
         }
     }
 
-    class WindowedPanel : Panel
+    public class WindowedPanel : Panel
     {
-        private bool dragging, drawContent = true;
+        private bool dragging, drawContent = true, closed;
         private Size xd;
+        private Control content;
 
-        public WindowedPanel(Panel content)
+        public WindowedPanel(Control c, string barTitle)
         {
-            Size = content.Size + new Size(0, 20);
-            content.Location = new Point(0, 20);
+            content = c;
+
+            Size = c.Size + new Size(0, 20);
+            c.Location = new Point(0, 20);
 
             Panel bar = new Panel();
             bar.Size = new Size(Size.Width - 20, 20);
             bar.Location = new Point(0, 0);
             bar.BackColor = Color.DarkOrchid;
+            bar.Text = barTitle;
 
             Button x = new Button();
             x.Size = new Size(20, 20);
@@ -477,8 +459,7 @@ namespace stonekart
 
             x.Click += (a, b) =>
             {
-                Parent.Controls.Remove(this);
-                content.Dispose();
+                close();
             };
 
             t.Click += (a, b) =>
@@ -487,7 +468,7 @@ namespace stonekart
 
                 if (drawContent)
                 {
-                    Size = content.Size + new Size(0, 20);
+                    Size = c.Size + new Size(0, 20);
                 }
                 else
                 {
@@ -515,7 +496,38 @@ namespace stonekart
             Controls.Add(x);
             Controls.Add(t);
             Controls.Add(bar);
-            Controls.Add(content);
+            Controls.Add(c);
+        }
+
+        public void close()
+        {
+            closed = true;
+            Parent.Controls.Remove(this);
+        }
+
+        public Control getContent()
+        {
+            return content;
+        }
+
+        public bool isClosed()
+        {
+            return closed;
+        }
+    }
+
+    class GlobalMouseHandler : IMessageFilter
+    {
+
+        private const int left = 0x201, right = 0x205;
+
+        public bool PreFilterMessage(ref Message m)
+        {
+            if (m.Msg == left || m.Msg == right)
+            {
+                
+            }
+            return false;
         }
     }
 

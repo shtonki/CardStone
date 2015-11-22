@@ -17,7 +17,7 @@ namespace stonekart
             MainFrame.login();
         }
 
-        public static void newGame()
+        public static void newGame(GameConnection c)
         {
             Thread t = new Thread(newGameT);
             t.Start();

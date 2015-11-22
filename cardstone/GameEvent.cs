@@ -30,13 +30,17 @@ namespace stonekart
         }
 
 
-        public string toNetworkString()
+        public string toString()
         {
             return "event:" + type + ':' + getCruftString();
         }
 
         protected abstract string getCruftString();
 
+        public static GameEvent fromString(string s)
+        {
+            return null;
+        }
     }
 
     class DrawEvent : GameEvent

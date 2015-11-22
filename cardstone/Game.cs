@@ -298,7 +298,7 @@ namespace stonekart
         {
             kappa.handle(e);
 
-            connection.sendString(e.toNetworkString());
+            connection.sendGameEvent(e);
         }
 
         private Foo f;
