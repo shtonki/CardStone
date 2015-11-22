@@ -18,6 +18,9 @@ namespace stonekart
 
         public Game(GameConnection cn)
         {
+            
+            //while (true) { System.Console.WriteLine(cn.getNextGameEvent()); }
+            
             connection = cn;
 
 
@@ -297,7 +300,6 @@ namespace stonekart
         public void handleEvent(GameEvent e)
         {
             kappa.handle(e);
-
             connection.sendGameEvent(e);
         }
 

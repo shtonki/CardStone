@@ -200,7 +200,7 @@ namespace stonekart
 
         private void send(string head, string content)
         {
-            Network.sendRaw(head + ':' + villainName + ':');
+            Network.sendRaw(head + ':' + villainName + ':' + content);
         }
 
         public virtual void sendGameEvent(GameEvent e)
@@ -208,7 +208,7 @@ namespace stonekart
             send("game", e.toString());
         }
 
-        public virtual GameEvent getNextGameEvent()
+        public virtual string getNextGameEvent()
         {
             if (eventQueue.Count == 0)
             {
@@ -219,7 +219,7 @@ namespace stonekart
             string r = eventQueue.Dequeue();
             smf.Release();
 
-            return GameEvent.fromString(r);
+            return r;//GameEvent.fromString(r);
         }
 
     }

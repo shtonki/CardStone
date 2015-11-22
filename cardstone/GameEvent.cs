@@ -32,7 +32,7 @@ namespace stonekart
 
         public string toString()
         {
-            return "event:" + type + ':' + getCruftString();
+            return type + ',' + getCruftString();
         }
 
         protected abstract string getCruftString();

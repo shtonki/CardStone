@@ -19,14 +19,15 @@ namespace stonekart
 
         public static void newGame(GameConnection c)
         {
-            Thread t = new Thread(newGameT);
-            t.Start();
+            Thread t = new Thread(new ParameterizedThreadStart(newGameT));
+            t.Start(c);
         }
 
-        private static void newGameT()
+        private static void newGameT(object o)
         {
+            GameConnection c = (GameConnection)o;
             MainFrame.transitionToGame();
-            currentGame = new Game(new DummyConnection());
+            currentGame = new Game(c);
             currentGame.start();
             
         }
