@@ -84,8 +84,10 @@ namespace stonekart
             GameController.currentGame.fooPressed(b);
         }
 
-        public void showAddMana()
+        public void showAddMana(bool y)
         {
+            int q = y ? 1 : 0;
+
             for (int c = 0; c < 5; c++)
             {
                 int i = 0;
@@ -93,7 +95,7 @@ namespace stonekart
                 {
                     manaButtons[c][i].setState(ManaButton.FILLED);
                 }
-                for (; i < 1 + player.getMaxMana(c); i++)
+                for (; i < q + player.getMaxMana(c); i++)
                 {
                     if (i == 6) { break; }
                     manaButtons[c][i].setState(ManaButton.HOLLOW);

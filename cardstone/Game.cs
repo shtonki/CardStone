@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
 
 namespace stonekart
 {
-    class Game
+    public class Game
     {
-        private Player hero, villain, homePlayer, awayPlayer;
+        private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
 
+        private bool active;
+
         private GameConnection connection;
+        private CardFactory cardFactory;
 
         private KappaMan kappa;
 
         public Game(GameConnection cn)
         {
-            
-            //while (true) { System.Console.WriteLine(cn.getNextGameEvent()); }
-            
             connection = cn;
-
+            connection.setGame(this);
+            cardFactory = new CardFactory();
 
             setupEventHandlers();
 
@@ -40,9 +43,21 @@ namespace stonekart
 
         public void start()
         {
+            var v =
+                cardFactory.makeList(hero, new[]
+                {
+                    CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
+                    CardId.SolemnAberration, CardId.SolemnAberration,
+                });
 
-            hero.loadDeck(new[] { CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, }, new Location(Location.DECK, Location.HEROSIDE));
-            villain.loadDeck(new CardId[] {}, new Location(Location.DECK, Location.VILLAINSIDE));
+            var vx = cardFactory.makeList(villain, new[]
+                {
+                    CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
+                    CardId.SolemnAberration, CardId.SolemnAberration,
+                });
+
+            hero.loadDeck(v, new Location(Location.DECK, Location.HEROSIDE));
+            villain.loadDeck(vx, new Location(Location.DECK, Location.VILLAINSIDE));
 
 
             hero.shuffleDeck();
@@ -62,15 +77,40 @@ namespace stonekart
         {
             kappa = new KappaMan();
 
-            kappa.addHandler(new EventHandler(GameEvent.DRAW, delegate(GameEvent gevent)
+            kappa.addBaseHandler(new EventHandler(GameEventType.DRAW, @gevent =>
             {
-                hero.draw();
+                DrawEvent e = (DrawEvent)gevent;
+                e.getPlayer().draw();
             }));
 
-            kappa.addHandler(new EventHandler(GameEvent.CAST, delegate(GameEvent gevent)
+            kappa.addBaseHandler(new EventHandler(GameEventType.CAST, @gevent =>
             {
                 CastEvent e = (CastEvent)gevent;
-                e.getCard().moveTo(new Location(Location.STACK, Location.HEROSIDE));
+                e.getCard().moveTo(stack);
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.MOVECARD, @gevent =>
+            {
+                MoveCardEvent e = (MoveCardEvent)gevent;
+                e.getCard().moveTo(e.getLocation());
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.GAINMANA, @gevent =>
+            {
+                GainManaOrbEvent e = (GainManaOrbEvent)gevent;
+                e.getPlayer().addMana(e.getColor());
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.UNTOPPLAYER, @gevent =>
+            {
+                UntopPlayerEvent e = (UntopPlayerEvent)gevent;
+                e.getPlayer().untop();
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.RESOLVE, @gevent =>
+            {
+                ResolveEvent e = (ResolveEvent)gevent;
+                e.getCard().resolve(this);
             }));
         }
 
@@ -91,78 +131,173 @@ namespace stonekart
             Location.setPile(Location.STACK, Location.HEROSIDE, stack);
         }
 
+
         private void loop()
         {
+            //Thread.CurrentThread.Name = "XDDDDDDDDDD";
+            active = true;
+
             while (true)
             {
-                //refill step
-                hero.resetMana();
-                unTop(hero);
-                addMana();
-                givePriority(false);
+                activePlayer = active ? hero : villain;
+
+                //untop step
+                untopStep();
                 advanceStep();
 
                 //draw step
-                draw();
-                givePriority(false);
+                drawStep();
                 advanceStep();
 
                 //main phase 1
-                givePriority(true);
+                mainStep(1);
                 advanceStep();
 
                 //startCombat
-                givePriority(false);
+                startCombatStep();
                 advanceStep();
 
                 //attackers
-                handleEvent(new DeclareAttackersEvent(choseAttackers()));
-                givePriority(false);
+                chooseAttackersStep();
                 advanceStep();
 
-                //blockers
-                choseBlockers();
-                givePriority(false);
+                //defenders
+                chooseDefendersStep();
                 advanceStep();
 
                 //combatDamage
-                combatDamage();
-                givePriority(false);
+                combatDamageStep();
                 advanceStep();
 
                 //endCombat
-                givePriority(false);
+                endCombatStep();
                 advanceStep();
 
                 //main2
-                givePriority(true);
+                mainStep(2);
                 advanceStep();
 
                 //end
-                givePriority(false);
+                endStep();
                 advanceStep();
+
+                active = !active;
             }
         }
+
+        private void untopStep()
+        {
+            raiseEvent(new UntopPlayerEvent(activePlayer));
+
+            int s;
+            if (active)
+            {
+                MainFrame.showAddMana(true);
+                int c;
+                do
+                {
+                    c = getManaColor();
+                } while (hero.getMaxMana(c) == 6);
+                MainFrame.showAddMana(false);
+                s = c;
+                sendSelection(c);
+            }
+            else
+            {
+                s = demandSelection();
+            }
+
+            raiseEvent(new GainManaOrbEvent(activePlayer, s));
+            raiseEvent(new StepEvent(StepEvent.UNTOP));
+            givePriority(false);
+        }
+
+        private void drawStep()
+        {
+            raiseEvent(new DrawEvent(activePlayer));
+            raiseEvent(new StepEvent(StepEvent.DRAW));
+            givePriority(false);
+        }
+
+        private void mainStep(int i)
+        {
+            raiseEvent(new StepEvent(StepEvent.MAIN1));
+            givePriority(true);
+        }
+
+        private void startCombatStep()
+        {
+
+        }
+
+        private void chooseAttackersStep()
+        {
+
+        }
+
+        private void chooseDefendersStep()
+        {
+
+        }
+
+        private void combatDamageStep()
+        {
+
+        }
+
+        private void endCombatStep()
+        {
+
+        }
+
+        private void endStep()
+        {
+
+        }
+
 
         private void givePriority(bool main)
         {
             while (true)
             {
-                if (castOrPass(main))
+                Card c;
+                if (active)
                 {
-                    
+                    c = castOrPass(main);
                 }
                 else
                 {
+                    c = demandCastOrPass();
+                }
+
+                if (c == null)  //active player passed
+                {
+                    if (active)
+                    {
+                        c = demandCastOrPass();
+                    }
+                    else
+                    {
+                        c = castOrPass(main);
+                    }
+                }
+
+                if (c != null)
+                {
+                    raiseEvent(new CastEvent(c));
+                }
+                else //both passed
+                {
                     if (stack.Count > 0)
                     {
-                        resolve(stack.peek());                       
+                        resolveTop();                        
                     }
                     else
                     {
                         break;
                     }
                 }
+
             }
         }
 
@@ -171,7 +306,12 @@ namespace stonekart
             MainFrame.advanceStep();
         }
 
-        private bool castOrPass(bool main)
+        /// <summary>
+        /// Makes the user either pick a card or pass priority, then calls raiseAction on the resulting action which is either a PassAction or a CastAction
+        /// </summary>
+        /// <param name="main"></param>
+        /// <returns>A Card if a card was selected, null otherwise</returns>
+        private Card castOrPass(bool main)
         {
             MainFrame.setMessage("You have priority");
             while (true)
@@ -186,8 +326,8 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.clear();
-                            pass();
-                            return false;
+                            raiseAction(new PassAction());
+                            return null;
                         }
                     }
                     else if (f is CardButton)
@@ -197,18 +337,52 @@ namespace stonekart
                         if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay(hero))
                         {
                             MainFrame.clear();
-                            cast(c);
-                            return true;
+                            raiseAction(new CastAction(c));
+                            return c;
                         }
                     }
                 }
             }
         }
 
-        private Card[] choseAttackers()
+
+        private void sendCastOrPass(Card c)
         {
+            if (c == null)
+            {
+                raiseAction(new PassAction());
+            }
+            else
+            {
+                raiseAction(new CastAction(c));
+            }
+        }
+
+        private Card demandCastOrPass()
+        {
+            var v = connection.demandCastOrPass();
+            if (v is PassAction) { return null; }
+            if (v is CastAction) { return ((CastAction)v).getCard(); }
+            throw new Exception("really shouldn't happen");
+        }
+
+        private void sendSelection(int c)
+        {
+            raiseAction(new SelectAction(c));
+        }
+
+        private int demandSelection()
+        {
+            return connection.demandSelection();
+        }
+
+
+        private void chooseAttackers()
+        {
+            List<Card> cs = null;
+
             MainFrame.setMessage("Choose attackers");
-            while (true)
+            while (cs == null) 
             {
                 MainFrame.showButtons(ACCEPT);
                 while (true)
@@ -221,13 +395,13 @@ namespace stonekart
                         {
                             MainFrame.clear();
 
-                            List<Card> cs = new List<Card>();
+                            cs = new List<Card>();
                             foreach (Card c in hero.getField().getCards())
                             {
                                 if (c.isAttacking()) { cs.Add(c); }
                             }
 
-                            return cs.ToArray();
+                            break;
                         }
                     }
                     else if (f is CardButton)
@@ -239,6 +413,9 @@ namespace stonekart
                     }
                 }
             }
+
+            raiseAction(new DeclareAttackersAction(cs));
+            raiseEvent(new AttackingEvent(cs));
         }
 
         private void choseBlockers()
@@ -251,45 +428,11 @@ namespace stonekart
             
         }
 
-        private void unTop(Player p)
+        private void resolveTop()
         {
-            foreach (Card c in p.getField().getCards())
-            {
-                c.unTop();
-            }
-        }
-
-        private void draw()
-        {
-            handleEvent(new DrawEvent(hero == homePlayer));
-        }
-
-        private void pass()
-        {
-            handleEvent(new PassEvent());
-        }
-
-        private void cast(Card c)
-        {
-            handleEvent(new CastEvent(c));
-        }
-
-        private void resolve(Card c)
-        {
-            c.moveToOwners(Location.FIELD);
-            handleEvent(new ResolveCardEvent(c));
-        }
-
-        private void addMana()
-        {
-            MainFrame.showAddMana();
-            int c;
-            do
-            {
-                c = getManaColor();
-            } while (hero.getMaxMana(c) == 6);
-            hero.addMana(c);
-            handleEvent(new GainManaOrbEvent(c));
+            raiseEvent(new ResolveEvent(stack.peek()));
+            //c.ToOwners(Location.FIELD);
+            //raiseEvent(new ResolveCardEvent(c));
         }
 
         public Player getHero()
@@ -297,11 +440,23 @@ namespace stonekart
             return hero;
         }
 
-        public void handleEvent(GameEvent e)
+        public void raiseEvent(GameEvent e)
         {
             kappa.handle(e);
-            connection.sendGameEvent(e);
         }
+
+        private void raiseAction(GameAction a)
+        {
+            connection.sendGameAction(a);
+        }
+
+
+        public Card getCardById(int i)
+        {
+            return cardFactory.getCardById(i);
+        }
+
+
 
         private Foo f;
         private AutoResetEvent e = new AutoResetEvent(false);
@@ -372,24 +527,54 @@ namespace stonekart
 
             public KappaMan()
             {
-                xds = new EventHandler[100];
+                xds = new EventHandler[100]; //todo nope
             }
 
-            public void addHandler(EventHandler e)
+            public void addBaseHandler(EventHandler e)
             {
-                xds[e.type] = e;
+                int i = (int)e.type;
+                if (xds[i] != null) { throw new Exception("event already handled"); }
+                xds[i] = e;
             }
 
             public void handle(GameEvent e)
             {
-                if (xds[e.getType()] == null)
+                if (xds[(int)e.getType()] == null)
                 {
+                    System.Console.WriteLine("No handler for " + e.GetType());
                     return;
                 }
 
-                xds[e.getType()].invoke(e);
+                xds[(int)e.getType()].invoke(e);
+            }
+        }
+
+        private class CardFactory
+        {
+            private Dictionary<int, Card> cards = new Dictionary<int, Card>();
+            private int ctr = 0;
+
+            public Card makeCard(Player owner, CardId id)
+            {
+                int i = ctr++;
+                Card c = new Card(id);
+                c.setId(i);
+                c.setOwner(owner);
+                cards.Add(i, c);
+                return c;
+            }
+
+            public List<Card> makeList( Player p, params CardId[] ids)
+            {
+                return ids.Select((a) => makeCard(p, a)).ToList(); //LINQ: pretty and readable
+            }
+
+            public Card getCardById(int i)
+            {
+                return cards[i];
             }
         }
     }
+
 
 }

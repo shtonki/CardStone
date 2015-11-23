@@ -32,19 +32,16 @@ namespace stonekart
             notifyObserver();
         }
 
-        public void draw()
-        {
-            draw(1);
-        }
-
-        public void draw(int c)
+        public bool draw(int c = 1)
         {
             for (int i = 0; i < c; i++)
             {
+                if (deck.Count == 0) { return false; }
                 deck.peek().moveTo(hand);
             }
 
             notifyObserver();
+            return true;
         }
 
         public void shuffleDeck()
@@ -76,11 +73,22 @@ namespace stonekart
             }
         }
 
-        public void loadDeck(CardId[] deckList, Location l)
+        public void untop()
         {
-            foreach (CardId cid in deckList)
+            resetMana();
+
+            foreach (Card c in field.getCards())
             {
-                deck.add(new Card(cid, l));
+                c.unTop();
+            }
+        }
+
+        public void loadDeck(List<Card> deckList, Location l)
+        {
+            foreach (Card c in deckList)
+            {
+                deck.add(c);
+                c.setLocationRaw(l);
             }
         }
 

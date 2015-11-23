@@ -332,9 +332,9 @@ namespace stonekart
             buttonPanel.showButtons(i);
         }
 
-        public static void showAddMana()
+        public static void showAddMana(bool b)
         {
-            heroPanel.showAddMana();
+            heroPanel.showAddMana(b);
         }
 
         public static WindowedPanel showWindow(Control p, string barTitle)

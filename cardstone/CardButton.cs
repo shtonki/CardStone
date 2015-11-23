@@ -208,7 +208,7 @@ namespace stonekart
         private bool snapped;
         private Point def, att;
 
-        public void notifyObserver(Observable o)
+        public new void notifyObserver(Observable o)
         {
             base.notifyObserver(o);
 

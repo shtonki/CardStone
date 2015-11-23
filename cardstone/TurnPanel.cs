@@ -23,6 +23,7 @@ namespace stonekart
             end;
 
         private int step = 0;
+        private bool xd;
 
         public TurnPanel()
         {
@@ -44,6 +45,7 @@ namespace stonekart
         public void advanceStep()
         {
             step = (step + 1) % STEPS;
+            xd = xd ^ step == 0;
             Invalidate();
         }
 
@@ -68,8 +70,9 @@ namespace stonekart
             e.Graphics.DrawImage(endCombat, 4, 494);
             e.Graphics.DrawImage(main2, 4, 564);
             e.Graphics.DrawImage(end, 4, 634);
-
-            e.Graphics.DrawRectangle(new Pen(Color.Gold, 4), 1, 1 + step*70, 67, 67);
+            
+            
+            e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.DarkRed, 4), 1, 1 + step*70, 67, 67);
         }
     }
 }

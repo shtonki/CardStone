@@ -11,11 +11,11 @@ namespace stonekart
 {
     public class Card : Observable
     {
-        private static int idCtr = 0;
-
         private int id;
         private CardId cardId;
         private Location location;
+        private Player owner, controller;
+
         private bool attacking;
 
         private string name;
@@ -38,7 +38,6 @@ namespace stonekart
         {
             cardId = c;
             location = new Location(Location.NOWHERE);
-            id = idCtr++;
 
             int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0;
 
@@ -113,6 +112,11 @@ namespace stonekart
             return id;
         }
 
+        public void setId(int i)
+        {
+            id = i;
+        }
+
         public string getName()
         {
             return name;
@@ -133,6 +137,16 @@ namespace stonekart
             return cost;
         }
 
+        public Player getOwner()
+        {
+            return owner;
+        }
+
+        public void resolve(Game g)
+        {
+            moveTo(owner.getField());
+        }
+
 
         public void unTop()
         {
@@ -146,12 +160,6 @@ namespace stonekart
             moveTo(p);
         }
 
-        public void moveToOwners(byte i)
-        {
-            Pile p = Location.getPile(i, location.getSide());
-            moveTo(p);
-        }
-
         public void moveTo(Pile d)
         {
             Pile p = location.getPile();
@@ -161,6 +169,15 @@ namespace stonekart
             summoningSick = true;
         }
 
+        public void setLocationRaw(Location l)
+        {
+            location = l;
+        }
+
+        public void setOwner(Player p)
+        {
+            owner = p;
+        }
 
         public bool isAttacking()
         {

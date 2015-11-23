@@ -170,12 +170,13 @@ namespace stonekart
         }
     }
 
-    class GameConnection
+    public class GameConnection
     {
         public string villainName;
         protected Queue<string> eventQueue;
         private Semaphore smf;
         private AutoResetEvent mre;
+        private Game game;
 
         public GameConnection(string s)
         {
@@ -185,9 +186,15 @@ namespace stonekart
             smf = new Semaphore(1, 1);
         }
 
-        public virtual bool asHomePlayer()
+        public void setGame(Game g)
         {
-            return false;
+            //todo this really isn't pretty
+            game = g;
+        }
+
+        public bool asHomePlayer()
+        {
+            return true;
         }
 
         public void receiveGameMessage(string message)
@@ -203,12 +210,12 @@ namespace stonekart
             Network.sendRaw(head + ':' + villainName + ':' + content);
         }
 
-        public virtual void sendGameEvent(GameEvent e)
+        public virtual void sendGameAction(GameAction a)
         {
-            send("game", e.toString());
+            send("game", a.toString());
         }
 
-        public virtual string getNextGameEvent()
+        private GameAction getNextGameEvent()
         {
             if (eventQueue.Count == 0)
             {
@@ -219,9 +226,29 @@ namespace stonekart
             string r = eventQueue.Dequeue();
             smf.Release();
 
-            return r;//GameEvent.fromString(r);
+            return GameAction.fromString(r, game);
         }
 
+        public virtual GameAction demandCastOrPass()
+        {
+            GameAction a = getNextGameEvent();
+
+            if (a is PassAction || a is CastAction)
+            {
+                return a;
+            }
+            else
+            {
+                throw new Exception("demanded cast or pass and got " + a.GetType());
+            }
+        }
+
+        public virtual int demandSelection()
+        {
+            var v = getNextGameEvent();
+            if (v is SelectAction) { return ((SelectAction)v).getSelection(); }
+            throw new Exception("really bad");
+        }
     }
 
     class DummyConnection : GameConnection
@@ -231,14 +258,19 @@ namespace stonekart
 
         }
 
-        public override bool asHomePlayer()
+        public override void sendGameAction(GameAction e)
         {
-            return true;
+            System.Console.WriteLine(">" + e.toString());
         }
 
-        public override void sendGameEvent(GameEvent e)
+        public override GameAction demandCastOrPass()
         {
-            System.Console.WriteLine(e.toString());
+            return new PassAction();
+        }
+
+        public override int demandSelection()
+        {
+            return 0;
         }
     }
 }
