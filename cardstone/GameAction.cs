@@ -46,6 +46,18 @@ namespace stonekart
                     r = new CastAction(g.getCardById(Int32.Parse(ss[1])));
                 } break;
 
+                case "deck":
+                {
+                    CardId[] cs = new CardId[ss.Length-1];
+
+                    for (int i = 1; i < ss.Length; i++)
+                    {
+                        cs[i - 1] = (CardId)Int32.Parse(ss[i]);
+                    }
+
+                    r = new DeclareDeckAction(cs);
+                } break;
+
                 default:
                 {
                     throw new Exception("bad action received");
@@ -131,6 +143,33 @@ namespace stonekart
         public int getSelection()
         {
             return choice;
+        }
+    }
+
+    public class DeclareDeckAction : GameAction
+    {
+        private CardId[] ids;
+
+        public DeclareDeckAction(CardId[] cs)
+        {
+            ids = cs;
+        }
+
+        public override string toString()
+        {
+            StringBuilder b = new StringBuilder("deck,");
+
+            foreach (var v in ids)
+            {
+                b.Append((int)v + ",");
+            }
+            b.Length--;
+            return b.ToString();
+        }
+
+        public CardId[] getIds()
+        {
+            return ids;
         }
     }
 }

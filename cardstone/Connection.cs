@@ -12,10 +12,8 @@ class Connection
     private DataReceived receivedCallback;
     private ConnectionClosed closedCallback;
 
-    public Connection()
-    {
-        
-    }
+    private string you, me;
+
 
     public Connection(Socket s)
     {

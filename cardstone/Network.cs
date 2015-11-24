@@ -69,7 +69,6 @@ namespace stonekart
 
         public static void addGameConnection(string s, GameConnection c)
         {
-            System.Console.WriteLine("adding " + s);
             gameConnections.Add(s, c);
         }
 
@@ -146,7 +145,7 @@ namespace stonekart
 
                 case "startgame":
                 {
-                    GameConnection c = new GameConnection(ss[1]);
+                    GameConnection c = new GameConnection(ss[1], ss[2]);
                     Network.addGameConnection(ss[1], c);
                     GameController.newGame(c);
                 } break;
@@ -173,14 +172,20 @@ namespace stonekart
     public class GameConnection
     {
         public string villainName;
+        private bool home;
+
         protected Queue<string> eventQueue;
+
         private Semaphore smf;
         private AutoResetEvent mre;
         private Game game;
 
-        public GameConnection(string s)
+        public GameConnection(string s, string h)
         {
+            
             villainName = s;
+            home = h == "home";
+
             eventQueue = new Queue<string>();
             mre = new AutoResetEvent(false);
             smf = new Semaphore(1, 1);
@@ -194,7 +199,7 @@ namespace stonekart
 
         public bool asHomePlayer()
         {
-            return true;
+            return home;
         }
 
         public void receiveGameMessage(string message)
@@ -249,11 +254,16 @@ namespace stonekart
             if (v is SelectAction) { return ((SelectAction)v).getSelection(); }
             throw new Exception("really bad");
         }
+
+        public virtual CardId[] demandDeck()
+        {
+            return ((DeclareDeckAction)getNextGameEvent()).getIds();
+        }
     }
 
     class DummyConnection : GameConnection
     {
-        public DummyConnection() : base("")
+        public DummyConnection() : base("", "")
         {
 
         }
@@ -271,6 +281,12 @@ namespace stonekart
         public override int demandSelection()
         {
             return 0;
+        }
+
+        public override CardId[] demandDeck()
+        {
+            var v = new DeclareDeckAction(new[] {CardId.Kappa, CardId.BearCavalary, CardId.LightningBolt,});
+            return ((DeclareDeckAction)GameAction.fromString(v.toString(), null)).getIds();
         }
     }
 }

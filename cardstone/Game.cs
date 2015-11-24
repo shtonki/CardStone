@@ -43,6 +43,34 @@ namespace stonekart
 
         public void start()
         {
+            CardId[] myDeck = loadDeck();
+
+            bool starting;
+
+            //flip 'fair' coin xd
+            if (connection.asHomePlayer())
+            {
+                int z = new Random().Next(2);
+                raiseAction(new SelectAction(z));
+                starting = z == 0;
+            }
+            else
+            {
+                starting = demandSelection() == 1;
+            }
+
+            raiseAction(new DeclareDeckAction(myDeck));
+            CardId[] otherDeck = demandDeck();
+
+            
+
+            //raiseAction();
+
+            if (connection.asHomePlayer())
+            {
+                
+            }
+
             var v =
                 cardFactory.makeList(hero, new[]
                 {
@@ -64,6 +92,15 @@ namespace stonekart
             villain.shuffleDeck();
 
             gameStart();
+        }
+
+        private CardId[] loadDeck()
+        {
+            return new[]
+            {
+                CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
+                CardId.SolemnAberration, CardId.SolemnAberration,
+            };
         }
 
         private void gameStart()
@@ -200,7 +237,7 @@ namespace stonekart
                 } while (hero.getMaxMana(c) == 6);
                 MainFrame.showAddMana(false);
                 s = c;
-                sendSelection(c);
+                raiseAction(new SelectAction(c));
             }
             else
             {
@@ -346,18 +383,6 @@ namespace stonekart
         }
 
 
-        private void sendCastOrPass(Card c)
-        {
-            if (c == null)
-            {
-                raiseAction(new PassAction());
-            }
-            else
-            {
-                raiseAction(new CastAction(c));
-            }
-        }
-
         private Card demandCastOrPass()
         {
             var v = connection.demandCastOrPass();
@@ -366,14 +391,14 @@ namespace stonekart
             throw new Exception("really shouldn't happen");
         }
 
-        private void sendSelection(int c)
-        {
-            raiseAction(new SelectAction(c));
-        }
-
         private int demandSelection()
         {
             return connection.demandSelection();
+        }
+
+        private CardId[] demandDeck()
+        {
+            return connection.demandDeck();
         }
 
 
