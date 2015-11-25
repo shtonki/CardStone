@@ -5,12 +5,15 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
 namespace stonekart
 {
     static class Network
     {
+        public const string SERVER = "server";
+
         private static ServerConnection serverConnection;
         private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
 
@@ -33,7 +36,7 @@ namespace stonekart
                 string[] ss = s.Split(':');
                 if (ss[0] != "friend") { throw new Exception("v bad"); }
                 friends =  ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
-                serverConnection.start();
+                serverConnection.startAsync();
                 return true;
             }
             else
@@ -49,22 +52,22 @@ namespace stonekart
 
         public static void sendTell(string user, string message)
         {
-            serverConnection.sendString("tell:" + user + ':' + message);
+            serverConnection.sendMessage(user, "tell", message);
         }
 
         public static void addFriend(string s)
         {
-            serverConnection.sendString("friend:" + s);
+            serverConnection.sendMessage(SERVER, "friend", s);
         }
 
         public static void removeFriend(string s)
         {
-            serverConnection.sendString("unfriend:" + s);
+            serverConnection.sendMessage(SERVER, "unfriend", s);
         }
 
         public static void challenge(string s)
         {
-            serverConnection.sendString("challenge:" + s);
+            serverConnection.sendMessage(s, "challenge", "");
         }
 
         public static void addGameConnection(string s, GameConnection c)
@@ -82,9 +85,9 @@ namespace stonekart
             gameConnections[user].receiveGameMessage(content);
         }
 
-        public static void sendRaw(string s)
+        public static void sendRaw(string to, string head, string message)
         {
-            serverConnection.sendString(s);
+            serverConnection.sendMessage(to, head, message);
         }
     }
 
@@ -96,21 +99,25 @@ namespace stonekart
         public ServerConnection()
             : base("46.239.124.155")
         {
-            setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("server krashed"); });
+
+        }
+
+        public new void startAsync()
+        {
+            startAsync((connection, message) => gotMessage(message), connection => { System.Console.WriteLine("server krashed"); });
         }
 
         public bool handshake(string n)
         {
             name = n;
 
-            sendString(name);
+            sendMessage(Network.SERVER, "login", name);
 
-            String s = waitForString();
-            string[] ss = s.Split(':');
+            SMessage m = waitForMessage();
 
-            switch (ss[0])
+            switch (m.header)
             {
-                case "handshakeok":
+                case "validated":
                     {
                         System.Console.WriteLine("Connected as " + n);
                         return true;
@@ -118,21 +125,23 @@ namespace stonekart
 
                 case "error":
                     {
-                        System.Console.WriteLine(ss[1]);
+                        System.Console.WriteLine(m.message);
                         return false;
                     } break;
 
                 default:
                     {
-                        System.Console.WriteLine("Uknown return {0}", s);
+                        System.Console.WriteLine("Uknown return {0}", m.header);
                     } break;
             }
 
             return true;
         }
 
-        public void gotString(byte[] bs)
+        public void gotMessage(SMessage m)
         {
+            System.Console.WriteLine('<' + m.ToString());
+            /*
             string s = Encoding.UTF8.GetString(bs);
             string[] ss = s.Split(':');
 
@@ -160,12 +169,19 @@ namespace stonekart
                     System.Console.WriteLine('\'' + s + '\'');
                 } break;
             }
+             */
         }
 
         public string requestFriends()
         {
-            sendString("friend");
-            return waitForString();
+            sendMessage(Network.SERVER, "friend", "");
+            var v = waitForMessage();
+            return v.message;
+        }
+
+        public new void sendMessage(string user, string header, string message)
+        {
+            base.sendMessage(new SMessage(user, name, header, message));
         }
     }
 
@@ -212,7 +228,7 @@ namespace stonekart
 
         private void send(string head, string content)
         {
-            Network.sendRaw(head + ':' + villainName + ':' + content);
+            Network.sendRaw(villainName, head, content);
         }
 
         public virtual void sendGameAction(GameAction a)
