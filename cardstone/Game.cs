@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -20,6 +21,8 @@ namespace stonekart
         private CardFactory cardFactory;
 
         private KappaMan kappa;
+
+        private delegate bool xd(Card c);
 
         public Game(GameConnection cn)
         {
@@ -43,49 +46,28 @@ namespace stonekart
 
         public void start()
         {
-            CardId[] myDeck = loadDeck();
+            CardId[] myCards = loadDeck();
 
-            bool starting;
+            bool starting = connection.asHomePlayer();
 
-            //flip 'fair' coin xd
+            raiseAction(new DeclareDeckAction(myCards));
+            CardId[] otherCards = demandDeck();
+
+            List<Card> myDeck, otherDeck;
+
             if (connection.asHomePlayer())
             {
-                int z = new Random().Next(2);
-                raiseAction(new SelectAction(z));
-                starting = z == 0;
+                myDeck = cardFactory.makeList(hero, myCards);
+                otherDeck = cardFactory.makeList(villain, otherCards);
             }
             else
             {
-                starting = demandSelection() == 1;
+                otherDeck = cardFactory.makeList(villain, otherCards);
+                myDeck = cardFactory.makeList(hero, myCards);                
             }
 
-            raiseAction(new DeclareDeckAction(myDeck));
-            CardId[] otherDeck = demandDeck();
-
-            
-
-            //raiseAction();
-
-            if (connection.asHomePlayer())
-            {
-                
-            }
-
-            var v =
-                cardFactory.makeList(hero, new[]
-                {
-                    CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
-                    CardId.SolemnAberration, CardId.SolemnAberration,
-                });
-
-            var vx = cardFactory.makeList(villain, new[]
-                {
-                    CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
-                    CardId.SolemnAberration, CardId.SolemnAberration,
-                });
-
-            hero.loadDeck(v, new Location(Location.DECK, Location.HEROSIDE));
-            villain.loadDeck(vx, new Location(Location.DECK, Location.VILLAINSIDE));
+            hero.loadDeck(myDeck, new Location(Location.DECK, Location.HEROSIDE));
+            villain.loadDeck(otherDeck, new Location(Location.DECK, Location.VILLAINSIDE));
 
 
             hero.shuffleDeck();
@@ -172,7 +154,7 @@ namespace stonekart
         private void loop()
         {
             //Thread.CurrentThread.Name = "XDDDDDDDDDD";
-            active = true;
+            active = connection.asHomePlayer();
 
             while (true)
             {
@@ -258,43 +240,67 @@ namespace stonekart
 
         private void mainStep(int i)
         {
-            raiseEvent(new StepEvent(StepEvent.MAIN1));
+            raiseEvent(new StepEvent(i == 1 ?StepEvent.MAIN1 : StepEvent.MAIN2));
             givePriority(true);
         }
 
         private void startCombatStep()
         {
-
+            raiseEvent(new StepEvent(StepEvent.BEGINCOMBAT));
+            givePriority(false);
         }
 
         private void chooseAttackersStep()
         {
+            Card[] attackers;
 
+            if (active)
+            {
+                attackers = chooseMultiple("Choose attackers", Color.Red, Location.FIELD, @c => { return c.canAttack(); });
+                raiseAction(new MultiSelectAction(attackers));
+            }
+            else
+            {
+                attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
+            }
+
+            foreach (var a in attackers)
+            {
+                a.setAttacking(true);
+            }
+
+            raiseEvent(new StepEvent(StepEvent.ATTACKERS));
+            givePriority(false);
         }
 
         private void chooseDefendersStep()
         {
-
+            raiseEvent(new StepEvent(StepEvent.DEFENDERS));
+            givePriority(false);
         }
 
         private void combatDamageStep()
         {
-
+            raiseEvent(new StepEvent(StepEvent.DAMAGE));
+            givePriority(false);
         }
 
         private void endCombatStep()
         {
-
+            raiseEvent(new StepEvent(StepEvent.ENDCOMBAT));
+            givePriority(false);
         }
 
         private void endStep()
         {
-
+            raiseEvent(new StepEvent(StepEvent.END));
+            givePriority(false);
         }
 
 
         private void givePriority(bool main)
         {
+            //todo make it check toggleboxes and autopass
             while (true)
             {
                 Card c;
@@ -315,7 +321,15 @@ namespace stonekart
                     }
                     else
                     {
-                        c = castOrPass(main);
+                        if (stack.Count == 0)
+                        {
+                            c = null;
+                            raiseAction(new CastAction(null));
+                        }
+                        else
+                        {
+                            c = castOrPass(main);
+                        }
                     }
                 }
 
@@ -363,7 +377,7 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.clear();
-                            raiseAction(new PassAction());
+                            raiseAction(new CastAction(null));
                             return null;
                         }
                     }
@@ -385,29 +399,35 @@ namespace stonekart
 
         private Card demandCastOrPass()
         {
-            var v = connection.demandCastOrPass();
-            if (v is PassAction) { return null; }
-            if (v is CastAction) { return ((CastAction)v).getCard(); }
-            throw new Exception("really shouldn't happen");
+            var v = connection.demandAction(typeof(CastAction)) as CastAction;
+            return v.getCard();
         }
 
         private int demandSelection()
         {
-            return connection.demandSelection();
+            var v = connection.demandAction(typeof (SelectAction)) as SelectAction;
+            return v.getSelection();
         }
 
         private CardId[] demandDeck()
         {
-            return connection.demandDeck();
+            var v = connection.demandAction(typeof(DeclareDeckAction)) as DeclareDeckAction;
+            return v.getIds();
+        }
+
+        private int[] demandMultiSelection()
+        {
+            var v = connection.demandAction(typeof(MultiSelectAction)) as MultiSelectAction;
+            return v.getSelections();
         }
 
 
-        private void chooseAttackers()
+        private Card[] chooseMultiple(string message, Color c, int location, xd xd)
         {
-            List<Card> cs = null;
+            MainFrame.setMessage(message);
 
-            MainFrame.setMessage("Choose attackers");
-            while (cs == null) 
+            List<CardButton> bs = new List<CardButton>();
+            while (true) 
             {
                 MainFrame.showButtons(ACCEPT);
                 while (true)
@@ -420,27 +440,38 @@ namespace stonekart
                         {
                             MainFrame.clear();
 
-                            cs = new List<Card>();
-                            foreach (Card c in hero.getField().getCards())
+                            Card[] r = new Card[bs.Count];
+
+                            for (int i = 0; i < bs.Count; i++)
                             {
-                                if (c.isAttacking()) { cs.Add(c); }
+                                r[i] = bs[i].getCard();
+                                bs[i].setBorder(null);
                             }
 
-                            break;
+                            return r;
                         }
                     }
                     else if (f is CardButton)
                     {
+                        var cb = f as CardButton;
 
-                        CardButton b = (CardButton)f;
-                        Card c = b.getCard();
-                        if (c.canAttack()) { c.toggleAttacking(); }
+                        Card crd = cb.getCard();
+
+                        if (!xd(crd)) { continue; }
+
+                        if (bs.Contains(cb))
+                        {
+                            bs.Remove(cb);
+                            cb.setBorder(null);
+                        }
+                        else
+                        {
+                            bs.Add(cb);
+                            cb.setBorder(c);
+                        }
                     }
                 }
             }
-
-            raiseAction(new DeclareAttackersAction(cs));
-            raiseEvent(new AttackingEvent(cs));
         }
 
         private void choseBlockers()

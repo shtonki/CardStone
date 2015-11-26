@@ -106,24 +106,38 @@ class Connection
 
                 X x = new X(bx);
 
-                while (true)
+                try
                 {
-                    x.assertNext(HEADER);
-                    string to = x.toNext(SEPARATOR);
-                    string from = x.toNext(SEPARATOR);
-                    string header = x.toNext(SEPARATOR);
-                    string message = x.atEnd() ? "" : x.toNext(TAILER);
 
-                    handleMessage(new SMessage(to, from, header, message));
+                    while (true)
+                    {
+                        x.assertNext(HEADER);
+                        string to = x.toNext(SEPARATOR);
+                        string from = x.toNext(SEPARATOR);
+                        string header = x.toNext(SEPARATOR);
+                        string message = x.atEnd() ? "" : x.toNext(TAILER);
 
-                    if (x.atEnd()) { break; }
+                        handleMessage(new SMessage(to, from, header, message));
+
+                        if (x.atEnd())
+                        {
+                            break;
+                        }
+                    }
                 }
-
+                catch (Exception)
+                {
+                    Console.WriteLine(x);
+                    break;
+                }
             }
         }
         catch (SocketException)
         {
-            closedCallback(this);
+            if (closedCallback != null)
+            {
+                closedCallback(this);                
+            }
         }
     }
 
@@ -182,6 +196,11 @@ class Connection
         public bool atEnd()
         {
             return c == bs.Length;
+        }
+
+        public override string ToString()
+        {
+            return Encoding.UTF8.GetString(bs);
         }
     }
 }

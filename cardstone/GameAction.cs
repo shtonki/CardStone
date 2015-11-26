@@ -21,7 +21,7 @@ namespace stonekart
             {
                 case "pass":
                 {
-                    r = new PassAction();
+                    r = new CastAction(null);
                 } break;
 
                 case "select":
@@ -29,16 +29,16 @@ namespace stonekart
                     r = new SelectAction(Int32.Parse(ss[1]));
                 } break;
 
-                case "attackers":
+                case "mselect":
                 {
-                    //todo actually do this
-                    r = new DeclareAttackersAction();
-                    break;
-                    List<Card> cs = new List<Card>();
+                    int[] iss = new int[ss.Length - 1];
 
                     for (int i = 1; i < ss.Length; i++)
                     {
+                        iss[i - 1] = Int32.Parse(ss[i]);
                     }
+
+                    r = new MultiSelectAction(iss);
                 } break;
 
                 case "cast":
@@ -69,14 +69,6 @@ namespace stonekart
     }
 
 
-    public class PassAction : GameAction
-    {
-        public override string toString()
-        {
-            return "pass";
-        }
-    }
-
     public class CastAction : GameAction
     {
         private Card card;
@@ -93,20 +85,20 @@ namespace stonekart
 
         public override string toString()
         {
-            return "cast," + card.getId();
+            return card == null ? "pass" : "cast," + card.getId();
         }
     }
-
-    public class DeclareAttackersAction : GameAction
+    /*
+    public class MultiSelectEvent : GameAction
     {
         private List<Card> attackers;
 
-        public DeclareAttackersAction(List<Card> cs)
+        public MultiSelectEvent(List<Card> cs)
         {
             attackers = cs;
         }
 
-        public DeclareAttackersAction()
+        public MultiSelectEvent()
         {
             attackers = new List<Card>();
         }
@@ -125,7 +117,7 @@ namespace stonekart
             return b.ToString();
         }
     }
-
+    */
     public class SelectAction : GameAction
     {
         private int choice;
@@ -150,6 +142,11 @@ namespace stonekart
     {
         private CardId[] ids;
 
+        public DeclareDeckAction()
+        {
+            ids = new CardId[0];
+        }
+
         public DeclareDeckAction(CardId[] cs)
         {
             ids = cs;
@@ -172,4 +169,46 @@ namespace stonekart
             return ids;
         }
     }
+    
+    public class MultiSelectAction : GameAction
+    {
+        private int[] ints;
+
+        public MultiSelectAction()
+        {
+            ints = new int[0];
+        }
+
+        public MultiSelectAction(Card[] cs)
+        {
+            ints = cs.Select(@c => c.getId()).ToArray();
+        }
+
+        public MultiSelectAction(int[] iss)
+        {
+            ints = iss;
+        }
+
+        public int[] getSelections()
+        {
+            return ints;
+        }
+
+        public override string toString()
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append("mselect,");
+
+            foreach (int i in ints)
+            {
+                b.Append(i);
+                b.Append(',');
+            }
+
+            b.Length--;
+
+            return b.ToString();
+        }
+    }
+     
 }

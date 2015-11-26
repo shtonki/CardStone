@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using WMPLib;
 
 namespace stonekart
 {
@@ -40,6 +41,20 @@ namespace stonekart
             endCombat = Image.FromFile(resPath + "endcombat.png");
             main2 = Image.FromFile(resPath + "main2.png");
             end = Image.FromFile(resPath + "end.png");
+
+
+            for (int i = 0; i < 20; i++)
+            {
+                ToggleBox b = new ToggleBox();
+                b.Location = new Point(i%2 * 60, (i/2)*70);
+                Controls.Add(b);
+                var i1 = i;
+                b.Click += (_, __) =>
+                {
+                    System.Console.WriteLine(i1);
+                    b.toggle();
+                };
+            }
         }
 
         public void advanceStep()
@@ -51,7 +66,7 @@ namespace stonekart
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            //base.OnPaint(e);
+            base.OnPaint(e);
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,   70, 140);
@@ -72,7 +87,32 @@ namespace stonekart
             e.Graphics.DrawImage(end, 4, 634);
             
             
-            e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.DarkRed, 4), 1, 1 + step*70, 67, 67);
+            e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.LightGray, 4), 1, 1 + step*70, 67, 67);
+        }
+
+        class ToggleBox : Panel
+        {
+            private bool t;
+
+            public ToggleBox()
+            {
+                Size = new Size(10, 10);
+                BackColor = Color.Transparent;
+            }
+
+            public void toggle()
+            {
+                t = !t;
+                Invalidate();
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                base.OnPaint(e);
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                e.Graphics.FillEllipse(new SolidBrush(t ? Color.DarkOrchid : Color.Lime), 0, 0, 9, 9);
+                //e.Graphics.DrawEllipse(new Pen(Color.DarkOrchid, 1), 0, 0, 10, 10);
+            }
         }
     }
 }

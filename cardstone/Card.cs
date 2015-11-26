@@ -142,6 +142,11 @@ namespace stonekart
             return owner;
         }
 
+        public Location getLocation()
+        {
+            return location;
+        }
+
         public void resolve(Game g)
         {
             moveTo(owner.getField());

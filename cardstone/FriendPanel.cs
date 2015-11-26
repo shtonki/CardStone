@@ -131,7 +131,7 @@ namespace stonekart
 
         public void getWhisper(string from, string message)
         {
-            getConversation(from).appendLine(message);
+            getConversation(from).appendLine(from + ": " + message);
 
         }
 

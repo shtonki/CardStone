@@ -130,10 +130,10 @@ namespace stonekart
             stackPanel = new CardBox(190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            heroFieldPanel = new FieldPanel();
+            heroFieldPanel = new FieldPanel(true);
             heroFieldPanel.Location = new Point(600, 330);
 
-            villainFieldPanel = new FieldPanel();
+            villainFieldPanel = new FieldPanel(false);
             villainFieldPanel.Location = new Point(600, 10);
 
             gamePanel.Controls.Add(buttonPanel);
@@ -265,7 +265,7 @@ namespace stonekart
         }
 
         private static AutoResetEvent waitForLogin = new AutoResetEvent(false);
-
+        
         private static void loginWithName(string x)
         {
             if (!Network.login(x))
@@ -273,15 +273,14 @@ namespace stonekart
                 System.Console.WriteLine("soeiroj");
                 return;
             }
-            var s = Network.getFriends();
 
-            friendPanel.setFriends(s);
+            Network.sendRaw(Network.SERVER, "friend", "");
 
             loginPanel.Hide();
             friendPanel.Show();
             waitForLogin.Set();
         }
-
+         
         private static void transitionTo(Panel p)
         {
             if (frame.InvokeRequired)
@@ -381,9 +380,14 @@ namespace stonekart
         public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
+            villain.setObserver(villainPanel);
+
             hero.getHand().setObserver(handPanel);
+
             stack.setObserver(stackPanel);
+
             hero.getField().setObserver(heroFieldPanel);
+            villain.getField().setObserver(villainFieldPanel);
         }
 
         public static void handleCommand(string s)

@@ -21,6 +21,8 @@ namespace stonekart
         private int id;
         private Card card;
 
+        private Pen borderPen;
+
         static CardButton()
         {
             var a = new PrivateFontCollection();
@@ -87,6 +89,13 @@ namespace stonekart
         {
             if (InvokeRequired) { Invoke(new Action(() => { Size = v ? SHOW : HIDE; })); }
             else { Size = v ? SHOW : HIDE; }
+        }
+
+        public void setBorder(Color? c)
+        {
+            borderPen = c == null ? null : new Pen(c.Value, 8);
+            //borderPen = c == null ? null : borderPen == null ? new Pen(c.Value, 8) : null;
+            Invalidate();
         }
 
         private const int w = 33;
@@ -181,6 +190,11 @@ namespace stonekart
                     pevent.Graphics.DrawString(card.getToughness().ToString(), PTFont, b, 154, 250);
                 }
 
+                if (borderPen != null)
+                {
+                    pevent.Graphics.DrawRectangle(borderPen, 0, 0, WIDTH, HEIGHT);                    
+                }
+
                 /*
                 pevent.Graphics.FillEllipse(new SolidBrush(Color.LightSlateGray), 158 - i * 15, 5, 14, 14);
                 Font gcFont = new Font(fontFamilyA, 18, FontStyle.Regular, GraphicsUnit.Pixel);
@@ -200,27 +214,6 @@ namespace stonekart
             {
                 Visible = card != null;       
             }
-        }
-    }
-
-    class SnapCardButton : CardButton, Observer
-    {
-        private bool snapped;
-        private Point def, att;
-
-        public new void notifyObserver(Observable o)
-        {
-            base.notifyObserver(o);
-
-            Card c = (Card)o;
-            Invoke(new Action(() => { Location = c.isAttacking() ? att : def; }));
-        }
-
-        public void setLocation(int x, int y)
-        {
-            def = new Point(x, y);
-            att = new Point(x, y - 40);
-            Location = def;
         }
     }
 }

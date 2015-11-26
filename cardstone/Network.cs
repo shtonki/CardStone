@@ -17,8 +17,6 @@ namespace stonekart
         private static ServerConnection serverConnection;
         private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
 
-        private static string[] friends;
-
         public static void connect()
         {
             serverConnection = new ServerConnection();
@@ -32,10 +30,6 @@ namespace stonekart
             }
             if (serverConnection.handshake(name))
             {
-                string s = serverConnection.requestFriends();
-                string[] ss = s.Split(':');
-                if (ss[0] != "friend") { throw new Exception("v bad"); }
-                friends =  ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
                 serverConnection.startAsync();
                 return true;
             }
@@ -43,11 +37,6 @@ namespace stonekart
             {
                 return false;
             }
-        }
-
-        public static string[] getFriends()
-        {
-            return friends;
         }
 
         public static void sendTell(string user, string message)
@@ -104,7 +93,7 @@ namespace stonekart
 
         public new void startAsync()
         {
-            startAsync((connection, message) => gotMessage(message), connection => { System.Console.WriteLine("server krashed"); });
+            startAsync((connection, message) => receiveMessage(message), connection => { System.Console.WriteLine("server krashed"); });
         }
 
         public bool handshake(string n)
@@ -138,38 +127,37 @@ namespace stonekart
             return true;
         }
 
-        public void gotMessage(SMessage m)
+        public void receiveMessage(SMessage m)
         {
-            System.Console.WriteLine('<' + m.ToString());
-            /*
-            string s = Encoding.UTF8.GetString(bs);
-            string[] ss = s.Split(':');
-
-            switch (ss[0])
+            System.Console.WriteLine(m.ToString());
+            
+            switch (m.header)
             {
-                case "told":
+                case "game":
                 {
-                        MainFrame.getTell(ss[1], ss[2]);
+                    Network.receiveGameMessage(m.from, m.message);
+                } break;
+
+                case "tell":
+                {
+                        MainFrame.getTell(m.from, m.message);
                 } break;
 
                 case "startgame":
                 {
-                    GameConnection c = new GameConnection(ss[1], ss[2]);
-                    Network.addGameConnection(ss[1], c);
+                    var ss = m.message.Split(',');
+                    GameConnection c = new GameConnection(ss[0], ss[1]);
+                    Network.addGameConnection(ss[0], c);
                     GameController.newGame(c);
-                } break;
 
-                case "game":
-                {
-                    Network.receiveGameMessage(ss[1], s.Substring(ss[0].Length + ss[1].Length + 2));
                 } break;
 
                 default:
                 {
-                    System.Console.WriteLine('\'' + s + '\'');
+                    System.Console.WriteLine("borked message: " + m.ToString());
                 } break;
             }
-             */
+             
         }
 
         public string requestFriends()
@@ -187,7 +175,7 @@ namespace stonekart
 
     public class GameConnection
     {
-        public string villainName;
+        public readonly string villainName;
         private bool home;
 
         protected Queue<string> eventQueue;
@@ -213,7 +201,7 @@ namespace stonekart
             game = g;
         }
 
-        public bool asHomePlayer()
+        public virtual bool asHomePlayer()
         {
             return home;
         }
@@ -223,6 +211,7 @@ namespace stonekart
             smf.WaitOne();
             eventQueue.Enqueue(message);
             mre.Set();
+            
             smf.Release();
         }
 
@@ -238,7 +227,7 @@ namespace stonekart
 
         private GameAction getNextGameEvent()
         {
-            if (eventQueue.Count == 0)
+            while (eventQueue.Count == 0)
             {
                 mre.WaitOne();
             }
@@ -250,11 +239,20 @@ namespace stonekart
             return GameAction.fromString(r, game);
         }
 
+        public virtual GameAction demandAction(System.Type t)
+        {
+            var a = getNextGameEvent();
+
+            if (a.GetType() == t) { return a; }
+
+            throw new Exception("sbunh");
+        }
+        /*
         public virtual GameAction demandCastOrPass()
         {
             GameAction a = getNextGameEvent();
 
-            if (a is PassAction || a is CastAction)
+            if (a is CastAction)
             {
                 return a;
             }
@@ -266,6 +264,7 @@ namespace stonekart
 
         public virtual int demandSelection()
         {
+
             var v = getNextGameEvent();
             if (v is SelectAction) { return ((SelectAction)v).getSelection(); }
             throw new Exception("really bad");
@@ -275,13 +274,13 @@ namespace stonekart
         {
             return ((DeclareDeckAction)getNextGameEvent()).getIds();
         }
+         */
     }
 
     class DummyConnection : GameConnection
     {
         public DummyConnection() : base("", "")
         {
-
         }
 
         public override void sendGameAction(GameAction e)
@@ -289,20 +288,34 @@ namespace stonekart
             System.Console.WriteLine(">" + e.toString());
         }
 
-        public override GameAction demandCastOrPass()
+        public override GameAction demandAction(System.Type t)
         {
-            return new PassAction();
+            if (t == typeof(CastAction))
+            {
+                return new CastAction(null);
+            }
+
+            if (t == typeof(MultiSelectAction))
+            {
+                return new MultiSelectAction();
+            }
+
+            if (t == typeof(DeclareDeckAction))
+            {
+                return new DeclareDeckAction();
+            }
+
+            if (t == typeof(SelectAction))
+            {
+                return new SelectAction(0);
+            }
+
+            throw new NotImplementedException("oops xdd");
         }
 
-        public override int demandSelection()
+        public override bool asHomePlayer()
         {
-            return 0;
-        }
-
-        public override CardId[] demandDeck()
-        {
-            var v = new DeclareDeckAction(new[] {CardId.Kappa, CardId.BearCavalary, CardId.LightningBolt,});
-            return ((DeclareDeckAction)GameAction.fromString(v.toString(), null)).getIds();
+            return true;
         }
     }
 }
