@@ -14,16 +14,15 @@ namespace stonekart
 
         public Pile()
         {
-            cards = new List<Card>();
+            cards = new List<Card>(); 
         }
 
         public Pile(CardId[] cs)
         {
             cards = new List<Card>();
-
             foreach (CardId i in cs)
             {
-                new Card(i).moveTo(this);
+                 new Card(i).moveTo(this);
             }
         }
 

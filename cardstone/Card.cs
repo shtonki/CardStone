@@ -161,7 +161,6 @@ namespace stonekart
             summoningSick = true;
         }
 
-
         public bool isAttacking()
         {
             return attacking;
