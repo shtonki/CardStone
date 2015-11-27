@@ -19,7 +19,7 @@ namespace stonekart
         private bool attacking;
 
         private string name;
-        private Cost cost;
+        //private Cost cost;
         private Type type;
         private Race? race;
         private SubType? subType;
@@ -27,6 +27,9 @@ namespace stonekart
 
         private int? power, toughness;
         private bool summoningSick;
+
+        private Ability[] abilities;
+        private Ability castAbility;
 
         public Card(CardId c, Location l)
             : this(c)
@@ -85,8 +88,10 @@ namespace stonekart
             }
 
 
-            ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
-            cost = new Cost(mc);
+            ManaCoster mc = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
+            CastingCost cost = new CastingCost(mc);
+            Effect e = new Effect(new StackResolve());
+            castAbility = new Ability(cost, e);
 
             if ((power == null) != (toughness == null))
             {
@@ -122,9 +127,9 @@ namespace stonekart
             return name;
         }
 
-        public ManaCost getManaCost()
+        public ManaCoster getManaCost()
         {
-            return cost.getManaCost();
+            return getCastingCost().getManaCost();
         }
 
         public bool isCastable()
@@ -132,12 +137,17 @@ namespace stonekart
             return location.getLocation() == Location.HAND;
         }
 
-        public Cost getCost()
+        public CastingCost getCastingCost()
         {
-            return cost;
+            return castAbility.cost as CastingCost;
         }
 
         public Player getOwner()
+        {
+            return owner;
+        }
+
+        public Player getController()
         {
             return owner;
         }
@@ -150,6 +160,11 @@ namespace stonekart
         public void resolve(Game g)
         {
             moveTo(owner.getField());
+        }
+
+        public Type getType()
+        {
+            return type;
         }
 
 

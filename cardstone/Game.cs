@@ -256,7 +256,7 @@ namespace stonekart
 
             if (active)
             {
-                attackers = chooseMultiple("Choose attackers", Color.Red, Location.FIELD, @c => { return c.canAttack(); });
+                attackers = chooseMultiple("Choose attackers", Color.Red, Location.FIELD, @c => { return c.getOwner() == hero && c.canAttack(); });
                 raiseAction(new MultiSelectAction(attackers));
             }
             else
@@ -321,10 +321,10 @@ namespace stonekart
                     }
                     else
                     {
-                        if (stack.Count == 0)
+                        if (stack.Count == 0) //todo make this respect stop options
                         {
                             c = null;
-                            raiseAction(new CastAction(null));
+                            raiseAction(new CastAction());
                         }
                         else
                         {
@@ -377,7 +377,7 @@ namespace stonekart
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
                             MainFrame.clear();
-                            raiseAction(new CastAction(null));
+                            raiseAction(new CastAction());
                             return null;
                         }
                     }
@@ -385,11 +385,16 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable() && c.getCost().tryPay(hero))
+                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable())
                         {
-                            MainFrame.clear();
-                            raiseAction(new CastAction(c));
-                            return c;
+                            var v = c.getCastingCost().check(c);
+                            if (v != null)
+                            {
+                                c.getCastingCost().pay(c, v);
+                                MainFrame.clear();
+                                raiseAction(new CastAction(c, v));
+                                return c;
+                            }
                         }
                     }
                 }

@@ -9,25 +9,32 @@
             effecters = es;
         }
 
-        public void resolve()
+        public void resolve(Card c)
         {
             foreach (Effecter e in effecters)
             {
-                e.resolve();
+                e.resolve(c);
             }
         }
     }
 
     abstract class Effecter
     {
-        abstract public void resolve();
+        abstract public void resolve(Card c);
     }
 
-    class Ping : Effecter
+    class StackResolve : Effecter
     {
-        public override void resolve()
+        public override void resolve(Card c)
         {
-            throw new System.NotImplementedException();
+            if (c.getType() == Type.Creature || c.getType() == Type.Relic)
+            {
+                c.moveTo(c.getController().getField());
+            }
+            else
+            {
+                c.moveTo(c.getOwner().getGraveyard());
+            }
         }
     }
 }

@@ -131,7 +131,7 @@ namespace stonekart
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
                 //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
 
-
+                /*
 
                 int[] mc = card.getManaCost().getColors();
                 int i = 0;
@@ -178,7 +178,7 @@ namespace stonekart
                         i++;
                     }
                 }
-
+                */
                 if (card.hasPT())
                 {
                     Brush p = new SolidBrush(Color.Silver);

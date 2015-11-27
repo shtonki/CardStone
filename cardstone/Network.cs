@@ -292,7 +292,7 @@ namespace stonekart
         {
             if (t == typeof(CastAction))
             {
-                return new CastAction(null);
+                return new CastAction();
             }
 
             if (t == typeof(MultiSelectAction))

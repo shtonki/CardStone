@@ -12,6 +12,11 @@ namespace stonekart
     {
         private ManaButton[][] manaButtons = new ManaButton[5][];
         private Player player;
+        private Label health;
+
+
+        private static Font f = new Font(new FontFamily("Comic Sans MS"), 20);
+
         private static int x = 0;
         public PlayerPanel()
         {
@@ -30,23 +35,23 @@ namespace stonekart
                     Color c = Color.Chartreuse;
                     switch (i)
                     {
-                        case ManaCost.WHITE:
+                        case ManaCoster.WHITE:
                         {
                             c = Color.White;
                         } break;
-                        case ManaCost.BLUE:
+                        case ManaCoster.BLUE:
                         {
                             c = Color.Blue;
                         } break;
-                        case ManaCost.BLACK:
+                        case ManaCoster.BLACK:
                         {
                             c = Color.Black;
                         } break;
-                        case ManaCost.RED:
+                        case ManaCoster.RED:
                         {
                             c = Color.Red;
                         } break;
-                        case ManaCost.GREEN:
+                        case ManaCoster.GREEN:
                         {
                             c = Color.Green;
                         } break;
@@ -64,14 +69,13 @@ namespace stonekart
 
                     Controls.Add(b);
 
-                    Font f = new Font(new FontFamily("Comic Sans MS"), 20);
 
-                    Label l = new Label();
-                    l.AutoSize = true;
-                    l.Text = "5";
-                    l.Font = f;
-                    l.Location = new Point(10, 300);
-                    Controls.Add(l);
+                    //health = new Label();
+                    //health.Size = new Size(100, 100);
+                    //health.AutoSize = true;
+                    //health.Font = f;
+                    //health.Location = new Point(10, 300);
+                    //Controls.Add(health);
                 }
             }
 
@@ -110,7 +114,6 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             player = (Player)o;
-
             for (int c = 0; c < 5; c++)
             {
                 int i = 0;
@@ -127,6 +130,16 @@ namespace stonekart
                     manaButtons[c][i].setState(ManaButton.HIDDEN);
                 }
             }
+
+            Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.DrawString(player.getHealth().ToString(), f, new SolidBrush(Color.Black), 10, 300);
         }
 
         public class ManaButton : UserControl, Foo

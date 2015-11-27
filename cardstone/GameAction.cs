@@ -21,7 +21,7 @@ namespace stonekart
             {
                 case "pass":
                 {
-                    r = new CastAction(null);
+                    r = new CastAction();
                 } break;
 
                 case "select":
@@ -43,7 +43,24 @@ namespace stonekart
 
                 case "cast":
                 {
-                    r = new CastAction(g.getCardById(Int32.Parse(ss[1])));
+                    List<int[]> us = new List<int[]>();
+                    List<int> ts = new List<int>();
+                    int card = Int32.Parse(ss[1]);
+
+                    for (int i = 2; i < ss.Length; i++)
+                    {
+                        char c = ss[i][0];
+                        if (c == 'u') //u'0'0'1'
+                        {
+                            us.Add(ss[i].Split('\'').Select(Int32.Parse).ToArray());
+                        }
+                        else if (c == 't')
+                        {
+                            ts.Add(Int32.Parse(ss[i].Substring(1)));
+                        }
+                    }
+
+                    r = new CastAction(g.getCardById(Int32.Parse(ss[1])), us.ToArray());
                 } break;
 
                 case "deck":
@@ -72,10 +89,18 @@ namespace stonekart
     public class CastAction : GameAction
     {
         private Card card;
+        private int[][] costs;
 
-        public CastAction(Card c)
+        public CastAction()
+        {
+            card = null;
+            costs = null;
+        }
+
+        public CastAction(Card c, int[][] cs)
         {
             card = c;
+            costs = cs;
         }
 
         public Card getCard()
@@ -85,7 +110,19 @@ namespace stonekart
 
         public override string toString()
         {
-            return card == null ? "pass" : "cast," + card.getId();
+            if (card == null) { return "pass"; } 
+
+            StringBuilder b = new StringBuilder();
+            foreach (int[] l in costs)
+            {
+                b.Append('c');
+                foreach (int i in l)
+                {
+                    b.Append('\'');
+                    b.Append(i.ToString());
+                }
+            }
+            return "cast," + card.getId() + b.ToString();
         }
     }
     /*

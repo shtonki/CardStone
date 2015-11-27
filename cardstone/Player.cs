@@ -10,6 +10,7 @@ namespace stonekart
     public class Player : Observable
     {
         private int[] curMana, maxMana;
+        private int health;
 
         private Pile hand, graveyard, exile, field, deck;
 
@@ -23,7 +24,10 @@ namespace stonekart
 
             curMana = new int[5];
             maxMana = new int[5];
+
+            health = 20;
         }
+
 
         public void addMana(int i)
         {
@@ -49,6 +53,7 @@ namespace stonekart
             deck.shuffle();
         }
 
+
         public int getCurrentMana(int color)
         {
             return curMana[color];
@@ -59,11 +64,34 @@ namespace stonekart
             return maxMana[color];
         }
 
+        public int getHealth()
+        {
+            return health;
+        }
+
+
+        public void damage(int i)
+        {
+            health -= i;
+            notifyObserver();
+        }
+
         public void spendMana(int color, int amount)
         {
             curMana[color] -= amount;
             notifyObserver();
         }
+
+        public void spendMana(int[] i)
+        {
+            foreach (var v in i)
+            {
+                curMana[v]--;
+            }
+
+            notifyObserver();
+        }
+
 
         public void resetMana()
         {
@@ -83,10 +111,12 @@ namespace stonekart
             }
         }
 
+
         public void loadDeck(List<Card> deckList, Location l)
         {
             foreach (Card c in deckList)
             {
+                c.setOwner(this);
                 deck.add(c);
                 c.setLocationRaw(l);
             }
