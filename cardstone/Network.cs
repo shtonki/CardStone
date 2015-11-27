@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace stonekart
 {
     static class Network
     {
-        private static ServerConnection serverConnection;
+        public const string SERVER = "server";
 
-        private static string[] friends;
+        private static ServerConnection serverConnection;
+        private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
 
         public static void connect()
         {
@@ -26,10 +30,7 @@ namespace stonekart
             }
             if (serverConnection.handshake(name))
             {
-                string s = serverConnection.requestFriends();
-                string[] ss = s.Split(':');
-                if (ss[0] != "friend") { throw new Exception("v bad"); }
-                friends =  ss[1].Split(',').TakeWhile(s1 => s1.Length != 0).ToArray();
+                serverConnection.startAsync();
                 return true;
             }
             else
@@ -38,118 +39,283 @@ namespace stonekart
             }
         }
 
-        public static string[] getFriends()
+        public static void sendTell(string user, string message)
         {
-            return friends;
+            serverConnection.sendMessage(user, "tell", message);
+        }
+
+        public static void addFriend(string s)
+        {
+            serverConnection.sendMessage(SERVER, "friend", s);
+        }
+
+        public static void removeFriend(string s)
+        {
+            serverConnection.sendMessage(SERVER, "unfriend", s);
+        }
+
+        public static void challenge(string s)
+        {
+            serverConnection.sendMessage(s, "challenge", "");
+        }
+
+        public static void addGameConnection(string s, GameConnection c)
+        {
+            gameConnections.Add(s, c);
+        }
+
+        public static void receiveGameMessage(string user, string content)
+        {
+            if (!gameConnections.ContainsKey(user))
+            {
+                System.Console.WriteLine("game message from a dead man " + user);
+                return;
+            }
+            gameConnections[user].receiveGameMessage(content);
+        }
+
+        public static void sendRaw(string to, string head, string message)
+        {
+            serverConnection.sendMessage(to, head, message);
         }
     }
 
 
     class ServerConnection : Connection
     {
-        private string name;
+        public string name { get; private set; }
 
         public ServerConnection()
             : base("46.239.124.155")
         {
-            setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("server krashed"); });
+
+        }
+
+        public new void startAsync()
+        {
+            startAsync((connection, message) => receiveMessage(message), connection => { System.Console.WriteLine("server krashed"); });
         }
 
         public bool handshake(string n)
         {
             name = n;
 
-            sendString(name);
+            sendMessage(Network.SERVER, "login", name);
 
-            String s = waitForString();
-            string[] ss = s.Split(':');
+            SMessage m = waitForMessage();
 
-            switch (ss[0])
+            switch (m.header)
             {
-                case "handshakeok":
+                case "validated":
                     {
-                        System.Console.WriteLine("Connected");
+                        System.Console.WriteLine("Connected as " + n);
                         return true;
                     }
 
                 case "error":
                     {
-                        System.Console.WriteLine(ss[1]);
+                        System.Console.WriteLine(m.message);
                         return false;
                     } break;
 
                 default:
                     {
-                        System.Console.WriteLine("Uknown return {0}", s);
+                        System.Console.WriteLine("Uknown return {0}", m.header);
                     } break;
             }
 
             return true;
         }
 
-        public void gotString(byte[] bs)
+        public void receiveMessage(SMessage m)
         {
-            System.Console.WriteLine(bs);
+            System.Console.WriteLine(m.ToString());
+            
+            switch (m.header)
+            {
+                case "game":
+                {
+                    Network.receiveGameMessage(m.from, m.message);
+                } break;
+
+                case "tell":
+                {
+                        MainFrame.getTell(m.from, m.message);
+                } break;
+
+                case "startgame":
+                {
+                    var ss = m.message.Split(',');
+                    GameConnection c = new GameConnection(ss[0], ss[1]);
+                    Network.addGameConnection(ss[0], c);
+                    GameController.newGame(c);
+
+                } break;
+
+                default:
+                {
+                    System.Console.WriteLine("borked message: " + m.ToString());
+                } break;
+            }
+             
         }
 
         public string requestFriends()
         {
-            sendString("friend:" + name);
-            return waitForString();
+            sendMessage(Network.SERVER, "friend", "");
+            var v = waitForMessage();
+            return v.message;
+        }
+
+        public new void sendMessage(string user, string header, string message)
+        {
+            base.sendMessage(new SMessage(user, name, header, message));
         }
     }
 
-    class GameConnection : Connection
+    public class GameConnection
     {
-        public GameConnection(Socket s) : base(s)
+        public readonly string villainName;
+        private bool home;
+
+        protected Queue<string> eventQueue;
+
+        private Semaphore smf;
+        private AutoResetEvent mre;
+        private Game game;
+
+        public GameConnection(string s, string h)
         {
+            
+            villainName = s;
+            home = h == "home";
+
+            eventQueue = new Queue<string>();
+            mre = new AutoResetEvent(false);
+            smf = new Semaphore(1, 1);
         }
 
-        public GameConnection()
+        public void setGame(Game g)
         {
-            //setCallback((connection, bytes) => gotString(bytes), connection => { System.Console.WriteLine("other player disconnected"); });
-            //start();
+            //todo this really isn't pretty
+            game = g;
         }
 
         public virtual bool asHomePlayer()
         {
-            return false;
+            return home;
         }
 
-        private void gotString(byte[] bs)
+        public void receiveGameMessage(string message)
         {
-            System.Console.WriteLine(bs);
+            smf.WaitOne();
+            eventQueue.Enqueue(message);
+            mre.Set();
+            
+            smf.Release();
         }
 
-        public void sendGameEvent(GameEvent e)
+        private void send(string head, string content)
         {
-            sendString(e.toNetworkString());
+            Network.sendRaw(villainName, head, content);
         }
 
-        public new virtual void sendString(string s) 
+        public virtual void sendGameAction(GameAction a)
         {
-            base.sendString(s);
+            send("game", a.toString());
         }
 
+        private GameAction getNextGameEvent()
+        {
+            while (eventQueue.Count == 0)
+            {
+                mre.WaitOne();
+            }
+
+            smf.WaitOne();
+            string r = eventQueue.Dequeue();
+            smf.Release();
+
+            return GameAction.fromString(r, game);
+        }
+
+        public virtual GameAction demandAction(System.Type t)
+        {
+            var a = getNextGameEvent();
+
+            if (a.GetType() == t) { return a; }
+
+            throw new Exception("sbunh");
+        }
+        /*
+        public virtual GameAction demandCastOrPass()
+        {
+            GameAction a = getNextGameEvent();
+
+            if (a is CastAction)
+            {
+                return a;
+            }
+            else
+            {
+                throw new Exception("demanded cast or pass and got " + a.GetType());
+            }
+        }
+
+        public virtual int demandSelection()
+        {
+
+            var v = getNextGameEvent();
+            if (v is SelectAction) { return ((SelectAction)v).getSelection(); }
+            throw new Exception("really bad");
+        }
+
+        public virtual CardId[] demandDeck()
+        {
+            return ((DeclareDeckAction)getNextGameEvent()).getIds();
+        }
+         */
     }
 
     class DummyConnection : GameConnection
     {
-        public DummyConnection()
+        public DummyConnection() : base("", "")
         {
+        }
 
+        public override void sendGameAction(GameAction e)
+        {
+            System.Console.WriteLine(">" + e.toString());
+        }
+
+        public override GameAction demandAction(System.Type t)
+        {
+            if (t == typeof(CastAction))
+            {
+                return new CastAction();
+            }
+
+            if (t == typeof(MultiSelectAction))
+            {
+                return new MultiSelectAction();
+            }
+
+            if (t == typeof(DeclareDeckAction))
+            {
+                return new DeclareDeckAction();
+            }
+
+            if (t == typeof(SelectAction))
+            {
+                return new SelectAction(0);
+            }
+
+            throw new NotImplementedException("oops xdd");
         }
 
         public override bool asHomePlayer()
         {
             return true;
         }
-
-
-        public override void sendString(String s)
-        {
-            System.Console.WriteLine(s);
-        }
-
     }
 }
