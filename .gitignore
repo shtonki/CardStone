@@ -3,6 +3,8 @@
 *.Cache
 *.manifest
 *.pdb
+stonekart.sln
 /cardstone/obj/Debug/*
 /obj/Debug/*.cs
 pushaT.bat
+settings

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ability.cs" />
     <Compile Include="ButtonPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -59,7 +60,6 @@
     <Compile Include="Connection.cs" />
     <Compile Include="Cost.cs" />
     <Compile Include="Effect.cs" />
-    <Compile Include="EventHandler.cs" />
     <Compile Include="FieldPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -68,6 +68,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Game.cs" />
+    <Compile Include="GameAction.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />

@@ -1,24 +1,26 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace stonekart
 {
+
     class FieldPanel : Panel, Foo, Observer
     {
         private SnapCardButton[] buttons;
         private const int BUTTONS = 10;
 
-        public FieldPanel()
+        public FieldPanel(bool asHero)
         {
-            BackColor = Color.IndianRed;
             Size = new Size(900, 320);
+            BackColor = Color.DarkKhaki;
 
             buttons = new SnapCardButton[BUTTONS];
 
             for (int i = 0; i < BUTTONS; i++)
             {
-                buttons[i] = new SnapCardButton();
-                buttons[i].setLocation(5 + 183 * i, 38);
+                buttons[i] = new SnapCardButton(asHero);
+                buttons[i].setLocation(5 + 183 * i, asHero ? 38 : 0);
                 Controls.Add(buttons[i]);
                 buttons[i].setVisible(false);
             }
@@ -41,6 +43,33 @@ namespace stonekart
             {
                 buttons[i].setVisible(false);
             }
+        }
+    }
+
+    class SnapCardButton : CardButton, Observer
+    {
+        private Point def, att;
+
+        private int xdd;
+
+        public SnapCardButton(bool b)
+        {
+            xdd = b ? -40 : 40;
+        }
+
+        public new void notifyObserver(Observable o)
+        {
+            base.notifyObserver(o);
+
+            Card c = (Card)o;
+            Invoke(new Action(() => { Location = c.isAttacking() ? att : def; }));
+        }
+
+        public void setLocation(int x, int y)
+        {
+            def = new Point(x, y);
+            att = new Point(x, y + xdd);
+            Location = def;
         }
     }
 }

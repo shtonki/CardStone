@@ -7,138 +7,241 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    public enum GameEventType
+    {
+        DRAW,
+        CAST,
+        GAINMANA,
+        ATTACK,
+        DEFEND,
+        TOP,
+        UNTOP,
+        UNTOPPLAYER,
+        MOVECARD,
+        STEP,
+        RESOLVE,
+    }
+
     public abstract class GameEvent
     {
+
+        /*
         public const int
             DRAW = 1,
             CAST = 2,
-            PASS = 3,
+            UNTOP = 3,
             GAINMANA = 4,
             DECLAREATTACKERS = 5,
-            RESOLVECARD = 6;
+            TOP = 6,
+            RESETMANA = 7,
 
-        private int type;
+            xd = -1;
+        */
+        private GameEventType type;
 
-        public GameEvent(int type)
+        public GameEvent(GameEventType type)
         {
             this.type = type;
         }
 
-        public int getType()
+        public GameEventType getType()
         {
             return type;
         }
-
-
-        public string toNetworkString()
-        {
-            return "event:" + type + ':' + getCruftString();
-        }
-
-        protected abstract string getCruftString();
-
     }
 
-    class DrawEvent : GameEvent
+    class DrawEvent : PlayerEvent
     {
-        private bool homePlayer;
-
-        public DrawEvent(bool homePlayer) : base(DRAW)
+        public DrawEvent(Player p) : base(p, GameEventType.DRAW)
         {
-            this.homePlayer = homePlayer;
         }
 
-        protected override string getCruftString()
+        public new Player getPlayer()
         {
-            return homePlayer ? "home" : "away";
+            return p;
         }
     }
 
-    class CastEvent : GameEvent
+    class CastEvent : CardEvent
     {
-        private Card card;
-
-        public CastEvent(Card c) : base(CAST)
+        public CastEvent(Card c) : base(c, GameEventType.CAST)
         {
-            card = c;
+        }
+    }
+
+    class GainManaOrbEvent : PlayerEvent
+    {
+        private int c;
+
+        public GainManaOrbEvent(Player player, int color) : base(player, GameEventType.GAINMANA)
+        {
+            c = color;
+        }
+
+        public int getColor()
+        {
+            return c;
+        }
+    }
+
+    class AttackingEvent : MultiCardEvent
+    {
+        public AttackingEvent(List<Card> c) : base(c, GameEventType.ATTACK)
+        {
+        }
+    }
+
+    class UntopEvent : MultiCardEvent
+    {
+        public UntopEvent(List<Card> cs) : base(cs, GameEventType.UNTOP)
+        {
+        }
+    }
+
+    class TopEvent : MultiCardEvent
+    {
+        public TopEvent(Card c) : base(c, GameEventType.TOP)
+        {
+        }
+    }
+
+    class UntopPlayerEvent : PlayerEvent
+    {
+        public UntopPlayerEvent(Player player) : base(player, GameEventType.UNTOPPLAYER)
+        {
+        }
+    }
+
+    class MoveCardEvent : GameEvent
+    {
+        private Card c;
+        private Location l;
+
+        public MoveCardEvent(Card card, Location loc) : base(GameEventType.MOVECARD)
+        {
+            c = card;
+            l = loc;
         }
 
         public Card getCard()
         {
-            return card;
+            return c;
         }
 
-        protected override string getCruftString()
+        public Location getLocation()
         {
-            return card.getId().ToString();
-        }
-    }
-
-    class PassEvent : GameEvent
-    {
-        public PassEvent() : base(PASS)
-        {
-        }
-
-        protected override string getCruftString()
-        {
-            return "";
+            return l;
         }
     }
 
-    class GainManaOrbEvent : GameEvent
+    class StepEvent : GameEvent
     {
-        private int color;
+        private int s;
 
-        public GainManaOrbEvent(int color) : base(GAINMANA)
+        public const int
+            UNTOP = 0,
+            DRAW = 1,
+            MAIN1 = 2,
+            BEGINCOMBAT = 3,
+            ATTACKERS = 4,
+            DEFENDERS = 5,
+            DAMAGE = 6,
+            ENDCOMBAT = 7,
+            MAIN2 = 8,
+            END = 9;
+
+
+        public StepEvent(int step) : base(GameEventType.STEP)
         {
-            this.color = color;
+            s = step;
         }
 
-        protected override string getCruftString()
+        public int getStep()
         {
-            return color.ToString();
+            return s;
         }
     }
 
-    class DeclareAttackersEvent : GameEvent
+    class ResolveEvent : CardEvent
     {
-        private Card[] attackers;
-
-        public DeclareAttackersEvent(Card[] c) : base(DECLAREATTACKERS)
+        public ResolveEvent(Card card) : base(card, GameEventType.RESOLVE)
         {
-            attackers = c;
+        }
+    }
+
+
+
+    abstract class PlayerEvent : GameEvent
+    {
+        protected Player p;
+
+        public PlayerEvent(Player player, GameEventType type) : base(type)
+        {
+            p = player;
         }
 
-        protected override string getCruftString()
+        public Player getPlayer()
         {
-            if (attackers.Length == 0) { return ""; }
+            return p;
+        }
+    }
 
-            StringBuilder s = new StringBuilder();
-            int i = 0;
+    abstract class CardEvent : GameEvent
+    {
+        protected Card c;
 
-            for (; i < attackers.Length - 1; i++)
+        public CardEvent(Card card, GameEventType type) : base(type)
+        {
+            c = card;
+        }
+
+        public Card getCard()
+        {
+            return c;
+        }
+    }
+
+    abstract class MultiCardEvent : GameEvent
+    {
+        protected List<Card> cs;
+
+        public MultiCardEvent(List<Card> cards, GameEventType t) : base(t)
+        {
+            cs = cards;
+        }
+
+        public MultiCardEvent(Card c, GameEventType t) : base(t)
+        {
+            cs = new List<Card>(1);
+            cs.Add(c);
+        }
+
+        public List<Card> getCards()
+        {
+            return cs;
+        }
+
+    }
+
+    public class EventHandler
+    {
+        public delegate void eventHandler(GameEvent e);
+
+        public GameEventType type;
+        private eventHandler main, pre, post;
+
+        public EventHandler(GameEventType t, eventHandler e)
+        {
+            type = t;
+            main = e;
+        }
+
+        public void invoke(GameEvent e)
+        {
+            if (type == e.getType())
             {
-                s.Append(attackers[i].getId() + ",");
+                main(e);
             }
-            s.Append(attackers[i].getId());
-
-            return s.ToString();
-        }
-    }
-
-    class ResolveCardEvent : GameEvent
-    {
-        private Card card;
-
-        public ResolveCardEvent(Card c) : base(RESOLVECARD)
-        {
-            card = c;
-        }
-
-        protected override string getCruftString()
-        {
-            return card.getId().ToString();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace stonekart
     public class Player : Observable
     {
         private int[] curMana, maxMana;
+        private int health;
 
         private Pile hand, graveyard, exile, field, deck;
 
@@ -23,7 +24,10 @@ namespace stonekart
 
             curMana = new int[5];
             maxMana = new int[5];
+
+            health = 20;
         }
+
 
         public void addMana(int i)
         {
@@ -32,25 +36,23 @@ namespace stonekart
             notifyObserver();
         }
 
-        public void draw()
-        {
-            draw(1);
-        }
-
-        public void draw(int c)
+        public bool draw(int c = 1)
         {
             for (int i = 0; i < c; i++)
             {
+                if (deck.Count == 0) { return false; }
                 deck.peek().moveTo(hand);
             }
 
             notifyObserver();
+            return true;
         }
 
         public void shuffleDeck()
         {
             deck.shuffle();
         }
+
 
         public int getCurrentMana(int color)
         {
@@ -62,11 +64,34 @@ namespace stonekart
             return maxMana[color];
         }
 
+        public int getHealth()
+        {
+            return health;
+        }
+
+
+        public void damage(int i)
+        {
+            health -= i;
+            notifyObserver();
+        }
+
         public void spendMana(int color, int amount)
         {
             curMana[color] -= amount;
             notifyObserver();
         }
+
+        public void spendMana(int[] i)
+        {
+            foreach (var v in i)
+            {
+                curMana[v]--;
+            }
+
+            notifyObserver();
+        }
+
 
         public void resetMana()
         {
@@ -76,11 +101,24 @@ namespace stonekart
             }
         }
 
-        public void loadDeck(CardId[] deckList, Location l)
+        public void untop()
         {
-            foreach (CardId cid in deckList)
+            resetMana();
+
+            foreach (Card c in field.getCards())
             {
-                deck.add(new Card(cid, l));
+                c.unTop();
+            }
+        }
+
+
+        public void loadDeck(List<Card> deckList, Location l)
+        {
+            foreach (Card c in deckList)
+            {
+                c.setOwner(this);
+                deck.add(c);
+                c.setLocationRaw(l);
             }
         }
 

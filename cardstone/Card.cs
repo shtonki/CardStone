@@ -11,15 +11,15 @@ namespace stonekart
 {
     public class Card : Observable
     {
-        private static int idCtr = 0;
-
         private int id;
         private CardId cardId;
         private Location location;
+        private Player owner, controller;
+
         private bool attacking;
 
         private string name;
-        private Cost cost;
+        //private Cost cost;
         private Type type;
         private Race? race;
         private SubType? subType;
@@ -27,6 +27,9 @@ namespace stonekart
 
         private int? power, toughness;
         private bool summoningSick;
+
+        private Ability[] abilities;
+        private Ability castAbility;
 
         public Card(CardId c, Location l)
             : this(c)
@@ -38,7 +41,6 @@ namespace stonekart
         {
             cardId = c;
             location = new Location(Location.NOWHERE);
-            id = idCtr++;
 
             int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0;
 
@@ -86,8 +88,10 @@ namespace stonekart
             }
 
 
-            ManaCost mc = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost);
-            cost = new Cost(mc);
+            ManaCoster mc = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
+            CastingCost cost = new CastingCost(mc);
+            Effect e = new Effect(new StackResolve());
+            castAbility = new Ability(cost, e);
 
             if ((power == null) != (toughness == null))
             {
@@ -113,14 +117,19 @@ namespace stonekart
             return id;
         }
 
+        public void setId(int i)
+        {
+            id = i;
+        }
+
         public string getName()
         {
             return name;
         }
 
-        public ManaCost getManaCost()
+        public ManaCoster getManaCost()
         {
-            return cost.getManaCost();
+            return getCastingCost().getManaCost();
         }
 
         public bool isCastable()
@@ -128,9 +137,34 @@ namespace stonekart
             return location.getLocation() == Location.HAND;
         }
 
-        public Cost getCost()
+        public CastingCost getCastingCost()
         {
-            return cost;
+            return castAbility.cost as CastingCost;
+        }
+
+        public Player getOwner()
+        {
+            return owner;
+        }
+
+        public Player getController()
+        {
+            return owner;
+        }
+
+        public Location getLocation()
+        {
+            return location;
+        }
+
+        public void resolve(Game g)
+        {
+            moveTo(owner.getField());
+        }
+
+        public Type getType()
+        {
+            return type;
         }
 
 
@@ -146,12 +180,6 @@ namespace stonekart
             moveTo(p);
         }
 
-        public void moveToOwners(byte i)
-        {
-            Pile p = Location.getPile(i, location.getSide());
-            moveTo(p);
-        }
-
         public void moveTo(Pile d)
         {
             Pile p = location.getPile();
@@ -161,6 +189,15 @@ namespace stonekart
             summoningSick = true;
         }
 
+        public void setLocationRaw(Location l)
+        {
+            location = l;
+        }
+
+        public void setOwner(Player p)
+        {
+            owner = p;
+        }
         public bool isAttacking()
         {
             return attacking;

@@ -32,6 +32,7 @@ namespace stonekart
 
         public void notifyObserver(Observable o)
         {
+            Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh
             Pile p = (Pile)o;
 
             int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.getCards().Count) ? CardButton.WIDTH : WIDTH/(1+p.getCards().Count));
@@ -49,7 +50,7 @@ namespace stonekart
             {
                 cardButtons[i].setVisible(false);
             }
-
+            Form.CheckForIllegalCrossThreadCalls = true;
         }
     }
 }

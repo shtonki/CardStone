@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    interface Foo
+    public interface Foo
     {
 
     }

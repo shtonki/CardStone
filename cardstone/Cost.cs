@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace stonekart
 {
     public class Cost
     {
-        private ManaCost manaCost;
+        //private ManaCoster manaCost;
         private List<Coster> costs;
-
+        /*
         public bool tryPay(Player p)
         {
             if (checkAll(p))
@@ -17,35 +18,63 @@ namespace stonekart
             }
             return false;
         }
-
-        private bool checkAll(Player p)
+        */
+        public int[][] check(Card card)
         {
-            foreach (Coster c in costs)
+            int[][] r = new int[costs.Count][];
+            for (int i = 0; i < costs.Count; i++)
             {
-                if (!c.check(p))
+                int[] c = costs[i].check(card);
+                if (c == null) { return null; }
+                r[i] = c;
+            }
+            return r;
+        }
+
+        public void pay(Card card, int[][] i)
+        {
+            if (i.Length != costs.Count) { throw new Exception("can't"); }
+            for (int j = 0; j < i.Length; j++)
+            {
+                costs[j].pay(card, i[j]);
+            }
+        }
+
+        public Cost(params Coster[] cs)
+        {
+            costs = new List<Coster>(cs);
+        }
+
+        public Cost(params Coster[][] cs)
+        {
+            int c = 0;
+            //foreach (Coster[] l in cs) { c += l.Length; }
+            costs = new List<Coster>(c);
+            foreach (Coster[] xs in cs)
+            {
+                foreach (Coster t in xs)
                 {
-                    return false;
+                    costs.Add(t);
                 }
             }
-            return true;
         }
+    }
 
-        private void payAll(Player p)
-        {
-            foreach (Coster c in costs)
-            {
-                c.pay(p);
-            }
-        }
+    public class CastingCost : Cost
+    {
+        private ManaCoster manaCost;
 
-        public Cost(ManaCost c)
+        public CastingCost(ManaCoster c) : base(c)
         {
             manaCost = c;
-            costs = new List<Coster>();
-            costs.Add(manaCost);
         }
 
-        public ManaCost getManaCost()
+        public CastingCost(ManaCoster c, params Coster[] cs) : base(new Coster[]{c}, cs)
+        {
+            manaCost = c;
+        }
+
+        public ManaCoster getManaCost()
         {
             return manaCost;
         }
@@ -53,11 +82,11 @@ namespace stonekart
 
     public abstract class Coster
     {
-        public abstract bool check(Player p);
-        abstract public void pay(Player p);
+        public abstract int[] check(Card c);
+        abstract public void pay(Card c, int[] i);
     }
 
-    public class ManaCost : Coster
+    public class ManaCoster : Coster
     {
         public const int
             WHITE = 0,
@@ -66,41 +95,48 @@ namespace stonekart
             RED = 3,
             GREEN = 4;
 
-        private int[] colors;
+        private List<int> cost;
 
-        public ManaCost(int white, int blue, int black, int red, int green)
+        public ManaCoster(int white, int blue, int black, int red, int green)
         {
-            colors = new int[5];
-            colors[WHITE] = white;
-            colors[BLUE] = blue;
-            colors[BLACK] = black;
-            colors[RED] = red;
-            colors[GREEN] = green;
-        }
-
-        public override bool check(Player p)
-        {
-            for (int i = 0; i < 5; i++)
+            cost = new List<int>();
+            int[] _ = new[] {white, blue, black, red, green};
+            for (int c = 0; c < 5; c++)
             {
-                if (p.getCurrentMana(i) < colors[i])
+                for (int i = 0; i < _[c]; c++)
                 {
-                    return false;
+                    cost.Add(c);
                 }
             }
-            return true;
         }
 
-        public override void pay(Player p)
+        public override int[] check(Card card)
         {
+            Player p = card.getOwner();
+
+            int[] cs = new int[5];
+
+            foreach (var b in cost)
+            {
+                cs[b]++;
+            }
+
             for (int i = 0; i < 5; i++)
             {
-                p.spendMana(i, colors[i]);
+                if (p.getCurrentMana(i) < cs[i]) { return null; }
             }
+            
+            return cost.ToArray();
+        }
+
+        public override void pay(Card card, int[] i)
+        {
+            card.getOwner().spendMana(i);
         }
 
         public int[] getColors()
         {
-            return colors;
+            return cost.ToArray();
         }
     }
 }

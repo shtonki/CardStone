@@ -70,14 +70,18 @@ namespace stonekart
             {
                 return;
             }
+            Invoke(new Action(() => { textLabel.Text = s; }));
 
-            textLabel.Text = s;
         }
 
         public void showButtons(int i)
         {
-            accept.Size = (i & ACCEPT) != 0 ? SHOW : HIDE;
-            cancel.Size = (i & CANCEL) != 0 ? SHOW : HIDE;
+            Invoke(new Action(() =>
+            {
+                accept.Size = (i & ACCEPT) != 0 ? SHOW : HIDE;
+                cancel.Size = (i & CANCEL) != 0 ? SHOW : HIDE;
+            }));
+            
         }
 
         private void buttonPressed(FooButton b)

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -44,20 +45,21 @@ namespace stonekart
 
         private static FriendPanel friendPanel;
 
-
         private static Panel activePanel;
-        private static Control popupPanel;
         
         public MainFrame()
         {
             InitializeComponent();
 
             frame = this;
+            //frame.
+
+            Application.AddMessageFilter(new GlobalMouseHandler());
 
             FormClosed += (sender, args) => { Environment.Exit(0); };
 
             Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-            //FormBorderStyle = FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
 
 
@@ -67,11 +69,6 @@ namespace stonekart
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
 
-
-            this.Click += (sender, args) =>
-            {
-                System.Console.WriteLine("xd");
-            };
 
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
@@ -133,10 +130,10 @@ namespace stonekart
             stackPanel = new CardBox(190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            heroFieldPanel = new FieldPanel();
+            heroFieldPanel = new FieldPanel(true);
             heroFieldPanel.Location = new Point(600, 330);
 
-            villainFieldPanel = new FieldPanel();
+            villainFieldPanel = new FieldPanel(false);
             villainFieldPanel.Location = new Point(600, 10);
 
             gamePanel.Controls.Add(buttonPanel);
@@ -229,7 +226,7 @@ namespace stonekart
             kappaPanel.Controls.Add(d);
             d.Click += (a,aa) =>
             {
-                GameController.newGame();
+                GameController.newGame(new DummyConnection());
             };
 
             loginPanel.Controls.Add(usernameLabel);
@@ -254,6 +251,7 @@ namespace stonekart
             }
             else
             {
+                Thread.Sleep(100);
                 loginWithName(Settings.username);
             }
 
@@ -267,7 +265,7 @@ namespace stonekart
         }
 
         private static AutoResetEvent waitForLogin = new AutoResetEvent(false);
-
+        
         private static void loginWithName(string x)
         {
             if (!Network.login(x))
@@ -275,47 +273,31 @@ namespace stonekart
                 System.Console.WriteLine("soeiroj");
                 return;
             }
-            System.Console.WriteLine(x);
-            var s = Network.getFriends();
 
-            friendPanel.addFriends(s);
+            Network.sendRaw(Network.SERVER, "friend", "");
 
             loginPanel.Hide();
             friendPanel.Show();
             waitForLogin.Set();
         }
-
-        public static void showPopupPanel(Control p)
-        {
-            if (popupPanel != null) { closePopupPanel(); }
-
-            popupPanel = p;
-            popupPanel.Visible = true;
-            //System.Console.WriteLine((MousePosition.X - frame.Location.X) + " " + MousePosition.Y);
-            popupPanel.Location = new Point((MousePosition.X - frame.Location.X - p.Size.Width/2), (MousePosition.Y - frame.Location.Y - p.Size.Height));
-            frame.Controls.Add(popupPanel);
-            popupPanel.BringToFront();
-
-
-
-            popupPanel.MouseLeave += (sender, args) =>
-            {
-                closePopupPanel();
-            };
-        }
-
-        public static void closePopupPanel()
-        {
-            frame.Controls.Remove(popupPanel);
-            popupPanel.Visible = false;
-            popupPanel = null;
-        }
-
+         
         private static void transitionTo(Panel p)
         {
-            if (activePanel != null) { activePanel.Size = new Size(0,0); }
-            activePanel = p;
-            p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            if (frame.InvokeRequired)
+            {
+                frame.Invoke(new Action(() =>
+                {
+                    if (activePanel != null) { activePanel.Size = new Size(0, 0); }
+                    activePanel = p;
+                    p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+                }));
+            }
+            else
+            {
+                if (activePanel != null) { activePanel.Size = new Size(0, 0); }
+                activePanel = p;
+                p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            }
         }
 
         public static void transitionToGame()
@@ -349,17 +331,63 @@ namespace stonekart
             buttonPanel.showButtons(i);
         }
 
-        public static void showAddMana()
+        public static void showAddMana(bool b)
         {
-            heroPanel.showAddMana();
+            heroPanel.showAddMana(b);
         }
+
+        public static WindowedPanel showWindow(Control p, string barTitle)
+        {
+            WindowedPanel v = null;
+            if (frame.InvokeRequired)
+            {
+                frame.Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        v = new WindowedPanel(p, barTitle);
+                        frame.Controls.Add(v);
+                        v.BringToFront();
+                    }
+                    catch (Exception e)
+                    {
+                        System.Console.WriteLine(e.ToString());
+                    }
+                }));
+            }
+            else
+            {
+                v = new WindowedPanel(p, barTitle);
+                frame.Controls.Add(v);
+                v.BringToFront();
+            }
+
+            return v;
+        }
+
+        public static WindowedPanel showWindow(Control p)
+        {
+            return showWindow(p, "");
+        }
+
+
+        public static void getTell(string user, string message)
+        {
+            friendPanel.getWhisper(user, message);
+        }
+
 
         public static void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
+            villain.setObserver(villainPanel);
+
             hero.getHand().setObserver(handPanel);
+
             stack.setObserver(stackPanel);
+
             hero.getField().setObserver(heroFieldPanel);
+            villain.getField().setObserver(villainFieldPanel);
         }
 
         public static void handleCommand(string s)
@@ -380,13 +408,130 @@ namespace stonekart
 
         public new void Hide()
         {
-            xd = Size;
-            Size = new Size(0, 0);
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() =>
+                {
+                    xd = Size;
+                    Size = new Size(0, 0);
+                }));
+            }
+            else
+            {
+                xd = Size;
+                Size = new Size(0, 0);
+            }
         }
 
         public new void Show()
         {
-            Size = xd;
+            Invoke(new Action(() =>
+            {
+                Size = xd;
+            }));
+        }
+    }
+
+    public class WindowedPanel : Panel
+    {
+        private bool dragging, drawContent = true, closed;
+        private Size xd;
+        private Control content;
+
+        public WindowedPanel(Control c, string barTitle)
+        {
+            content = c;
+
+            Size = c.Size + new Size(0, 20);
+            c.Location = new Point(0, 20);
+
+            Panel bar = new Panel();
+            bar.Size = new Size(Size.Width - 20, 20);
+            bar.Location = new Point(0, 0);
+            bar.BackColor = Color.DarkOrchid;
+            bar.Text = barTitle;
+
+            Button x = new Button();
+            x.Size = new Size(20, 20);
+            x.Location = new Point(Size.Width - 20, 0);
+            x.BackColor = Color.Red;
+
+            Button t = new Button();
+            t.Size = new Size(20, 20);
+            t.Location = new Point(Size.Width - 40, 0);
+            t.BackColor = Color.Orange;
+
+            x.Click += (a, b) =>
+            {
+                close();
+            };
+
+            t.Click += (a, b) =>
+            {
+                drawContent = !drawContent;
+
+                if (drawContent)
+                {
+                    Size = c.Size + new Size(0, 20);
+                }
+                else
+                {
+                    Size = new Size(Size.Width, 20);
+                }
+            };
+
+            bar.MouseDown += (sender, args) =>
+            {
+                dragging = true;
+                xd = new Size(args.X, args.Y);
+            };
+
+            bar.MouseUp += (asd, sdf) =>
+            {
+                dragging = false;
+            };
+
+            bar.MouseMove += (sender, args) =>
+            {
+                if (!dragging) { return; }
+                Location = Location - xd + new Size(args.X, args.Y);
+            };
+
+            Controls.Add(x);
+            Controls.Add(t);
+            Controls.Add(bar);
+            Controls.Add(c);
+        }
+
+        public void close()
+        {
+            closed = true;
+            Parent.Controls.Remove(this);
+        }
+
+        public Control getContent()
+        {
+            return content;
+        }
+
+        public bool isClosed()
+        {
+            return closed;
+        }
+    }
+
+    class GlobalMouseHandler : IMessageFilter
+    {
+
+        private const int left = 0x201, right = 0x205;
+
+        public bool PreFilterMessage(ref Message m)
+        {
+            if (m.Msg == left || m.Msg == right)
+            {
+                
+            }
+            return false;
         }
     }
 

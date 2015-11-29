@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -14,11 +15,13 @@ namespace stonekart
     {
         static void Main(string[] args)
         {
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
+
             Settings.loadSettings();
 
             //FontLoader.init();
 
-            Form.CheckForIllegalCrossThreadCalls = false;
+            //Form.CheckForIllegalCrossThreadCalls = false;
             Thread t = new Thread(new ThreadStart(asd));
             t.Start();
             

@@ -21,6 +21,8 @@ namespace stonekart
         private int id;
         private Card card;
 
+        private Pen borderPen;
+
         static CardButton()
         {
             var a = new PrivateFontCollection();
@@ -85,7 +87,15 @@ namespace stonekart
 
         public void setVisible(bool v)
         {
-            Size = v ? SHOW : HIDE;
+            if (InvokeRequired) { Invoke(new Action(() => { Size = v ? SHOW : HIDE; })); }
+            else { Size = v ? SHOW : HIDE; }
+        }
+
+        public void setBorder(Color? c)
+        {
+            borderPen = c == null ? null : new Pen(c.Value, 8);
+            //borderPen = c == null ? null : borderPen == null ? new Pen(c.Value, 8) : null;
+            Invalidate();
         }
 
         private const int w = 33;
@@ -121,7 +131,7 @@ namespace stonekart
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
                 //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
 
-
+                /*
 
                 int[] mc = card.getManaCost().getColors();
                 int i = 0;
@@ -168,7 +178,7 @@ namespace stonekart
                         i++;
                     }
                 }
-
+                */
                 if (card.hasPT())
                 {
                     Brush p = new SolidBrush(Color.Silver);
@@ -178,6 +188,11 @@ namespace stonekart
                     pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
                     pevent.Graphics.DrawString(card.getPower().ToString(), PTFont, b, 4, 250);
                     pevent.Graphics.DrawString(card.getToughness().ToString(), PTFont, b, 154, 250);
+                }
+
+                if (borderPen != null)
+                {
+                    pevent.Graphics.DrawRectangle(borderPen, 0, 0, WIDTH, HEIGHT);                    
                 }
 
                 /*
@@ -191,28 +206,14 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             card = (Card)o;
-            Visible = card != null;
-        }
-    }
-
-    class SnapCardButton : CardButton, Observer
-    {
-        private bool snapped;
-        private Point def, att;
-
-        public void notifyObserver(Observable o)
-        {
-            base.notifyObserver(o);
-
-            Card c = (Card)o;
-            Location = c.isAttacking() ? att : def;
-        }
-
-        public void setLocation(int x, int y)
-        {
-            def = new Point(x, y);
-            att = new Point(x, y - 40);
-            Location = def;
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { Visible = card != null; }));
+            }
+            else
+            {
+                Visible = card != null;       
+            }
         }
     }
 }
