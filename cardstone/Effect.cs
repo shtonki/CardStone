@@ -1,6 +1,6 @@
 ﻿namespace stonekart
 {
-    class Effect
+    public class Effect
     {
         private Effecter[] effecters;
 
@@ -18,7 +18,7 @@
         }
     }
 
-    abstract class Effecter
+    public abstract class Effecter
     {
         abstract public void resolve(Card c);
     }

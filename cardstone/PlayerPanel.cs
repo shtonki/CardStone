@@ -14,6 +14,7 @@ namespace stonekart
         private Player player;
         private Label health;
 
+        private string hlt = "x";
 
         private static Font f = new Font(new FontFamily("Comic Sans MS"), 20);
 
@@ -131,15 +132,18 @@ namespace stonekart
                 }
             }
 
+            hlt = player.getHealth().ToString();
+
             Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-
+            
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            e.Graphics.DrawString(player.getHealth().ToString(), f, new SolidBrush(Color.Black), 10, 300);
+            e.Graphics.DrawString(hlt, f, new SolidBrush(Color.Black), 10, 300);
+             
         }
 
         public class ManaButton : UserControl, Foo

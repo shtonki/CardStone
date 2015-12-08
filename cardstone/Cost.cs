@@ -59,7 +59,7 @@ namespace stonekart
             }
         }
     }
-
+    /*
     public class CastingCost : Cost
     {
         private ManaCoster manaCost;
@@ -79,7 +79,7 @@ namespace stonekart
             return manaCost;
         }
     }
-
+    */
     public abstract class Coster
     {
         public abstract int[] check(Card c);
@@ -134,7 +134,7 @@ namespace stonekart
             card.getOwner().spendMana(i);
         }
 
-        public int[] getColors()
+        public int[] getColours()
         {
             return cost.ToArray();
         }

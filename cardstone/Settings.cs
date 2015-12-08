@@ -12,29 +12,29 @@ namespace stonekart
 
         public static void loadSettings()
         {
-            var f = File.Open("settings", FileMode.OpenOrCreate);
-            var r = new StreamReader(f);
 
             string s;
-
-            while ((s = r.ReadLine()) != null)
+            using (var r = new StreamReader("settings"))
             {
-                string ls, rs;
-                string[] ss = s.Split('=');
-                ls = ss[0].Trim();
-                rs = ss[1].Trim();
-
-                switch (ls)
+                while (!r.EndOfStream)
                 {
-                    case "username":
-                    {
-                        username = rs;
-                    } break;
+                    s = r.ReadLine();
+                    string[] ss = s.Split('=');
+                    var ls = ss[0].Trim();
+                    var rs = ss[1].Trim();
 
-                    default:
+                    switch (ls)
                     {
-                        System.Console.WriteLine("bad setting: {0}", s);
-                    } break;
+                        case "username":
+                        {
+                            username = rs;
+                        } break;
+
+                        default:
+                        {
+                            System.Console.WriteLine("bad setting: {0}", s);
+                        } break;
+                    }
                 }
             }
         }

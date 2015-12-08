@@ -91,7 +91,7 @@ namespace stonekart
 
         }
 
-        public new void startAsync()
+        public void startAsync()
         {
             startAsync((connection, message) => receiveMessage(message), connection => { System.Console.WriteLine("server krashed"); });
         }
@@ -107,21 +107,21 @@ namespace stonekart
             switch (m.header)
             {
                 case "validated":
-                    {
-                        System.Console.WriteLine("Connected as " + n);
-                        return true;
-                    }
+                {
+                    System.Console.WriteLine("Connected as " + n);
+                    return true;
+                } break;
 
                 case "error":
-                    {
-                        System.Console.WriteLine(m.message);
-                        return false;
-                    } break;
+                {
+                    System.Console.WriteLine(m.message);
+                    return false;
+                } break;
 
                 default:
-                    {
-                        System.Console.WriteLine("Uknown return {0}", m.header);
-                    } break;
+                {
+                    System.Console.WriteLine("Uknown return {0}", m.header);
+                } break;
             }
 
             return true;
@@ -167,7 +167,7 @@ namespace stonekart
             return v.message;
         }
 
-        public new void sendMessage(string user, string header, string message)
+        public void sendMessage(string user, string header, string message)
         {
             base.sendMessage(new SMessage(user, name, header, message));
         }

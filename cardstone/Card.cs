@@ -28,8 +28,8 @@ namespace stonekart
         private int? power, toughness;
         private bool summoningSick;
 
-        private Ability[] abilities;
-        private Ability castAbility;
+        private List<ActivatedAbility> activatedAbilities;
+        private ManaCoster castingCost;
 
         public Card(CardId c, Location l)
             : this(c)
@@ -87,11 +87,14 @@ namespace stonekart
                 } break;
             }
 
+            activatedAbilities = new List<ActivatedAbility>();
 
-            ManaCoster mc = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
-            CastingCost cost = new CastingCost(mc);
+            castingCost = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
+            Cost cc = new Cost(castingCost);
             Effect e = new Effect(new StackResolve());
-            castAbility = new Ability(cost, e);
+            ActivatedAbility castAbility = new ActivatedAbility(this, cc, e);
+
+            activatedAbilities.Add(castAbility);
 
             if ((power == null) != (toughness == null))
             {
@@ -129,17 +132,7 @@ namespace stonekart
 
         public ManaCoster getManaCost()
         {
-            return getCastingCost().getManaCost();
-        }
-
-        public bool isCastable()
-        {
-            return location.getLocation() == Location.HAND;
-        }
-
-        public CastingCost getCastingCost()
-        {
-            return castAbility.cost as CastingCost;
+            return castingCost;
         }
 
         public Player getOwner()
@@ -165,6 +158,21 @@ namespace stonekart
         public Type getType()
         {
             return type;
+        }
+
+        public List<ActivatedAbility> getAvailableActivatedAbilities(bool canSorc)
+        {
+            List<ActivatedAbility> r = new List<ActivatedAbility>();
+
+            foreach (var v in activatedAbilities)
+            {
+                if (!v.castableFrom(location.getLocation())) { continue; }
+                if (!canSorc && !v.isInstant()) { continue; }
+
+                r.Add(v);
+            }
+
+            return r;
         }
 
 

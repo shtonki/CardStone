@@ -16,6 +16,7 @@ namespace stonekart
         private Pile stack;
 
         private bool active;
+        private int step;
 
         private GameConnection connection;
         private CardFactory cardFactory;
@@ -96,6 +97,11 @@ namespace stonekart
         {
             kappa = new KappaMan();
 
+            kappa.addBaseHandler(new EventHandler(GameEventType.STEP, @g =>
+            {
+                
+            }));
+
             kappa.addBaseHandler(new EventHandler(GameEventType.DRAW, @gevent =>
             {
                 DrawEvent e = (DrawEvent)gevent;
@@ -131,6 +137,12 @@ namespace stonekart
                 ResolveEvent e = (ResolveEvent)gevent;
                 e.getCard().resolve(this);
             }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.DAMAGEPLAYER, @gevent =>
+            {
+                DamagePlayerEvent e = (DamagePlayerEvent)gevent;
+                e.getPlayer().damage(e.getDamage());
+            }));
         }
 
         private void setLocations()
@@ -153,12 +165,13 @@ namespace stonekart
 
         private void loop()
         {
-            //Thread.CurrentThread.Name = "XDDDDDDDDDD";
             active = connection.asHomePlayer();
+            MainFrame.setStep(0, active);
 
             while (true)
             {
-                activePlayer = active ? hero : villain;
+                activePlayer =   active ? hero : villain;
+                inactivePlayer = active ? villain : hero;
 
                 //untop step
                 untopStep();
@@ -177,15 +190,15 @@ namespace stonekart
                 advanceStep();
 
                 //attackers
-                chooseAttackersStep();
+                bool b = chooseAttackersStep();
                 advanceStep();
 
                 //defenders
-                chooseDefendersStep();
+                if (b) { chooseDefendersStep(); }
                 advanceStep();
 
                 //combatDamage
-                combatDamageStep();
+                if (b) { combatDamageStep(); }
                 advanceStep();
 
                 //endCombat
@@ -198,9 +211,8 @@ namespace stonekart
 
                 //end
                 endStep();
-                advanceStep();
-
                 active = !active;
+                advanceStep();
             }
         }
 
@@ -250,7 +262,7 @@ namespace stonekart
             givePriority(false);
         }
 
-        private void chooseAttackersStep()
+        private bool chooseAttackersStep()
         {
             Card[] attackers;
 
@@ -264,24 +276,36 @@ namespace stonekart
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
             }
 
+            if (attackers.Length == 0) { return false; }
+
             foreach (var a in attackers)
             {
                 a.setAttacking(true);
+                //todo attackers event
             }
 
-            raiseEvent(new StepEvent(StepEvent.ATTACKERS));
+            //raiseEvent(new StepEvent(StepEvent.ATTACKERS));
             givePriority(false);
+            return true;
         }
 
         private void chooseDefendersStep()
         {
-            raiseEvent(new StepEvent(StepEvent.DEFENDERS));
+            //raiseEvent(new StepEvent(StepEvent.DEFENDERS));
             givePriority(false);
         }
 
         private void combatDamageStep()
         {
-            raiseEvent(new StepEvent(StepEvent.DAMAGE));
+            foreach (var v in activePlayer.getField().getCards())
+            {
+                if (v.isAttacking())
+                {
+                    raiseEvent(new DamagePlayerEvent(inactivePlayer, v, v.getPower()));
+                }
+            }
+
+            //raiseEvent(new StepEvent(StepEvent.DAMAGE));
             givePriority(false);
         }
 
@@ -306,7 +330,7 @@ namespace stonekart
                 Card c;
                 if (active)
                 {
-                    c = castOrPass(main);
+                    c = castOrPass(main && stack.Count == 0);
                 }
                 else
                 {
@@ -321,15 +345,7 @@ namespace stonekart
                     }
                     else
                     {
-                        if (stack.Count == 0) //todo make this respect stop options
-                        {
-                            c = null;
-                            raiseAction(new CastAction());
-                        }
-                        else
-                        {
-                            c = castOrPass(main);
-                        }
+                        c = castOrPass(false);
                     }
                 }
 
@@ -354,7 +370,8 @@ namespace stonekart
 
         private void advanceStep()
         {
-            MainFrame.advanceStep();
+            step = (step + 1)%10;
+            MainFrame.setStep(step, active);
         }
 
         /// <summary>
@@ -364,6 +381,7 @@ namespace stonekart
         /// <returns>A Card if a card was selected, null otherwise</returns>
         private Card castOrPass(bool main)
         {
+            if (checkAutoPass()) { return null; }
             MainFrame.setMessage("You have priority");
             while (true)
             {
@@ -385,12 +403,28 @@ namespace stonekart
                     {
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
-                        if (((main && stack.Count == 0) || c.isInstant()) && c.isCastable())
+                        var abilities = c.getAvailableActivatedAbilities(main);
+
+                        ActivatedAbility a;
+                        if (abilities.Count == 0)
                         {
-                            var v = c.getCastingCost().check(c);
+                            a = null;
+                        }
+                        else if (abilities.Count == 1)
+                        {
+                            a = abilities[0];
+                        }
+                        else
+                        {
+                            throw new Exception("we don't support these things yet");
+                        }
+
+                        if (a != null)
+                        {
+                            var v = a.getCost().check(c);
                             if (v != null)
                             {
-                                c.getCastingCost().pay(c, v);
+                                a.getCost().pay(c, v);
                                 MainFrame.clear();
                                 raiseAction(new CastAction(c, v));
                                 return c;
@@ -401,6 +435,10 @@ namespace stonekart
             }
         }
 
+        private bool checkAutoPass()
+        {
+            return false;
+        }
 
         private Card demandCastOrPass()
         {

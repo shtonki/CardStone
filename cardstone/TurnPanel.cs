@@ -57,10 +57,10 @@ namespace stonekart
             }
         }
 
-        public void advanceStep()
+        public void setStep(int s, bool a)
         {
-            step = (step + 1) % STEPS;
-            xd = xd ^ step == 0;
+            step = s;
+            xd = a;
             Invalidate();
         }
 

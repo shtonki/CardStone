@@ -310,9 +310,9 @@ namespace stonekart
             transitionTo(mainMenuPanel);
         }
 
-        public static void advanceStep()
+        public static void setStep(int s, bool a)
         {
-            turnPanel.advanceStep();
+            turnPanel.setStep(s, a);
         }
 
         public static void setMessage(string s)

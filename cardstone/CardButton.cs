@@ -131,19 +131,18 @@ namespace stonekart
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
                 //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
 
-                /*
-
-                int[] mc = card.getManaCost().getColors();
-                int i = 0;
+                
+                
+                int[] mc = card.getManaCost().getColours();
 
 
                 Pen manaBallPen = new Pen(b, 4);
 
 
 
-                for (int c = 0; c < 5; c++)
+                for (int i = 0; i < mc.Length; i++)
                 {
-                    switch (c)
+                    switch (mc[i])
                     {
                         case 0:
                             {
@@ -171,14 +170,12 @@ namespace stonekart
                             } break;
 
                     }
-                    for (int j = 0; j < mc[c]; j++)
-                    {
-                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 10, 10);
-                        pevent.Graphics.FillEllipse(b, 159 - i * 15, 7, 10, 10);
-                        i++;
-                    }
+
+                    pevent.Graphics.DrawEllipse(manaBallPen, 159 - i * 15, 7, 10, 10);
+                    pevent.Graphics.FillEllipse(b, 159 - i * 15, 7, 10, 10);
+
                 }
-                */
+                
                 if (card.hasPT())
                 {
                     Brush p = new SolidBrush(Color.Silver);

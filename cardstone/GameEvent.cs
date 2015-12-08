@@ -20,6 +20,7 @@ namespace stonekart
         MOVECARD,
         STEP,
         RESOLVE,
+        DAMAGEPLAYER,
     }
 
     public abstract class GameEvent
@@ -169,6 +170,34 @@ namespace stonekart
         }
     }
 
+    class DamagePlayerEvent : GameEvent
+    {
+        private Player p;
+        private Card s;
+        private int d;
+
+        public DamagePlayerEvent(Player player, Card source, int damage) : base(GameEventType.DAMAGEPLAYER)
+        {
+            p = player;
+            s = source;
+            d = damage;
+        }
+
+        public Player getPlayer()
+        {
+            return p;
+        }
+
+        public Card getSource()
+        {
+            return s;
+        }
+
+        public int getDamage()
+        {
+            return d;
+        }
+    }
 
 
     abstract class PlayerEvent : GameEvent

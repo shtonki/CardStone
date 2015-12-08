@@ -43,16 +43,16 @@ namespace stonekart
 
                 case "cast":
                 {
-                    List<int[]> us = new List<int[]>();
+                    List<int[]> cs = new List<int[]>();
                     List<int> ts = new List<int>();
                     int card = Int32.Parse(ss[1]);
 
                     for (int i = 2; i < ss.Length; i++)
                     {
                         char c = ss[i][0];
-                        if (c == 'u') //u'0'0'1'
+                        if (c == 'c') //c'0'0'1'
                         {
-                            us.Add(ss[i].Split('\'').Select(Int32.Parse).ToArray());
+                            cs.Add(ss[i].Split('\'').Select(Int32.Parse).ToArray());
                         }
                         else if (c == 't')
                         {
@@ -60,7 +60,7 @@ namespace stonekart
                         }
                     }
 
-                    r = new CastAction(g.getCardById(Int32.Parse(ss[1])), us.ToArray());
+                    r = new CastAction(g.getCardById(Int32.Parse(ss[1])), cs.ToArray());
                 } break;
 
                 case "deck":
