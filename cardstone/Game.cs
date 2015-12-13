@@ -23,6 +23,8 @@ namespace stonekart
 
         private KappaMan kappa;
 
+        private Stack<StackWrapperFuckHopeGasTheKikes> stackxd;
+
         private delegate bool xd(Card c);
 
         public Game(GameConnection cn)
@@ -33,12 +35,13 @@ namespace stonekart
 
             setupEventHandlers();
 
-            hero = new Player();
-            villain = new Player();
+            hero = new Player(Location.HEROSIDE);
+            villain = new Player(Location.VILLAINSIDE);
             homePlayer = cn.asHomePlayer() ? hero : villain;
             awayPlayer = cn.asHomePlayer() ? villain : hero;
 
             stack = new Pile();
+            stackxd = new Stack<StackWrapperFuckHopeGasTheKikes>();
 
             setLocations();
 
@@ -81,8 +84,18 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration, CardId.SolemnAberration,
-                CardId.SolemnAberration, CardId.SolemnAberration,
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.ForkedLightning, 
+                CardId.ForkedLightning, 
+                CardId.ForkedLightning, 
+                CardId.ForkedLightning, 
+                CardId.FrothingGoblin, 
+                CardId.FrothingGoblin, 
+                CardId.FrothingGoblin, 
+                CardId.FrothingGoblin, 
             };
         }
 
@@ -105,19 +118,25 @@ namespace stonekart
             kappa.addBaseHandler(new EventHandler(GameEventType.DRAW, @gevent =>
             {
                 DrawEvent e = (DrawEvent)gevent;
-                e.getPlayer().draw();
+                e.getPlayer().draw(e.getCards());
+                e.getPlayer().notifyObserver();
             }));
 
             kappa.addBaseHandler(new EventHandler(GameEventType.CAST, @gevent =>
             {
                 CastEvent e = (CastEvent)gevent;
-                e.getCard().moveTo(stack);
+                var v = e.getStuff();
+                v.card.moveTo(stack);
+                stackxd.Push(v);
+
+                v.card.getOwner().notifyObserver();
             }));
 
             kappa.addBaseHandler(new EventHandler(GameEventType.MOVECARD, @gevent =>
             {
                 MoveCardEvent e = (MoveCardEvent)gevent;
                 e.getCard().moveTo(e.getLocation());
+                e.getCard().getOwner().notifyObserver();
             }));
 
             kappa.addBaseHandler(new EventHandler(GameEventType.GAINMANA, @gevent =>
@@ -135,13 +154,55 @@ namespace stonekart
             kappa.addBaseHandler(new EventHandler(GameEventType.RESOLVE, @gevent =>
             {
                 ResolveEvent e = (ResolveEvent)gevent;
-                e.getCard().resolve(this);
+                var x = e.getStuff();
+
+                if (!stackxd.Pop().Equals(x) || stack.peek() != x.card)
+                {
+                    throw new CannotUnloadAppDomainException("we don't need to deal with the immigration \"problem\" that's not politically correct xddd");
+                }
+
+                Ability a = x.ability;
+                Card card = x.card;
+
+                List<GameEvent> es = a.getEffect().resolve(card, x.targets);
+
+                foreach (var v in es)
+                {
+                    kappa.handle(v);
+                }
+
+                if (card.isDummy())
+                {
+                    throw new NotImplementedException();
+                }
+
+                if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+                {
+                    raiseEvent(new MoveCardEvent(card, Location.GRAVEYARD));
+                }
+                else
+                {
+                    raiseEvent(new MoveCardEvent(card, Location.FIELD));
+                }
+
             }));
 
             kappa.addBaseHandler(new EventHandler(GameEventType.DAMAGEPLAYER, @gevent =>
             {
                 DamagePlayerEvent e = (DamagePlayerEvent)gevent;
                 e.getPlayer().damage(e.getDamage());
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.DAMAGECREATURE, @gevent =>
+            {
+                DamageCreatureEvent e = (DamageCreatureEvent)gevent;
+                e.getCreature().damage(e.getDamage());
+            }));
+
+            kappa.addBaseHandler(new EventHandler(GameEventType.BURYCREATURE, @gevent =>
+            {
+                BuryCreature e = (BuryCreature)gevent;
+                raiseEvent(new MoveCardEvent(e.getCard(), Location.GRAVEYARD));
             }));
         }
 
@@ -301,7 +362,7 @@ namespace stonekart
             {
                 if (v.isAttacking())
                 {
-                    raiseEvent(new DamagePlayerEvent(inactivePlayer, v, v.getPower()));
+                    raiseEvent(new DamagePlayerEvent(inactivePlayer, v, v.getCurrentPower()));
                 }
             }
 
@@ -327,31 +388,31 @@ namespace stonekart
             //todo make it check toggleboxes and autopass
             while (true)
             {
-                Card c;
+                checkGameState();
+                StackWrapperFuckHopeGasTheKikes a;
                 if (active)
                 {
-                    c = castOrPass(main && stack.Count == 0);
+                    a = castOrPass(main && stack.Count == 0);
                 }
                 else
                 {
-                    c = demandCastOrPass();
+                    a = demandCastOrPass();
                 }
 
-                if (c == null)  //active player passed
+                if (a == null)  //active player passed
                 {
                     if (active)
                     {
-                        c = demandCastOrPass();
+                        a = demandCastOrPass();
                     }
                     else
                     {
-                        c = castOrPass(false);
+                        a = castOrPass(false);
                     }
                 }
-
-                if (c != null)
+                if (a != null)
                 {
-                    raiseEvent(new CastEvent(c));
+                    raiseEvent(new CastEvent(a));
                 }
                 else //both passed
                 {
@@ -374,12 +435,38 @@ namespace stonekart
             MainFrame.setStep(step, active);
         }
 
+        private void checkGameState()
+        {
+            List<GameEvent> xd = new List<GameEvent>();
+
+            foreach (var v in hero.getField().getCards())
+            {
+                if (v.getCurrentToughness() <= 0)
+                {
+                    xd.Add(new BuryCreature(v));
+                }
+            }
+
+            foreach (var v in villain.getField().getCards())
+            {
+                if (v.getCurrentToughness() <= 0)
+                {
+                    xd.Add(new BuryCreature(v));
+                }
+            }
+
+            foreach (var v in xd)
+            {
+                raiseEvent(v);
+            }
+        }
+
         /// <summary>
         /// Makes the user either pick a card or pass priority, then calls raiseAction on the resulting action which is either a PassAction or a CastAction
         /// </summary>
         /// <param name="main"></param>
         /// <returns>A Card if a card was selected, null otherwise</returns>
-        private Card castOrPass(bool main)
+        private StackWrapperFuckHopeGasTheKikes castOrPass(bool main)
         {
             if (checkAutoPass()) { return null; }
             MainFrame.setMessage("You have priority");
@@ -419,15 +506,18 @@ namespace stonekart
                             throw new Exception("we don't support these things yet");
                         }
 
+                        
+
                         if (a != null)
                         {
                             var v = a.getCost().check(c);
                             if (v != null)
                             {
+                                var targets = getTargets(a);
                                 a.getCost().pay(c, v);
                                 MainFrame.clear();
-                                raiseAction(new CastAction(c, v));
-                                return c;
+                                raiseAction(new CastAction(c, v)); //todo (seba) not even an anti pattern just horrible
+                                return new StackWrapperFuckHopeGasTheKikes(c, a, targets);
                             }
                         }
                     }
@@ -440,10 +530,42 @@ namespace stonekart
             return false;
         }
 
-        private Card demandCastOrPass()
+        private Target[] getTargets(Ability a)
+        {
+            MainFrame.setMessage("Select target(s)");
+
+            Target[] targets = new Target[a.countTargets()];
+            TargetRule[] rules = a.getTargetRules();
+
+            int i = 0;
+            while (i < targets.Length)
+            {
+                Target t = null;
+                Foo f = getFoo();
+                if (f is PlayerButton)
+                {
+                    t = new Target(((PlayerButton)f).getPlayer());
+                }
+                else if (f is CardButton)
+                {
+                    t = new Target(((CardButton)f).getCard());
+                }
+
+                //add option to cancel this shit
+
+                if (t != null && rules[i].check(t))
+                {
+                    targets[i++] = t;
+                }
+            }
+            return targets;
+        }
+
+        private StackWrapperFuckHopeGasTheKikes demandCastOrPass()
         {
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            return v.getCard();
+            if (v.getCard() == null) { return null; }
+            return new StackWrapperFuckHopeGasTheKikes(v.getCard(), v.getAbility(), new Target[]{});//v.getAbility();
         }
 
         private int demandSelection()
@@ -529,7 +651,7 @@ namespace stonekart
 
         private void resolveTop()
         {
-            raiseEvent(new ResolveEvent(stack.peek()));
+            raiseEvent(new ResolveEvent(stackxd.Peek()));
             //c.ToOwners(Location.FIELD);
             //raiseEvent(new ResolveCardEvent(c));
         }
@@ -556,7 +678,7 @@ namespace stonekart
         }
 
 
-
+        //todo seba this really shouldn't be here
         private Foo f;
         private AutoResetEvent e = new AutoResetEvent(false);
 
@@ -626,7 +748,7 @@ namespace stonekart
 
             public KappaMan()
             {
-                xds = new EventHandler[100]; //todo nope
+                xds = new EventHandler[100]; //1todo nope
             }
 
             public void addBaseHandler(EventHandler e)
@@ -675,5 +797,18 @@ namespace stonekart
         }
     }
 
+    //the fact that making this a struct creates 20 lines of code shows what a fucking joke this language is
+    public class StackWrapperFuckHopeGasTheKikes
+    {
+        public Card card;
+        public Ability ability;
+        public Target[] targets;
 
+        public StackWrapperFuckHopeGasTheKikes(Card c, Ability a, Target[] cs)
+        {
+            card = c;
+            ability = a;
+            targets = cs;
+        }
+    }
 }

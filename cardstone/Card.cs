@@ -25,10 +25,10 @@ namespace stonekart
         private SubType? subType;
         private Effect resolveEffect;
 
-        private int? power, toughness;
+        private int? power, toughness, currentPower, currentToughness;
         private bool summoningSick;
 
-        private List<ActivatedAbility> activatedAbilities;
+        private List<Ability> abilities;
         private ManaCoster castingCost;
 
         public Card(CardId c, Location l)
@@ -42,13 +42,27 @@ namespace stonekart
             cardId = c;
             location = new Location(Location.NOWHERE);
 
+            List<Effecter> fx = new List<Effecter>();
+
             int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0;
+
+            string s = cardId.ToString();
+            StringBuilder b = new StringBuilder();
+            b.Append(s[0]);
+            for (int i = 1; i < s.Length; i++)
+            {
+                char ch = s[i];
+                if ((byte)ch <= 90) { b.Append(' '); }
+
+                b.Append(ch);
+            }
+
+            name = b.ToString();
 
             switch (cardId)
             {
                 case CardId.Kappa:
                 {
-                    name = "Kappa";
                     blueCost = 2;
                     power = 1;
                     toughness = 3;
@@ -58,7 +72,6 @@ namespace stonekart
 
                 case CardId.BearCavalary:
                 {
-                    name = "Bear Cavalary";
                     greenCost = 2;
                     type = Type.Creature;
                     race = Race.Bear;
@@ -69,15 +82,20 @@ namespace stonekart
 
                 case CardId.LightningBolt:
                 {
-                    name = "Lightning Bolt";
                     redCost = 1;
                     type = Type.Instant;
-                    //Effect = 
+                    fx.Add(new PingN(1,3));
+                } break;
+
+                case CardId.ForkedLightning:
+                {
+                    redCost = 1;
+                    type = Type.Sorcery;
+                    fx.Add(new PingN(2, 1));
                 } break;
 
                 case CardId.SolemnAberration:
                 {
-                    name = "Solemn Aberration";
                     blackCost = 1;
                     type = Type.Creature;
                     race = Race.Zombie;
@@ -85,16 +103,39 @@ namespace stonekart
                     toughness = 2;
                     //todo can't block
                 } break;
+
+                case CardId.PropheticVision:
+                {
+                    blueCost = 1;
+                    type = Type.Sorcery;
+                    fx.Add(new OwnerDrawsEffecter(2));
+                } break;
+
+                case CardId.FrothingGoblin:
+                {
+                    redCost = 1;
+                    type = Type.Creature;
+                    power = 2;
+                    toughness = 2;
+                } break;
+
             }
 
-            activatedAbilities = new List<ActivatedAbility>();
+            if (power != null)
+            {
+                currentPower = power;
+                currentToughness = toughness;
+            }
 
+            abilities = new List<Ability>();
+
+            Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
             Cost cc = new Cost(castingCost);
-            Effect e = new Effect(new StackResolve());
-            ActivatedAbility castAbility = new ActivatedAbility(this, cc, e);
+            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x);
+            castAbility.setInstant(type == Type.Instant);
 
-            activatedAbilities.Add(castAbility);
+            abilities.Add(castAbility);
 
             if ((power == null) != (toughness == null))
             {
@@ -150,10 +191,17 @@ namespace stonekart
             return location;
         }
 
-        public void resolve(Game g)
+        public Ability getAbility(int i)
         {
-            moveTo(owner.getField());
+            return abilities[i];
         }
+
+        public bool isDummy()
+        {
+            return false;
+        }
+
+
 
         public Type getType()
         {
@@ -164,12 +212,14 @@ namespace stonekart
         {
             List<ActivatedAbility> r = new List<ActivatedAbility>();
 
-            foreach (var v in activatedAbilities)
+            foreach (var v in abilities)
             {
-                if (!v.castableFrom(location.getLocation())) { continue; }
-                if (!canSorc && !v.isInstant()) { continue; }
+                if (!(v is ActivatedAbility)) { continue; }
+                ActivatedAbility a = v as ActivatedAbility;
+                if (!a.castableFrom(location.getLocation())) { continue; }
+                if (!canSorc && !a.isInstant()) { continue; }
 
-                r.Add(v);
+                r.Add(a);
             }
 
             return r;
@@ -197,6 +247,13 @@ namespace stonekart
             summoningSick = true;
         }
 
+        public void damage(int d)
+        {
+            currentToughness -= d;
+            notifyObserver();
+        }
+
+
         public void setLocationRaw(Location l)
         {
             location = l;
@@ -222,20 +279,26 @@ namespace stonekart
             return power != null;
         }
 
-        public int getPower()
+        public int getCurrentPower()
         {
-            return power.GetValueOrDefault();
+            return currentPower.GetValueOrDefault();
         }
 
-        public int getToughness()
+        public int getCurrentToughness()
         {
-            return toughness.GetValueOrDefault();
+            return currentToughness.GetValueOrDefault();
+        }
+
+        public bool isDamaged()
+        {
+            return currentToughness != toughness;
         }
 
         public bool canAttack()
         {
             return !summoningSick;
         }
+
 
 
         public Image getArt()
@@ -263,6 +326,9 @@ namespace stonekart
         BearCavalary,
         LightningBolt,
         SolemnAberration,
+        PropheticVision,
+        ForkedLightning,
+        FrothingGoblin,
     }
 
     public enum Type

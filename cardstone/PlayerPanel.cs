@@ -8,13 +8,18 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    public class PlayerPanel : Panel, Foo, Observer
+    public class PlayerPanel : Panel, Observer
     {
         private ManaButton[][] manaButtons = new ManaButton[5][];
         private Player player;
         private Label health;
+        private PlayerButton playerButton;
 
-        private string hlt = "x";
+        private string
+            hlt = "x",
+            dck = "x",
+            hnd = "x",
+            yrd = "x";
 
         private static Font f = new Font(new FontFamily("Comic Sans MS"), 20);
 
@@ -71,6 +76,15 @@ namespace stonekart
                     Controls.Add(b);
 
 
+                    playerButton = new PlayerButton();
+                    playerButton.Size = new Size(70, 70);
+                    playerButton.Location = new Point(220, 260);
+                    playerButton.Click += (_, __) =>
+                    {
+                        GameController.currentGame.fooPressed(playerButton);
+                    };
+                    Controls.Add(playerButton);
+
                     //health = new Label();
                     //health.Size = new Size(100, 100);
                     //health.AutoSize = true;
@@ -115,6 +129,8 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             player = (Player)o;
+            playerButton.setPlayer(player);
+
             for (int c = 0; c < 5; c++)
             {
                 int i = 0;
@@ -133,6 +149,10 @@ namespace stonekart
             }
 
             hlt = player.getHealth().ToString();
+            dck = player.getDeck().Count.ToString();
+            hnd = player.getHand().Count.ToString();
+            yrd = player.getGraveyard().Count.ToString();
+
 
             Invalidate();
         }
@@ -143,6 +163,9 @@ namespace stonekart
             
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             e.Graphics.DrawString(hlt, f, new SolidBrush(Color.Black), 10, 300);
+            e.Graphics.DrawString(dck, f, new SolidBrush(Color.Black), 60, 300);
+            e.Graphics.DrawString(hnd, f, new SolidBrush(Color.Black), 110, 300);
+            e.Graphics.DrawString(yrd, f, new SolidBrush(Color.Black), 160, 300);
              
         }
 
@@ -209,6 +232,26 @@ namespace stonekart
                     throw new Exception("fghj");
                 }
             }
+        }
+    }
+
+    public class PlayerButton : Button, Foo
+    {
+        private Player p;
+
+        public PlayerButton()
+        {
+            
+        }
+
+        public void setPlayer(Player player)
+        {
+            p = player;
+        }
+
+        public Player getPlayer()
+        {
+            return p;
         }
     }
 }

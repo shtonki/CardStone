@@ -179,12 +179,13 @@ namespace stonekart
                 if (card.hasPT())
                 {
                     Brush p = new SolidBrush(Color.Silver);
-                    b = new SolidBrush(Color.Black);
+                    Brush pt = new SolidBrush(Color.Black);
+                    Brush damaged = new SolidBrush(Color.DarkRed);
 
                     pevent.Graphics.FillEllipse(p, -w, 280 - w, 2 * w, 2 * w);
                     pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
-                    pevent.Graphics.DrawString(card.getPower().ToString(), PTFont, b, 4, 250);
-                    pevent.Graphics.DrawString(card.getToughness().ToString(), PTFont, b, 154, 250);
+                    pevent.Graphics.DrawString(card.getCurrentPower().ToString(), PTFont, pt, 4, 250);
+                    pevent.Graphics.DrawString(card.getCurrentToughness().ToString(), PTFont, card.isDamaged() ? damaged : pt, 154, 250);
                 }
 
                 if (borderPen != null)
@@ -211,6 +212,7 @@ namespace stonekart
             {
                 Visible = card != null;       
             }
+            Invalidate();
         }
     }
 }

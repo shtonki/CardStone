@@ -88,8 +88,12 @@ namespace stonekart
 
     public class CastAction : GameAction
     {
+        //todo seba this entire class is about as current as internet exploder
+
+
         private Card card;
         private int[][] costs;
+        private int ability;
 
         public CastAction()
         {
@@ -106,6 +110,12 @@ namespace stonekart
         public Card getCard()
         {
             return card;
+        }
+
+        public Ability getAbility()
+        {
+            if (card == null) { return null; }
+            return card.getAbility(ability);
         }
 
         public override string toString()

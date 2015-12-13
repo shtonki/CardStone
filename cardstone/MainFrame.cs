@@ -537,7 +537,6 @@ namespace stonekart
 
     public static class Console
     {
-
         public static void writeLine(object s)
         {
             MainFrame.printLine(s.ToString());

@@ -28,6 +28,10 @@ namespace stonekart
         private byte location;
         private byte side;
 
+        /// <summary>
+        /// This isn't the contructor you're looking for
+        /// </summary>
+        /// <param name="location"></param>
         public Location(byte location)
         {
             this.location = location;

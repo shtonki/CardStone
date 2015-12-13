@@ -21,6 +21,8 @@ namespace stonekart
         STEP,
         RESOLVE,
         DAMAGEPLAYER,
+        DAMAGECREATURE,
+        BURYCREATURE,
     }
 
     public abstract class GameEvent
@@ -53,20 +55,46 @@ namespace stonekart
 
     class DrawEvent : PlayerEvent
     {
+        private int cs;
+
         public DrawEvent(Player p) : base(p, GameEventType.DRAW)
         {
+            cs = 1;
+        }
+
+        public DrawEvent(Player p, int cards) : base(p, GameEventType.DRAW)
+        {
+            cs = cards;
         }
 
         public new Player getPlayer()
         {
             return p;
         }
+
+        public int getCards()
+        {
+            return cs;
+        }
     }
 
-    class CastEvent : CardEvent
+    class CastEvent : GameEvent
     {
-        public CastEvent(Card c) : base(c, GameEventType.CAST)
+        private StackWrapperFuckHopeGasTheKikes xd;
+
+        public CastEvent(Card c, Ability ability, params Target[] cs) : base(GameEventType.CAST)
         {
+            xd = new StackWrapperFuckHopeGasTheKikes(c, ability , cs);
+        }
+
+        public CastEvent(StackWrapperFuckHopeGasTheKikes x) : base(GameEventType.CAST)
+        {
+            xd = x;
+        }
+
+        public StackWrapperFuckHopeGasTheKikes getStuff()
+        {
+            return xd;
         }
     }
 
@@ -124,6 +152,11 @@ namespace stonekart
             l = loc;
         }
 
+        public MoveCardEvent(Card card, byte pile) : this(card, new Location(pile, card.getOwner().getSide()))
+        {
+            
+        }
+
         public Card getCard()
         {
             return c;
@@ -163,30 +196,26 @@ namespace stonekart
         }
     }
 
-    class ResolveEvent : CardEvent
+    class ResolveEvent : GameEvent
     {
-        public ResolveEvent(Card card) : base(card, GameEventType.RESOLVE)
+        private StackWrapperFuckHopeGasTheKikes xdd;
+
+        public ResolveEvent(StackWrapperFuckHopeGasTheKikes xd) : base(GameEventType.RESOLVE)
         {
+            xdd = xd;
+        }
+
+        public StackWrapperFuckHopeGasTheKikes getStuff()
+        {
+            return xdd;
         }
     }
 
-    class DamagePlayerEvent : GameEvent
+    abstract class DamageFooEvent : GameEvent
     {
-        private Player p;
         private Card s;
         private int d;
 
-        public DamagePlayerEvent(Player player, Card source, int damage) : base(GameEventType.DAMAGEPLAYER)
-        {
-            p = player;
-            s = source;
-            d = damage;
-        }
-
-        public Player getPlayer()
-        {
-            return p;
-        }
 
         public Card getSource()
         {
@@ -196,6 +225,49 @@ namespace stonekart
         public int getDamage()
         {
             return d;
+        }
+
+        protected DamageFooEvent(Card source, int damage, GameEventType type) : base(type)
+        {
+            s = source;
+            d = damage;
+        }
+    }
+
+    class DamagePlayerEvent : DamageFooEvent
+    {
+        private Player p;
+
+        public DamagePlayerEvent(Player player, Card source, int damage) : base(source, damage, GameEventType.DAMAGEPLAYER)
+        {
+            p = player;
+        }
+
+        public Player getPlayer()
+        {
+            return p;
+        }
+    }
+
+    class DamageCreatureEvent : DamageFooEvent
+    {
+        private Card c;
+
+        public DamageCreatureEvent(Card creature, Card source, int damage) : base(source, damage, GameEventType.DAMAGECREATURE)
+        {
+            c = creature;
+        }
+
+        public Card getCreature()
+        {
+            return c;
+        }
+    }
+
+    class BuryCreature : CardEvent
+    {
+        public BuryCreature(Card card) : base(card, GameEventType.BURYCREATURE)
+        {
         }
     }
 

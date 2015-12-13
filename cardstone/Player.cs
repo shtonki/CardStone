@@ -14,8 +14,12 @@ namespace stonekart
 
         private Pile hand, graveyard, exile, field, deck;
 
-        public Player()
+        private byte side;
+
+        public Player(byte side)
         {
+            this.side = side;
+
             hand = new Pile();
             graveyard = new Pile();
             exile = new Pile();
@@ -111,6 +115,11 @@ namespace stonekart
             }
         }
 
+
+        public byte getSide()
+        {
+            return side;
+        }
 
         public void loadDeck(List<Card> deckList, Location l)
         {
