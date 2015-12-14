@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace stonekart
 {
     public class Effect
     {
         private Effecter[] effecters;
-        private TargetRule[] targetRules; 
+        private TargetRule[] targetRules;
+
+        private string explanation;
 
         public Effect(params Effecter[] es)
         {
@@ -16,6 +19,7 @@ namespace stonekart
             targetRules = new TargetRule[countTargets()];
 
             int i = 0;
+            StringBuilder b = new StringBuilder();
 
             foreach (var v in es)
             {
@@ -23,7 +27,11 @@ namespace stonekart
                 {
                     targetRules[i++] = vv;
                 }
+
+                b.Append(v.getExplanation());
             }
+
+            explanation = b.ToString();
         }
 
         public List<GameEvent> resolve(Card c, Target[] ts)
@@ -61,6 +69,11 @@ namespace stonekart
 
             return i;
         }
+
+        public string getExplanation()
+        {
+            return explanation;
+        }
     }
 
     public abstract class Effecter
@@ -92,6 +105,8 @@ namespace stonekart
         {
             return targets.Count;
         }
+
+        public abstract string getExplanation();
     }
 
     public class OwnerDrawsEffecter : Effecter
@@ -107,6 +122,11 @@ namespace stonekart
         {
             GameEvent e = new DrawEvent(c.getController(), i);
             return new[] {e};
+        }
+
+        public override string getExplanation()
+        {
+            return "Draw " + i + " cards.";
         }
     }
 
@@ -143,6 +163,18 @@ namespace stonekart
             }
 
             return r;
+        }
+
+        public override string getExplanation()
+        {
+            if (targets.Count == 1)
+            {
+                return "Deal " + d + " damage to target.";
+            }
+            else
+            {
+                return "Deal " + d*targets.Count + " damage split between up to " + targets.Count + " targets.";
+            }
         }
     }
 }

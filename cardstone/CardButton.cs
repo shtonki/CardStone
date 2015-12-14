@@ -100,6 +100,8 @@ namespace stonekart
 
         private const int w = 33;
 
+        private static Rectangle flavorTextRectangle = new Rectangle(13, 183, 160, 70);
+
         protected override void OnPaint(PaintEventArgs pevent)
         {
             //base.OnPaint(pevent);
@@ -129,7 +131,7 @@ namespace stonekart
                 //Brush b = (Brush)blackBrush.Clone();
                 pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
-                //pevent.Graphics.DrawString("Flying", textFont, blackBrush, 13, 193);
+                pevent.Graphics.DrawString(card.getAbilitiesString(), archTypeFont, b, flavorTextRectangle);
 
                 
                 

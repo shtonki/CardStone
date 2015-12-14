@@ -513,16 +513,38 @@ namespace stonekart
                             var v = a.getCost().check(c);
                             if (v != null)
                             {
-                                var targets = getTargets(a);
+                                var targets = getTargets(a);    //todo allow canceling xd
                                 a.getCost().pay(c, v);
                                 MainFrame.clear();
-                                raiseAction(new CastAction(c, v)); //todo (seba) not even an anti pattern just horrible
-                                return new StackWrapperFuckHopeGasTheKikes(c, a, targets);
+                                var sw = new StackWrapperFuckHopeGasTheKikes(c, a, targets);
+                                CastAction ca = new CastAction(sw, v);
+                                //CastAction cb = GameAction.fromString("cast," + ca.toString(), this) as CastAction;
+                                raiseAction(new CastAction(sw, v)); //todo (seba) not even an anti pattern just horrible
+                                return sw;
                             }
                         }
                     }
                 }
             }
+        }
+
+        private bool cmp(CastAction a, CastAction b)
+        {
+            if (a.isPass() != b.isPass()) { return false; }
+
+            StackWrapperFuckHopeGasTheKikes sa = a.getStackWrapper(), sb = b.getStackWrapper();
+
+            if (sa.ability != sb.ability ||
+                sa.card != sb.card ||
+                sa.targets.Length != sb.targets.Length) { return false; }
+
+            for (int i = 0; i < sa.targets.Length; i++)
+            {
+                Target ta = sa.targets[i], tb = sb.targets[i];
+                if (ta.getPlayer() != tb.getPlayer() || ta.getCard() != tb.getCard()) { return false; }
+            }
+
+            return true;
         }
 
         private bool checkAutoPass()
@@ -564,8 +586,8 @@ namespace stonekart
         private StackWrapperFuckHopeGasTheKikes demandCastOrPass()
         {
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            if (v.getCard() == null) { return null; }
-            return new StackWrapperFuckHopeGasTheKikes(v.getCard(), v.getAbility(), new Target[]{});//v.getAbility();
+            if (v.isPass()) { return null; }
+            return v.getStackWrapper();
         }
 
         private int demandSelection()
@@ -677,6 +699,12 @@ namespace stonekart
             return cardFactory.getCardById(i);
         }
 
+        /*todo 0 - home 1 - away; meaning one has to flip it when getting a 
+         * message from the other player which is anything but practical */
+        public Player getPlayerById(int i)
+        {
+            return i == 0 ? homePlayer : awayPlayer;
+        }
 
         //todo seba this really shouldn't be here
         private Foo f;

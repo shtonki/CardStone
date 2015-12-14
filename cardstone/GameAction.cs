@@ -43,24 +43,58 @@ namespace stonekart
 
                 case "cast":
                 {
-                    List<int[]> cs = new List<int[]>();
-                    List<int> ts = new List<int>();
-                    int card = Int32.Parse(ss[1]);
+                    string thepuddn = ss[1];
+                    string[] puddns = thepuddn.Split(';');
 
-                    for (int i = 2; i < ss.Length; i++)
+                    Card c = g.getCardById(Int32.Parse(puddns[0]));
+                    Ability a = c.getAbilityByIndex(Int32.Parse(puddns[1]));
+
+                    string[] ts = puddns[2].Split('\'');
+
+                    List<Target> targets = new List<Target>(ts.Length);
+                    Target ta;
+
+                    foreach (var t in ts)
                     {
-                        char c = ss[i][0];
-                        if (c == 'c') //c'0'0'1'
+                        if (t.Length == 0) { continue; }
+                        int x = Int32.Parse(t.Substring(1));
+                        if (t[0] == 'p')
                         {
-                            cs.Add(ss[i].Split('\'').Select(Int32.Parse).ToArray());
+                            ta = new Target(g.getPlayerById(x));
                         }
-                        else if (c == 't')
+                        else if (t[0] == 'c')
                         {
-                            ts.Add(Int32.Parse(ss[i].Substring(1)));
+                            ta = new Target(g.getCardById(x));
                         }
+                        else
+                        {
+                            throw new InvalidOleVariantTypeException("yup");
+                        }
+                        targets.Add(ta);
                     }
 
-                    r = new CastAction(g.getCardById(Int32.Parse(ss[1])), cs.ToArray());
+
+
+                    string[] cs = puddns[3].Split('\'');
+                    int[][] csts = new int[cs.Length][];
+
+
+                    for (int i = 0; i < cs.Length; i++)
+                    {
+                        string[] xds = cs[i].Split('*');
+                        int[] xx = new int[xds.Length];
+
+                        for (int j = 0; j < xx.Length; j++)
+                        {
+                            xx[j] = Int32.Parse(xds[j]);
+                        }
+
+                        csts[i] = xx;
+                    }
+
+                    var sw = new StackWrapperFuckHopeGasTheKikes(c, a, targets.ToArray());
+                    r = new CastAction(sw, csts);
+
                 } break;
 
                 case "deck":
@@ -91,48 +125,71 @@ namespace stonekart
         //todo seba this entire class is about as current as internet exploder
 
 
-        private Card card;
+        private StackWrapperFuckHopeGasTheKikes sw;
         private int[][] costs;
-        private int ability;
 
         public CastAction()
         {
-            card = null;
+            sw = null;
             costs = null;
         }
 
-        public CastAction(Card c, int[][] cs)
+        public CastAction(StackWrapperFuckHopeGasTheKikes s, int[][] cs)
         {
-            card = c;
+            sw = s;
             costs = cs;
         }
 
-        public Card getCard()
+        public bool isPass()
         {
-            return card;
+            return sw == null;
         }
 
-        public Ability getAbility()
+        public int[][] getCosts()
         {
-            if (card == null) { return null; }
-            return card.getAbility(ability);
+            return costs;
+        }
+
+        public StackWrapperFuckHopeGasTheKikes getStackWrapper()
+        {
+            return sw;
         }
 
         public override string toString()
         {
-            if (card == null) { return "pass"; } 
+            if (sw == null) { return "pass"; }
 
-            StringBuilder b = new StringBuilder();
-            foreach (int[] l in costs)
+
+            StringBuilder ts = new StringBuilder(), cs = new StringBuilder();
+
+            foreach (var t in sw.targets)
             {
-                b.Append('c');
-                foreach (int i in l)
+                if (t.isPlayer())
                 {
-                    b.Append('\'');
-                    b.Append(i.ToString());
+                    ts.Append("p");
+                    ts.Append(t.getPlayer().getSide());
                 }
+                else if (t.isCreature())
+                {
+                    ts.Append("c");
+                    ts.Append(t.getCard().getId());
+                }
+                ts.Append("'");
             }
-            return "cast," + card.getId() + b.ToString();
+            if (ts.Length > 0) { ts.Length--; }
+            foreach (var v in costs)
+            {
+                foreach (var i in v)
+                {
+                    cs.Append(i);
+                    cs.Append("*");
+                }
+                if (v.Length == 0) { continue; } //todo this whole thing is awful sketchy and since it hasn't been tested probably works flawlessly
+                cs.Length--;
+                cs.Append("'");
+            }
+            cs.Length--;
+            return "" + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
         }
     }
     /*

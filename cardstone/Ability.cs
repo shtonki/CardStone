@@ -30,6 +30,8 @@ namespace stonekart
         {
             return effect.getTargetRules();
         }
+
+        public abstract string getExplanation();
     }
 
     public class ActivatedAbility : Ability
@@ -78,5 +80,12 @@ namespace stonekart
             return instant;
         }
 
+
+        public override string getExplanation()
+        {
+            return effect.getExplanation();
+        }
     }
+
+    
 }

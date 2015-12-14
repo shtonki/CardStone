@@ -30,6 +30,7 @@ namespace stonekart
 
         private List<Ability> abilities;
         private ManaCoster castingCost;
+        private List<KeyAbility> keyAbilities; 
 
         public Card(CardId c, Location l)
             : this(c)
@@ -43,6 +44,8 @@ namespace stonekart
             location = new Location(Location.NOWHERE);
 
             List<Effecter> fx = new List<Effecter>();
+            
+            keyAbilities = new List<KeyAbility>();
 
             int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0;
 
@@ -115,8 +118,9 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Creature;
-                    power = 2;
-                    toughness = 2;
+                    power = 1;
+                    toughness = 1;
+                    keyAbilities.Add(KeyAbility.Fervor);
                 } break;
 
             }
@@ -201,6 +205,16 @@ namespace stonekart
             return false;
         }
 
+        public void setLocationRaw(Location l)
+        {
+            location = l;
+        }
+
+        public void setOwner(Player p)
+        {
+            owner = p;
+        }
+
 
 
         public Type getType()
@@ -254,24 +268,10 @@ namespace stonekart
         }
 
 
-        public void setLocationRaw(Location l)
-        {
-            location = l;
-        }
-
-        public void setOwner(Player p)
-        {
-            owner = p;
-        }
-
+        
         public bool isAttacking()
         {
             return attacking;
-        }
-
-        public bool isInstant()
-        {
-            return type == Type.Instant;
         }
 
         public bool hasPT()
@@ -296,10 +296,24 @@ namespace stonekart
 
         public bool canAttack()
         {
-            return !summoningSick;
+            return location.getLocation() == Location.FIELD && (!summoningSick || has(KeyAbility.Fervor));
+        }
+
+        public bool has(KeyAbility a)
+        {
+            return keyAbilities.Contains(a);
         }
 
 
+        public int getAbilityIndex(Ability a)
+        {
+            return abilities.FindIndex(v => v == a);
+        }
+
+        public Ability getAbilityByIndex(int ix)
+        {
+            return abilities[ix];
+        }
 
         public Image getArt()
         {
@@ -311,11 +325,24 @@ namespace stonekart
             return ImageLoader.getFrame();
         }
 
-        public String getArchtypeString()
+        public string getArchtypeString()
         {
             return type.ToString() +
                 (race != null ? " - " + race.ToString() + " " : "") +
                 (subType != null ? subType.ToString() : "");
+        }
+
+        public string getAbilitiesString()
+        {
+            StringBuilder b = new StringBuilder();
+            b.AppendLine(abilities[0].getExplanation());
+
+            foreach (var v in keyAbilities)
+            {
+                b.AppendLine(v.ToString());
+            }
+
+            return b.ToString();
         }
 
     }
@@ -345,12 +372,18 @@ namespace stonekart
         Salamander,
         Fish,
         Bear,
-        Zombie
+        Zombie,
+        Goblin,
     }
 
     public enum SubType
     {
         Warrior,
         Wizard,
+    }
+
+    public enum KeyAbility
+    {
+        Fervor,
     }
 }
