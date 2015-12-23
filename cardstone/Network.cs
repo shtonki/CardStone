@@ -19,11 +19,23 @@ namespace stonekart
 
         public static void connect()
         {
-            serverConnection = new ServerConnection();
+            try
+            {
+                serverConnection = new ServerConnection();
+            }
+            catch (Exception)
+            {
+                System.Console.WriteLine("server offline");
+            }
         }
 
+        //todo seba make it return an int representing success or cause of error
         public static bool login(string name)
         {
+            if (serverConnection == null)
+            {
+                return false;
+            }
             if (name.Length < 2)
             {
                 return false;

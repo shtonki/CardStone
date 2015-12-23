@@ -46,6 +46,7 @@ namespace stonekart
         }
     }
 
+    //todo seba move this to where it should be
     class SnapCardButton : CardButton, Observer
     {
         private Point def, att;

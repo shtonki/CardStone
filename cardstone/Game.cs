@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 
 namespace stonekart
@@ -84,18 +85,18 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.ForkedLightning, 
-                CardId.ForkedLightning, 
-                CardId.ForkedLightning, 
-                CardId.ForkedLightning, 
-                CardId.FrothingGoblin, 
-                CardId.FrothingGoblin, 
-                CardId.FrothingGoblin, 
-                CardId.FrothingGoblin, 
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
+                CardId.SolemnAberration,  
             };
         }
 
@@ -587,6 +588,15 @@ namespace stonekart
         {
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
             if (v.isPass()) { return null; }
+            if (v.getStackWrapper().ability is ActivatedAbility)
+            {
+                ActivatedAbility aa = v.getStackWrapper().ability as ActivatedAbility;
+                aa.getCost().pay(v.getStackWrapper().card, v.getCosts());
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
             return v.getStackWrapper();
         }
 

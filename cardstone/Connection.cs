@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using stonekart;
+using Console = System.Console;
 
 class Connection
 {
@@ -31,8 +33,24 @@ class Connection
         t.Start();
     }
 
-    public Connection(string s) : this(new TcpClient(s, 6969).Client)
+    public Connection(string s) : this(anonymousFunction(s).Client)
     {
+    }
+
+    private static TcpClient anonymousFunction(string s)
+    {
+        TcpClient r = new TcpClient();
+        IAsyncResult rs = r.BeginConnect(s, 6969, null, null);
+
+        bool success = rs.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+
+        if (!success)
+        {
+            throw new Exception("Failed to connect.");
+        }
+
+        // we have connected
+        return r;
     }
 
     private void setCallback(DataReceived r, ConnectionClosed c)
