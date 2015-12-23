@@ -42,7 +42,7 @@ namespace stonekart
             {
                 Button b = new Button();
                 Label l = new Label();
-
+                //
                 l.Size = new Size(120, 40);
                 l.Location = new Point(0, i * 40);
                 l.Text = i.ToString();
