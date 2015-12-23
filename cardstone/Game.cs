@@ -207,6 +207,9 @@ namespace stonekart
             }));
         }
 
+        /// <summary>
+        ///  Sets the piles in Location
+        /// </summary>
         private void setLocations()
         {
             Location.setPile(Location.HAND, Location.HEROSIDE, hero.getHand());
