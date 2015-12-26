@@ -189,7 +189,7 @@ namespace stonekart
                 cs.Append("'");
             }
             cs.Length--;
-            return "" + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
+            return "cast" + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
         }
     }
     /*
