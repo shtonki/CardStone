@@ -160,6 +160,11 @@ namespace stonekart
 
         public static void sendMessage(ConversationPanel conversation, string message)
         {
+            if (message == "/challenge")
+            {
+                Network.challenge(conversation.partner);
+                return;
+            }
             Network.sendTell(conversation.partner, message);
             conversation.appendLine("you: " + message);
         }

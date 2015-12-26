@@ -68,7 +68,7 @@ namespace stonekart
 
         public static void challenge(string s)
         {
-            serverConnection.sendMessage(s, "challenge", "");
+            serverConnection.sendMessage(SERVER, "requestgame", s);
         }
 
         public static void addGameConnection(string s, GameConnection c)

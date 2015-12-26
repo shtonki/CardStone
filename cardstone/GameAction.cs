@@ -111,7 +111,7 @@ namespace stonekart
 
                 default:
                 {
-                    throw new Exception("bad action received");
+                    throw new Exception("bad action received:\n{0}" + s);
                 } break;
             }
 
