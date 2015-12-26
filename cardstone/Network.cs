@@ -98,7 +98,7 @@ namespace stonekart
         public string name { get; private set; }
 
         public ServerConnection()
-            : base("46.59.89.121")
+            : base("155.4.125.53")
         {
 
         }

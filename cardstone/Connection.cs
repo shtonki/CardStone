@@ -42,7 +42,7 @@ class Connection
         TcpClient r = new TcpClient();
         IAsyncResult rs = r.BeginConnect(s, 6969, null, null);
 
-        bool success = rs.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+        bool success = rs.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2));
 
         if (!success)
         {
