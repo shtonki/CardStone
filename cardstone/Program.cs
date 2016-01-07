@@ -27,7 +27,7 @@ namespace stonekart
             //FontLoader.init();
 
             //Form.CheckForIllegalCrossThreadCalls = false;
-            Thread t = new Thread(new ThreadStart(asd));
+            Thread t = new Thread(new ThreadStart(createFrame));
             t.Start();
             
             ImageLoader.init();
@@ -38,7 +38,11 @@ namespace stonekart
             GameController.start();
         }
 
-        private static void asd()
+        /// <summary>
+        /// Creates a new MainFrame and starts executing the GUI thread. Should be started
+        /// in a separate thread as it does not return.
+        /// </summary>
+        private static void createFrame()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -85,18 +85,16 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
-                CardId.SolemnAberration,  
+                CardId.FrothingGoblin,  
+                CardId.FrothingGoblin,  
+                CardId.FrothingGoblin,  
+                CardId.FrothingGoblin,  
+                CardId.FrothingGoblin,  
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
             };
         }
 
@@ -353,6 +351,8 @@ namespace stonekart
 
         private void chooseDefendersStep()
         {
+
+
             //raiseEvent(new StepEvent(StepEvent.DEFENDERS));
             givePriority(false);
         }
@@ -586,7 +586,9 @@ namespace stonekart
 
         private StackWrapperFuckHopeGasTheKikes demandCastOrPass()
         {
+            MainFrame.setMessage("Opponent has priority");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
+            MainFrame.setMessage("");
             if (v.isPass()) { return null; }
             if (v.getStackWrapper().ability is ActivatedAbility)
             {
@@ -671,7 +673,7 @@ namespace stonekart
             }
         }
 
-        private void choseBlockers()
+        private void choseDefenders()
         {
             
         }

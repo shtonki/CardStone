@@ -270,7 +270,7 @@ namespace stonekart
         {
             if (!Network.login(x))
             {
-                System.Console.WriteLine("soeiroj");
+                System.Console.WriteLine("couldn't log in");
                 return;
             }
 
@@ -336,18 +336,24 @@ namespace stonekart
             heroPanel.showAddMana(b);
         }
 
-        public static WindowedPanel showWindow(Control p, string barTitle)
+        public static WindowedPanel showWindow(Control p, string barTitle, bool closeable, Action closeCallback)
         {
             WindowedPanel v = null;
+
+            Action a = () =>
+            {
+                v = new WindowedPanel(p, barTitle);
+                frame.Controls.Add(v);
+                v.BringToFront();
+            };
+
             if (frame.InvokeRequired)
             {
                 frame.Invoke(new Action(() =>
                 {
                     try
                     {
-                        v = new WindowedPanel(p, barTitle);
-                        frame.Controls.Add(v);
-                        v.BringToFront();
+                        
                     }
                     catch (Exception e)
                     {
@@ -534,6 +540,7 @@ namespace stonekart
             return false;
         }
     }
+    
 
     public static class Console
     {

@@ -19,7 +19,6 @@ namespace stonekart
         private bool attacking;
 
         private string name;
-        //private Cost cost;
         private Type type;
         private Race? race;
         private SubType? subType;
@@ -27,6 +26,7 @@ namespace stonekart
 
         private int? power, toughness, currentPower, currentToughness;
         private bool summoningSick;
+        private Card defending;
 
         private List<Ability> abilities;
         private ManaCoster castingCost;
@@ -272,6 +272,16 @@ namespace stonekart
         public bool isAttacking()
         {
             return attacking;
+        }
+
+        public bool isDefending()
+        {
+            return defending == null;
+        }
+
+        public void setDefending(Card o)
+        {
+            defending = o;
         }
 
         public bool hasPT()

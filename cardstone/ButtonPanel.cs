@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
+//todo this class shouldn't be a thing
 namespace stonekart
 {
     class ButtonPanel : Panel
