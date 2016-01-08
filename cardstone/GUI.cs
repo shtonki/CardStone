@@ -15,45 +15,156 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    public partial class MainFrame : Form
+    public static class GUI
     {
-        public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
-
-        public static ManualResetEvent x = new ManualResetEvent(false);
-
         private static MainFrame frame;
 
+        public static ManualResetEvent frameLoaded = new ManualResetEvent(false);
 
-        private static Panel mainMenuPanel;
+        public static void createFrame()
+        {
+            Action a = () =>
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                frame = new MainFrame();
+                Application.Run(frame);
+            };
+            Thread t = new Thread(new ThreadStart(a));
+            t.Start();
 
-        private static SPanel loginPanel;
-        private static SPanel kappaPanel;
+            frameLoaded.WaitOne();
+            transitionToMainMenu();
+        }   
 
-        private static TextBox usernameBox;
+        public static void transitionToGame()
+        {
+            frame.transitionTo(frame.gamePanel);
+        }
+
+        public static void transitionToMainMenu()
+        {
+            frame.transitionTo(frame.mainMenuPanel);
+        }
+
+        public static void setStep(int s, bool a)
+        {
+            frame.setStep(s, a);
+        }
+
+        public static void setMessage(string s)
+        {
+            frame.setMessage(s);
+        }
+
+        public static void clear()
+        {
+            setMessage("");
+            showButtons(ButtonPanel.NOTHING);
+        }
+
+        public static void showButtons(int i)
+        {
+            frame.showButtons(i);
+        }
+
+        public static void showAddMana(bool b)
+        {
+            frame.showAddMana(b);
+        }
+
+        public static WindowedPanel showWindow(Control p, string barTitle, bool closeable, Action closeCallback)
+        {
+            WindowedPanel v = null;
+
+            Action a = () =>
+            {
+                v = new WindowedPanel(p, barTitle);
+                frame.Controls.Add(v);
+                v.BringToFront();
+            };
+
+            if (frame.InvokeRequired)
+            {
+                frame.Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        
+                    }
+                    catch (Exception e)
+                    {
+                        System.Console.WriteLine(e.ToString());
+                    }
+                }));
+            }
+            else
+            {
+                v = new WindowedPanel(p, barTitle);
+                frame.Controls.Add(v);
+                v.BringToFront();
+            }
+
+            return v;
+        }
+
+        public static WindowedPanel showWindow(Control p)
+        {
+            return showWindow(p, "", false, null);
+        }
+
+        public static void showTell(string f, string m)
+        {
+            frame.showTell(f, m);
+        }
+
+        public static void setObservers(Player h, Player v, Pile s)
+        {
+            frame.setObservers(h, v, s);
+        }
+
+        public static void showLoginBox()
+        {
+            frame.showLoginBox();
+        }
+    }
+
+    public partial class MainFrame : Form
+    {
+        //todo(jasin) sholdn't be const fam
+        public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
 
-        private static Panel gamePanel;
 
-        private static TextBox inputBox, outputBox;
-        private static CardPanel handPanel;
-        private static PlayerPanel heroPanel, villainPanel;
-        private static ButtonPanel buttonPanel;
-        private static CardBox stackPanel;
-        private static FieldPanel heroFieldPanel, villainFieldPanel;
-        private static TurnPanel turnPanel;
+        #region mainmenu
+        public DisplayPanel mainMenuPanel { get; private set; }
 
+        private Panel loginPanel;
+        private Panel kappaPanel;
 
-        private static FriendPanel friendPanel;
+        private TextBox usernameBox;
+        #endregion
 
-        private static Panel activePanel;
+        #region gamepanel
+        public DisplayPanel gamePanel { get; private set; }
+
+        private TextBox inputBox, outputBox;
+        private CardPanel handPanel;
+        private PlayerPanel heroPanel, villainPanel;
+        private ButtonPanel buttonPanel;
+        private CardBox stackPanel;
+        private FieldPanel heroFieldPanel, villainFieldPanel;
+        private TurnPanel turnPanel;
+        #endregion
+
+        private FriendPanel friendPanel;
+
+        private Panel activePanel;
         
         public MainFrame()
         {
-            InitializeComponent();
-
-            frame = this;
-            //frame.
-
+            //InitializeComponent();
+            BackColor = Color.Fuchsia;
             Application.AddMessageFilter(new GlobalMouseHandler());
 
             FormClosed += (sender, args) => { Environment.Exit(0); };
@@ -77,15 +188,14 @@ namespace stonekart
             friendPanel.BringToFront();
             friendPanel.Hide();
 
-            transitionTo(mainMenuPanel);
+            //transitionTo(mainMenuPanel);
 
-            //Network.connect();
-            x.Set();
+            GUI.frameLoaded.Set();
         }
 
-        private static void setupGamePanel()
+        private void setupGamePanel()
         {
-            gamePanel = new Panel();
+            gamePanel = new DisplayPanel();
             gamePanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
 
             inputBox = new TextBox();
@@ -93,7 +203,7 @@ namespace stonekart
             {
                 if (args.KeyCode != Keys.Enter) { return; }
 
-                handleCommand(inputBox.Text);
+                Console.WriteLine(inputBox.Text);
                 inputBox.Clear();
             };
             inputBox.Size = new Size(200, 40);
@@ -157,17 +267,16 @@ namespace stonekart
             gamePanel.Controls.Add(turnPanel);
             gamePanel.Controls.Add(villainPanel);
 
-            //gamePanel.Visible = false;
-            gamePanel.Size = new Size(0, 0);
+            gamePanel.Visible = false;
         }
 
-        private static void setupMainMenuPanel()
+        private void setupMainMenuPanel()
         {
-            mainMenuPanel = new Panel();
+            mainMenuPanel = new DisplayPanel();
             mainMenuPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             mainMenuPanel.BackColor = Color.DarkRed;
 
-            loginPanel = new SPanel();
+            loginPanel = new Panel();
             loginPanel.Size = new Size(700, 400);
             loginPanel.BackColor = Color.Silver;
             loginPanel.Location = new Point((FRAMEWIDTH - 700) / 2, 200);
@@ -211,10 +320,10 @@ namespace stonekart
             c.Text = "Nyet";
             c.Click += (sender, args) =>
             {
-                asd();
+                Console.WriteLine("i'm not entirely sure what this button is supposed to do");
             };
 
-            kappaPanel = new SPanel();
+            kappaPanel = new Panel();
             kappaPanel.BackColor = Color.DarkKhaki;
             kappaPanel.Size = new Size(200, 200);
             kappaPanel.Location = new Point(400, 400);
@@ -238,146 +347,76 @@ namespace stonekart
             mainMenuPanel.Controls.Add(kappaPanel);
             mainMenuPanel.Controls.Add(loginPanel);
 
-            //mainMenuPanel.Visible = false;
-            mainMenuPanel.Size = new Size(0, 0);
+            mainMenuPanel.Visible = false;
         }
-
-        public static void login()
-        {
-            if (Settings.username == null)
-            {
-                loginPanel.Show();
-                waitForLogin.WaitOne();
-            }
-            else
-            {
-                Thread.Sleep(100);
-                loginWithName(Settings.username);
-            }
-
-            loginPanel.Hide();
-            kappaPanel.Show();
-        }
-
-        private static void asd()
-        {
-            waitForLogin.Set();
-        }
-
-        private static AutoResetEvent waitForLogin = new AutoResetEvent(false);
         
-        private static void loginWithName(string x)
-        {
-            if (!Network.login(x))
-            {
-                System.Console.WriteLine("soeiroj");
-                return;
-            }
 
-            Network.sendRaw(Network.SERVER, "friend", "");
-
-            loginPanel.Hide();
-            friendPanel.Show();
-            waitForLogin.Set();
-        }
-         
-        private static void transitionTo(Panel p)
+        public void transitionTo(Panel p)
         {
-            if (frame.InvokeRequired)
+            Action a = () =>
             {
-                frame.Invoke(new Action(() =>
-                {
-                    if (activePanel != null) { activePanel.Size = new Size(0, 0); }
-                    activePanel = p;
-                    p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-                }));
-            }
-            else
-            {
-                if (activePanel != null) { activePanel.Size = new Size(0, 0); }
+                activePanel?.Hide();
                 activePanel = p;
-                p.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
-            }
-        }
-
-        public static void transitionToGame()
-        {
-            transitionTo(gamePanel);
-        }
-
-        public static void transitionToMainMenu()
-        {
-            transitionTo(mainMenuPanel);
-        }
-
-        public static void setStep(int s, bool a)
-        {
-            turnPanel.setStep(s, a);
-        }
-
-        public static void setMessage(string s)
-        {
-            buttonPanel.setText(s);
-        }
-
-        public static void clear()
-        {
-            setMessage("");
-            showButtons(ButtonPanel.NOTHING);
-        }
-
-        public static void showButtons(int i)
-        {
-            buttonPanel.showButtons(i);
-        }
-
-        public static void showAddMana(bool b)
-        {
-            heroPanel.showAddMana(b);
-        }
-
-        public static WindowedPanel showWindow(Control p, string barTitle)
-        {
-            WindowedPanel v = null;
-            if (frame.InvokeRequired)
-            {
-                frame.Invoke(new Action(() =>
+                if (activePanel.InvokeRequired)
                 {
-                    try
+                    activePanel.Invoke(new Action(() =>
                     {
-                        v = new WindowedPanel(p, barTitle);
-                        frame.Controls.Add(v);
-                        v.BringToFront();
-                    }
-                    catch (Exception e)
+                        activePanel.Visible = false;
+                    }));
+                }
+                else
+                {
+                    activePanel.Visible = false;
+                }
+                if (p.InvokeRequired)
+                {
+                    p.Invoke(new Action(() =>
                     {
-                        System.Console.WriteLine(e.ToString());
-                    }
-                }));
+                        p.Visible = true;
+                    }));
+                }
+                else
+                {
+                    p.Visible = true;
+                }
+            };
+
+            if (InvokeRequired)
+            {
+                Invoke(a);
             }
             else
             {
-                v = new WindowedPanel(p, barTitle);
-                frame.Controls.Add(v);
-                v.BringToFront();
+                a();
             }
-
-            return v;
         }
 
-        public static WindowedPanel showWindow(Control p)
-        {
-            return showWindow(p, "");
-        }
-
-
-        public static void getTell(string user, string message)
+        public void showTell(string user, string message)
         {
             friendPanel.getWhisper(user, message);
         }
 
+        public void setStep(int s, bool a)
+        {
+            turnPanel.setStep(s, a);
+        }
 
-        public static void setObservers(Player hero, Player villain, Pile stack)
+        public void setMessage(string s)
+        {
+            buttonPanel.setText(s);
+        }
+
+        public void showButtons(int i)
+        {
+            buttonPanel.showButtons(i);
+        }
+
+        public void showAddMana(bool b)
+        {
+            heroPanel.showAddMana(b);
+        }
+
+        public void setObservers(Player hero, Player villain, Pile stack)
         {
             hero.setObserver(heroPanel);
             villain.setObserver(villainPanel);
@@ -389,46 +428,32 @@ namespace stonekart
             hero.getField().setObserver(heroFieldPanel);
             villain.getField().setObserver(villainFieldPanel);
         }
-
-        public static void handleCommand(string s)
+        
+        public void loginWithName(string x)
         {
-            Console.writeLine("] " + s);
+            //todo(seba) move this to network
+            if (!Network.login(x))
+            {
+                System.Console.WriteLine("couldn't log in");
+                return;
+            }
+
+            Network.sendRaw(Network.SERVER, "friend", "");
+
+            loginPanel.Hide();
+            friendPanel.Show();
         }
 
-        public static void printLine(string sgfs)
-        {
-            if (outputBox == null) { return; }
-            outputBox.AppendText(sgfs + Environment.NewLine);
-        }
-    }
-
-    class SPanel : Panel
-    {
-        private Size xd;
-
-        public new void Hide()
+        public void showLoginBox()
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() =>
-                {
-                    xd = Size;
-                    Size = new Size(0, 0);
-                }));
+                Invoke(new Action(() => { loginPanel.Visible = true; }));
             }
             else
             {
-                xd = Size;
-                Size = new Size(0, 0);
+                loginPanel.Visible = true;
             }
-        }
-
-        public new void Show()
-        {
-            Invoke(new Action(() =>
-            {
-                Size = xd;
-            }));
         }
     }
 
@@ -535,11 +560,9 @@ namespace stonekart
         }
     }
 
-    public static class Console
+    public class DisplayPanel : Panel
     {
-        public static void writeLine(object s)
-        {
-            MainFrame.printLine(s.ToString());
-        }
+        
     }
+    
 }

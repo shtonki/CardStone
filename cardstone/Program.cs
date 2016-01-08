@@ -25,25 +25,19 @@ namespace stonekart
             Settings.loadSettings();
 
             //FontLoader.init();
-
-            //Form.CheckForIllegalCrossThreadCalls = false;
-            Thread t = new Thread(new ThreadStart(asd));
-            t.Start();
+            
             
             ImageLoader.init();
             FontLoader.init();
 
-            MainFrame.x.WaitOne();
+            GUI.createFrame();
 
-            GameController.start();
+            Network.connect();
+
+            GUI.showLoginBox();
         }
 
-        private static void asd()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainFrame());
-        }
+        
 
         private static void xd()
         {

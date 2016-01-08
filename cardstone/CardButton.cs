@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class CardButton : Button, Foo, Observer
+    class CardButton : Button, GameElement, Observer
     {
         public static int WIDTH = 180, HEIGHT = 280;
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);

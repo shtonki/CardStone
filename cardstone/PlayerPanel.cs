@@ -169,7 +169,7 @@ namespace stonekart
              
         }
 
-        public class ManaButton : UserControl, Foo
+        public class ManaButton : UserControl, GameElement
         {
             public const int
                 FILLED = 0,
@@ -235,7 +235,7 @@ namespace stonekart
         }
     }
 
-    public class PlayerButton : Button, Foo
+    public class PlayerButton : Button, GameElement
     {
         private Player p;
 

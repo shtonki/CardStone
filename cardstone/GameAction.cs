@@ -7,10 +7,22 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+
+    //todo(seba) make this entire thing serializable
     public abstract class GameAction
     {
+        /// <summary>
+        /// Translates the GameAction to a string which can be sent to the other player
+        /// </summary>
+        /// <returns>The string representing this action</returns>
         public abstract string toString();
 
+        /// <summary>
+        /// Translates a string into a game action within a given game
+        /// </summary>
+        /// <param name="s">The string to translate</param>
+        /// <param name="g">The game in which to translate it</param>
+        /// <returns></returns>
         public static GameAction fromString(string s, Game g)
         {
             string[] ss = s.Split(',');
@@ -111,7 +123,7 @@ namespace stonekart
 
                 default:
                 {
-                    throw new Exception("bad action received");
+                    throw new Exception("bad action received:\n{0}" + s);
                 } break;
             }
 
@@ -189,7 +201,7 @@ namespace stonekart
                 cs.Append("'");
             }
             cs.Length--;
-            return "" + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
+            return "cast," + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
         }
     }
     /*

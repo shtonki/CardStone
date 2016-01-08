@@ -25,21 +25,11 @@ namespace stonekart
         BURYCREATURE,
     }
 
+    /// <summary>
+    /// Represents an action to be taken within the game
+    /// </summary>
     public abstract class GameEvent
     {
-
-        /*
-        public const int
-            DRAW = 1,
-            CAST = 2,
-            UNTOP = 3,
-            GAINMANA = 4,
-            DECLAREATTACKERS = 5,
-            TOP = 6,
-            RESETMANA = 7,
-
-            xd = -1;
-        */
         private GameEventType type;
 
         public GameEvent(GameEventType type)

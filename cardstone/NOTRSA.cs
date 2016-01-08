@@ -6,6 +6,9 @@ using System.Numerics;
 using System.Security.Cryptography;
 using System.Windows.Forms.VisualStyles;
 
+/// <summary>
+/// Definately not RSA
+/// </summary>
 abstract class RSA
 {
     private static RNGCryptoServiceProvider r = new RNGCryptoServiceProvider();

@@ -8,3 +8,4 @@ stonekart.sln
 /obj/Debug/*.cs
 pushaT.bat
 settings
+.vs/

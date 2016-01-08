@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
-using stonekart;
 using Console = System.Console;
 
 class Connection
@@ -23,6 +22,10 @@ class Connection
 
     AutoResetEvent xdd = new AutoResetEvent(false);
 
+    /// <summary>
+    /// Creates a new Connection from a socket.
+    /// </summary>
+    /// <param name="s"></param>
     public Connection(Socket s)
     {
         socket = s;
@@ -32,17 +35,22 @@ class Connection
         Thread t = new Thread(mine);
         t.Start();
     }
-
-    public Connection(string s) : this(anonymousFunction(s).Client)
+    
+    /// <summary>
+    /// Creates a new connection to the host host which times out after to seconds
+    /// </summary>
+    /// <param name="host">The remote host to which to connect</param>
+    /// <param name="to">The timeout for the connection</param>
+    public Connection(string host, int to = 2) : this(anonymousFunction(host, to).Client)
     {
     }
 
-    private static TcpClient anonymousFunction(string s)
+    private static TcpClient anonymousFunction(string s, int to)
     {
         TcpClient r = new TcpClient();
         IAsyncResult rs = r.BeginConnect(s, 6969, null, null);
 
-        bool success = rs.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+        bool success = rs.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(to));
 
         if (!success)
         {
@@ -59,11 +67,20 @@ class Connection
         closedCallback = c;
     }
 
+    /// <summary>
+    /// Starts asynchronously handling incoming data from the remote connection
+    /// </summary>
+    /// <param name="r">The function called when data is received</param>
+    /// <param name="c">The function called when the connection is closed</param>
     public void startAsync(DataReceived r, ConnectionClosed c)
     {
         setCallback(r, c);
     }
 
+    /// <summary>
+    /// Sends a message over the connection.
+    /// </summary>
+    /// <param name="m">The message which is to be sent</param>
     public void sendMessage(SMessage m)
     {
         StringBuilder b = new StringBuilder(4 + m.from.Length + m.to.Length + m.header.Length + (m.message == null ? 0 : m.message.Length));
@@ -100,6 +117,10 @@ class Connection
         }
     }
 
+    /// <summary>
+    /// Gets the next avaiable message in the buffer. If no messages are available it blocks until a message is available.
+    /// </summary>
+    /// <returns>The next available message in the buffer</returns>
     public SMessage waitForMessage()
     {
         if (messageQueue.Count == 0)
@@ -108,7 +129,10 @@ class Connection
         }
         return messageQueue.Dequeue();
     }
-
+    
+    /// <summary>
+    /// I'm pretty sure that this does important things
+    /// </summary>
     private void mine()
     {
         byte[] bs = new byte[0];
@@ -122,7 +146,7 @@ class Connection
                 byte[] bx = new byte[socket.Available];
                 socket.Receive(bx, bx.Length, SocketFlags.None);
 
-                X x = new X(bx);
+                MessageParser x = new MessageParser(bx);
 
                 try
                 {
@@ -172,12 +196,15 @@ class Connection
         }
     }
 
-    private class X
+    /// <summary>
+    /// I'm not even going to comment this mess. It werks.
+    /// </summary>
+    private class MessageParser
     {
         private byte[] bs;
         private int c;
 
-        public X(byte[] b)
+        public MessageParser(byte[] b)
         {
             bs = b;
             c = 0;
@@ -225,6 +252,13 @@ class Connection
 
 public class SMessage
 {
+    /// <summary>
+    /// Creates a new SMessage
+    /// </summary>
+    /// <param name="t">The name of the recipient</param>
+    /// <param name="f">The name of the sender</param>
+    /// <param name="h">The header of the message</param>
+    /// <param name="m">The content of the message</param>
     public SMessage(string t, string f, string h, string m)
     {
         from = f;
@@ -232,23 +266,14 @@ public class SMessage
         header = h;
         message = m ?? "";
     }
-
-    /*
-    public SMessage(string t, string f, string h)
-    {
-        from = f;
-        to = t;
-        header = h;
-        message = "";
-    }*/
-
+    
     public override string ToString()
     {
         return from + "->" + to + '\'' + header + ';' + message + '\'';
     }
 
-    public string from;
-    public string to;
-    public string header;
-    public string message;
+    public readonly string from;
+    public readonly string to;
+    public readonly string header;
+    public readonly string message;
 }
