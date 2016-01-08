@@ -60,6 +60,9 @@
     </Compile>
     <Compile Include="Connection.cs" />
     <Compile Include="Cost.cs" />
+    <Compile Include="DeckEditorPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Effect.cs" />
     <Compile Include="FieldPanel.cs">
       <SubType>Component</SubType>

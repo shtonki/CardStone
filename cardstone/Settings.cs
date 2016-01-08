@@ -12,8 +12,13 @@ namespace stonekart
 
         public static void loadSettings()
         {
-
             string s;
+            if (!File.Exists("settings"))
+            {
+                var f = File.Create("settings");
+                f.Close();
+                f.Dispose();
+            }
             using (var r = new StreamReader("settings"))
             {
                 while (!r.EndOfStream)

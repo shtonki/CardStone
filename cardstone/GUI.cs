@@ -34,7 +34,6 @@ namespace stonekart
             t.Start();
 
             frameLoaded.WaitOne();
-            transitionToMainMenu();
         }   
 
         public static void transitionToGame()
@@ -45,6 +44,11 @@ namespace stonekart
         public static void transitionToMainMenu()
         {
             frame.transitionTo(frame.mainMenuPanel);
+        }
+
+        public static void transitionToDeckEditor()
+        {
+            frame.transitionTo(frame.deckEditorPanel);
         }
 
         public static void setStep(int s, bool a)
@@ -157,6 +161,8 @@ namespace stonekart
         private TurnPanel turnPanel;
         #endregion
 
+        public DisplayPanel deckEditorPanel { get; private set; }
+
         private FriendPanel friendPanel;
 
         private Panel activePanel;
@@ -176,6 +182,7 @@ namespace stonekart
 
             setupMainMenuPanel();
             setupGamePanel();
+            setupDeckEditorPanel();
             
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
@@ -184,11 +191,11 @@ namespace stonekart
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
             Controls.Add(friendPanel);
+            Controls.Add(deckEditorPanel);
 
             friendPanel.BringToFront();
             friendPanel.Hide();
-
-            //transitionTo(mainMenuPanel);
+            
 
             GUI.frameLoaded.Set();
         }
@@ -349,13 +356,18 @@ namespace stonekart
 
             mainMenuPanel.Visible = false;
         }
-        
+
+        private void setupDeckEditorPanel()
+        {
+            deckEditorPanel = new DeckEditorPanel();
+            deckEditorPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
+            deckEditorPanel.Visible = false;
+        }
 
         public void transitionTo(Panel p)
         {
             Action a = () =>
             {
-                activePanel?.Hide();
                 activePanel = p;
                 if (activePanel.InvokeRequired)
                 {
