@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class FriendPanel : SPanel
+    class FriendPanel : Panel
     {
         public List<string> friendList { get; set; }
         private static Dictionary<string, WindowedPanel> conv = new Dictionary<string, WindowedPanel>();
@@ -70,7 +70,7 @@ namespace stonekart
 
             friendCount.Click += (sender, args) =>
             {
-                if (friendListWindow == null || friendListWindow.isClosed()) { updateFriendList(); friendListWindow = MainFrame.showWindow(friendListPanel); }
+                if (friendListWindow == null || friendListWindow.isClosed()) { updateFriendList(); friendListWindow = GUI.showWindow(friendListPanel); }
             };
 
             var addFriendButton = new Button();
@@ -95,7 +95,7 @@ namespace stonekart
 
                 p.Controls.Add(x);
 
-                MainFrame.showWindow(p);
+                GUI.showWindow(p);
             };
             
             Controls.Add(friendCount);
@@ -147,7 +147,7 @@ namespace stonekart
             {
                 conv.Remove(user);
                 p = new ConversationPanel(user);
-                conv.Add(user, MainFrame.showWindow(p));
+                conv.Add(user, GUI.showWindow(p));
             }
 
             return p;
@@ -160,6 +160,7 @@ namespace stonekart
 
         public static void sendMessage(ConversationPanel conversation, string message)
         {
+            //todo(jasin) make this a buttonx
             if (message == "/challenge")
             {
                 Network.challenge(conversation.partner);

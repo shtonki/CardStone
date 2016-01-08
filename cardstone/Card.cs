@@ -15,9 +15,8 @@ namespace stonekart
         private CardId cardId;
         private Location location;
         private Player owner, controller;
-
+        
         private bool attacking;
-
         private string name;
         private Type type;
         private Race? race;
@@ -31,13 +30,8 @@ namespace stonekart
         private List<Ability> abilities;
         private ManaCoster castingCost;
         private List<KeyAbility> keyAbilities; 
-
-        public Card(CardId c, Location l)
-            : this(c)
-        {
-            location = l;
-        }
-
+        
+        //todo(seba) move this entire constructor to a XML document
         public Card(CardId c)
         {
             cardId = c;
@@ -104,7 +98,6 @@ namespace stonekart
                     race = Race.Zombie;
                     power = 2;
                     toughness = 2;
-                    //todo can't block
                 } break;
 
                 case CardId.PropheticVision:
@@ -153,12 +146,7 @@ namespace stonekart
             attacking = a;
             notifyObserver();
         }
-
-        public void toggleAttacking()
-        {
-            setAttacking(!attacking);
-        }
-
+        
 
         public int getId()
         {

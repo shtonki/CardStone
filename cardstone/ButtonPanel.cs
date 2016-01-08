@@ -12,7 +12,7 @@ namespace stonekart
 {
     class ButtonPanel : Panel
     {
-        private FooButton
+        private GameElementButton
             cancel,
             accept;
 
@@ -37,7 +37,7 @@ namespace stonekart
             textLabel.Location = new Point(10, 10);
             textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
 
-            accept = new FooButton(ACCEPT);
+            accept = new GameElementButton(ACCEPT);
             accept.Size = HIDE;
             accept.BackColor = Color.GhostWhite;
             accept.Text = "Accept";
@@ -48,7 +48,7 @@ namespace stonekart
                 buttonPressed(accept);
             };
 
-            cancel = new FooButton(CANCEL);
+            cancel = new GameElementButton(CANCEL);
             cancel.Size = HIDE;
             cancel.BackColor = Color.GhostWhite;
             cancel.Text = "Cancel";
@@ -86,17 +86,17 @@ namespace stonekart
             
         }
 
-        private void buttonPressed(FooButton b)
+        private void buttonPressed(GameElementButton b)
         {
             GameController.currentGame.fooPressed(b);
         }
     }
 
-    class FooButton : Button, Foo
+    class GameElementButton : Button, GameElement
     {
         private int type;
 
-        public FooButton(int i)
+        public GameElementButton(int i)
         {
             type = i;
         }

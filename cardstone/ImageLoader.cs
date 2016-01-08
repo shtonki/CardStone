@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    /// <summary>
+    /// It just werks
+    /// </summary>
     class ImageLoader
     {
         private const string cardArtPath = @"res/IMG/card/";

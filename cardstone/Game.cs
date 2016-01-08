@@ -46,7 +46,7 @@ namespace stonekart
 
             setLocations();
 
-            MainFrame.setObservers(hero, villain, stack);
+            GUI.setObservers(hero, villain, stack);
         }
 
         public void start()
@@ -226,7 +226,7 @@ namespace stonekart
         private void loop()
         {
             active = connection.asHomePlayer();
-            MainFrame.setStep(0, active);
+            GUI.setStep(0, active);
 
             while (true)
             {
@@ -283,13 +283,13 @@ namespace stonekart
             int s;
             if (active)
             {
-                MainFrame.showAddMana(true);
+                GUI.showAddMana(true);
                 int c;
                 do
                 {
                     c = getManaColor();
                 } while (hero.getMaxMana(c) == 6);
-                MainFrame.showAddMana(false);
+                GUI.showAddMana(false);
                 s = c;
                 raiseAction(new SelectAction(c));
             }
@@ -433,7 +433,7 @@ namespace stonekart
         private void advanceStep()
         {
             step = (step + 1)%10;
-            MainFrame.setStep(step, active);
+            GUI.setStep(step, active);
         }
 
         private void checkGameState()
@@ -470,19 +470,19 @@ namespace stonekart
         private StackWrapperFuckHopeGasTheKikes castOrPass(bool main)
         {
             if (checkAutoPass()) { return null; }
-            MainFrame.setMessage("You have priority");
+            GUI.setMessage("You have priority");
             while (true)
             {
-                MainFrame.showButtons(ACCEPT);
+                GUI.showButtons(ACCEPT);
                 while (true)
                 {
-                    Foo f = getFoo();
-                    if (f is FooButton)
+                    GameElement f = getFoo();
+                    if (f is GameElementButton)
                     {
-                        var b = (FooButton)f;
+                        var b = (GameElementButton)f;
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
-                            MainFrame.clear();
+                            GUI.clear();
                             raiseAction(new CastAction());
                             return null;
                         }
@@ -516,7 +516,7 @@ namespace stonekart
                             {
                                 var targets = getTargets(a);    //todo allow canceling xd
                                 a.getCost().pay(c, v);
-                                MainFrame.clear();
+                                GUI.clear();
                                 var sw = new StackWrapperFuckHopeGasTheKikes(c, a, targets);
                                 CastAction ca = new CastAction(sw, v);
                                 //CastAction cb = GameAction.fromString("cast," + ca.toString(), this) as CastAction;
@@ -555,7 +555,7 @@ namespace stonekart
 
         private Target[] getTargets(Ability a)
         {
-            MainFrame.setMessage("Select target(s)");
+            GUI.setMessage("Select target(s)");
 
             Target[] targets = new Target[a.countTargets()];
             TargetRule[] rules = a.getTargetRules();
@@ -564,7 +564,7 @@ namespace stonekart
             while (i < targets.Length)
             {
                 Target t = null;
-                Foo f = getFoo();
+                GameElement f = getFoo();
                 if (f is PlayerButton)
                 {
                     t = new Target(((PlayerButton)f).getPlayer());
@@ -586,9 +586,9 @@ namespace stonekart
 
         private StackWrapperFuckHopeGasTheKikes demandCastOrPass()
         {
-            MainFrame.setMessage("Opponent has priority");
+            GUI.setMessage("Opponent has priority");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            MainFrame.setMessage("");
+            GUI.setMessage("");
             if (v.isPass()) { return null; }
             if (v.getStackWrapper().ability is ActivatedAbility)
             {
@@ -623,21 +623,21 @@ namespace stonekart
 
         private Card[] chooseMultiple(string message, Color c, int location, xd xd)
         {
-            MainFrame.setMessage(message);
+            GUI.setMessage(message);
 
             List<CardButton> bs = new List<CardButton>();
             while (true) 
             {
-                MainFrame.showButtons(ACCEPT);
+                GUI.showButtons(ACCEPT);
                 while (true)
                 {
-                    Foo f = getFoo();
-                    if (f is FooButton)
+                    GameElement f = getFoo();
+                    if (f is GameElementButton)
                     {
-                        var b = (FooButton)f;
+                        var b = (GameElementButton)f;
                         if (b.getType() == ButtonPanel.ACCEPT)
                         {
-                            MainFrame.clear();
+                            GUI.clear();
 
                             Card[] r = new Card[bs.Count];
 
@@ -719,14 +719,14 @@ namespace stonekart
         }
 
         //todo seba this really shouldn't be here
-        private Foo f;
+        private GameElement f;
         private AutoResetEvent e = new AutoResetEvent(false);
 
-        private Foo getFoo()
+        private GameElement getFoo()
         {
             e.WaitOne();
             if (f == null) { throw new Exception("this should never happen kappa"); }
-            Foo r = f;
+            GameElement r = f;
             f = null;
 
             return r;
@@ -736,7 +736,7 @@ namespace stonekart
         {
             while (true)
             {
-                Foo f = getFoo();
+                GameElement f = getFoo();
                 if (f is CardButton)
                 {
                     return ((CardButton)f).getCard();
@@ -744,16 +744,16 @@ namespace stonekart
             }
         }
 
-        private FooButton getButton(int i)
+        private GameElementButton getButton(int i)
         {
-            MainFrame.showButtons(i);
+            GUI.showButtons(i);
             while (true)
             {
-                Foo f = getFoo();
-                if (f is FooButton)
+                GameElement f = getFoo();
+                if (f is GameElementButton)
                 {
-                    MainFrame.showButtons(NONE);
-                    return (FooButton)f;
+                    GUI.showButtons(NONE);
+                    return (GameElementButton)f;
                 }
             }
         }
@@ -762,7 +762,7 @@ namespace stonekart
         {
             while (true)
             {
-                Foo f = getFoo();
+                GameElement f = getFoo();
                 if (f is PlayerPanel.ManaButton)
                 {
                     return ((PlayerPanel.ManaButton)f).getColor();
@@ -770,9 +770,9 @@ namespace stonekart
             }
         }
 
-        public void fooPressed(Foo foo)
+        public void fooPressed(GameElement gameElement)
         {
-            f = foo;
+            f = gameElement;
             e.Set();
         }
 

@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    /// <summary>
+    /// kill me now this is so fucking broken it's a joke at this point
+    /// it just werks though
+    /// </summary>
     public class Location
     {
 

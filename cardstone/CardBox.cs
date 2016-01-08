@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class CardBox : Panel, Foo, Observer
+    class CardBox : Panel, GameElement, Observer
     {
         private const int BUTTONS = 30;
         private CardButton[] buttons;

@@ -7,6 +7,10 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
+    /// <summary>
+    /// ebin 10/10
+    /// Isn't even used though xd.
+    /// </summary>
     public class FontLoader
     {
 

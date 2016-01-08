@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    /// <summary>
+    /// A class representing an ordered set of cards
+    /// </summary>
     public class Pile : Observable
     {
         private List<Card> cards;
@@ -16,17 +19,7 @@ namespace stonekart
         {
             cards = new List<Card>();
         }
-
-        public Pile(CardId[] cs)
-        {
-            cards = new List<Card>();
-
-            foreach (CardId i in cs)
-            {
-                new Card(i).moveTo(this);
-            }
-        }
-
+        
         public List<Card> getCards()
         {
             return cards;

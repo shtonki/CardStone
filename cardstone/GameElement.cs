@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    public interface Foo
+    /// <summary>
+    /// Needed because it is.
+    /// </summary>
+    public interface GameElement
     {
 
     }
