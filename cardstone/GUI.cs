@@ -127,40 +127,47 @@ namespace stonekart
             frame.setObservers(h, v, s);
         }
 
-        private static WaitFor<string> loggedInAs = new WaitFor<string>(); 
+        private static WaitFor<string> logInAs = new WaitFor<string>(); 
 
         public static bool login()
         {
-            frame.mainMenuPanel.loginPanel.setVisible(true);
+            if (Settings.username != null)
+            {
+                if (Network.attemptLogin(Settings.username))
+                {
+                    frame.friendPanel.setVisible(true);
+                    return true;
+                }
+            }
 
-            string s = loggedInAs.wait();
+            string s;
 
-            //todo(seba) do actual things
-            frame.mainMenuPanel.loginPanel.setVisible(false);
+            while (true)
+            {
+                frame.mainMenuPanel.loginPanel.setVisible(true);
 
+                s = logInAs.wait();
 
-            return s != null;
+                if (s == null)
+                {
+                    frame.mainMenuPanel.loginPanel.setVisible(false);
+                    return false;
+                }
+
+                if (Network.attemptLogin(s))
+                {
+                    frame.mainMenuPanel.loginPanel.setVisible(false);
+                    frame.friendPanel.setVisible(true);
+                    return true;
+                }
+            }
         }
 
         public static void loginWithName(string x)
         {
-            //todo(seba) move this to network
-            if (!Network.login(x))
-            {
-                System.Console.WriteLine("couldn't log in");
-                return;
-            }
-
-            loggedInAs.signal(x);
-
-            //Network.sendRaw(Network.SERVER, "friend", "");
-            
+            logInAs.signal(x);
         }
-
-        public static void loginOffline()
-        {
-            loggedInAs.signal(null);
-        }
+        
 
         public static void showPlayPanel()
         {

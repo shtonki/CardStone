@@ -47,10 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ability.cs" />
-    <Compile Include="ButtonPanel.cs">
-      <SubType>Component</SubType>
+    <Compile Include="..\..\slib\WaitFor\1.1\WaitFor.cs">
+      <Link>WaitFor.cs</Link>
     </Compile>
+    <Compile Include="Ability.cs" />
+    <Compile Include="ButtonPanel.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CardBox.cs">
       <SubType>Component</SubType>
@@ -104,11 +105,10 @@
     <Compile Include="TurnPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WaitFor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="settings" />
+    <None Include="bin\Debug\settings" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="GUI.resx">
@@ -147,6 +147,7 @@
   <ItemGroup>
     <Content Include="todos.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

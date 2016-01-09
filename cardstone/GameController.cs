@@ -34,8 +34,22 @@ namespace stonekart
             
             GUI.transitionToMainMenu();
 
-            
-            GUI.login();
+            if (connected)
+            {
+                Console.WriteLine("Connected to server");
+                if (GUI.login())
+                {
+                    Console.WriteLine("Logged in as {0}", Network.loggedInAs);
+                }
+                else
+                {
+                    Console.WriteLine("Not logged in");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Couldn't connect to server");
+            }
             
             GUI.showPlayPanel();
         }

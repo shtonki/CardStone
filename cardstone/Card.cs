@@ -16,7 +16,9 @@ namespace stonekart
         public Location location { get; set; }
         private Player owner, controller;
         
-        private bool attacking;
+        public bool attacking { get; set; }
+        private bool topped;
+
         private string name;
         private Type type;
         private Race? race;
@@ -139,13 +141,7 @@ namespace stonekart
                 throw new Exception("bad thing b0ss");
             }
         }
-
-
-        public void setAttacking(bool a)
-        {
-            attacking = a;
-            notifyObserver();
-        }
+        
         
 
         public int getId()
@@ -222,10 +218,15 @@ namespace stonekart
             return r;
         }
 
+        public void setTopped(bool b)
+        {
+            topped = b;
+            notifyObserver();
+        }
 
         public void unTop()
         {
-            setAttacking(false);
+            setTopped(false);
             summoningSick = false;
         }
         
@@ -234,14 +235,13 @@ namespace stonekart
             currentToughness -= d;
             notifyObserver();
         }
-
-
         
-        public bool isAttacking()
+
+        public bool isTopped()
         {
-            return attacking;
+            return topped;
         }
-        
+
         public bool hasPT()
         {
             return power != null;
@@ -265,6 +265,12 @@ namespace stonekart
         public bool canAttack()
         {
             return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
+        }
+
+        public bool canDefend()
+        {
+            throw new NotImplementedException();
+            return location.pile == LocationPile.FIELD;
         }
 
         public bool has(KeyAbility a)

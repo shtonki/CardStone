@@ -17,6 +17,8 @@ namespace stonekart
         private static ServerConnection serverConnection;
         private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
 
+        public static string loggedInAs { get; private set; }
+
         /// <summary>
         /// Connects to the game server
         /// </summary>
@@ -31,7 +33,6 @@ namespace stonekart
             catch (Exception)
             {
                 r = false;
-                System.Console.WriteLine("server offline");
             }
 
             return r;
@@ -43,7 +44,7 @@ namespace stonekart
         /// </summary>
         /// <param name="name">The username which is to be used to log in</param>
         /// <returns>true on success false otherwise</returns>
-        public static bool login(string name)
+        public static bool attemptLogin(string name)
         {
             if (serverConnection == null)
             {
@@ -56,6 +57,7 @@ namespace stonekart
             if (serverConnection.handshake(name))
             {
                 serverConnection.startAsync();
+                loggedInAs = name;
                 return true;
             }
             else
@@ -174,7 +176,6 @@ namespace stonekart
             {
                 case "validated":
                 {
-                    System.Console.WriteLine("Connected as " + username);
                     return true;
                 } break;
 
@@ -216,6 +217,11 @@ namespace stonekart
                     Network.addGameConnection(ss[0], c);
                     GameController.newGame(c);
 
+                } break;
+
+                case "error":
+                {
+                    Console.WriteLine("Error: {0}", m.message);
                 } break;
 
                 default:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
@@ -16,13 +17,15 @@ namespace stonekart
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
 
+        private Card[] attackers, defenders;  
+
         private bool active;
         private int step;
 
         private GameConnection connection;
         private CardFactory cardFactory;
 
-        private KappaMan kappa;
+        private EventHandler kappa;
 
         private Stack<StackWrapperFuckHopeGasTheKikes> stackxd;
         
@@ -48,6 +51,7 @@ namespace stonekart
 
         public void start()
         {
+
             CardId[] myCards = loadDeck();
 
             bool starting = connection.asHomePlayer();
@@ -104,21 +108,21 @@ namespace stonekart
 
         private void setupEventHandlers()
         {
-            kappa = new KappaMan();
+            kappa = new EventHandler();
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.STEP, @g =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.STEP, @g =>
             {
                 
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.DRAW, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DRAW, @gevent =>
             {
                 DrawEvent e = (DrawEvent)gevent;
                 e.getPlayer().draw(e.getCards());
                 e.getPlayer().notifyObserver();
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.CAST, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.CAST, @gevent =>
             {
                 CastEvent e = (CastEvent)gevent;
                 var v = e.getStuff();
@@ -128,26 +132,26 @@ namespace stonekart
                 v.card.getOwner().notifyObserver();
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.MOVECARD, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.MOVECARD, @gevent =>
             {
                 MoveCardEvent e = (MoveCardEvent)gevent;
                 moveCardTo(e.getCard(), e.getLocation());//e.getCard().moveTo(e.getLocation());
                 e.getCard().getOwner().notifyObserver();
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.GAINMANA, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.GAINMANA, @gevent =>
             {
                 GainManaOrbEvent e = (GainManaOrbEvent)gevent;
                 e.getPlayer().addMana(e.getColor());
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.UNTOPPLAYER, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.UNTOPPLAYER, @gevent =>
             {
                 UntopPlayerEvent e = (UntopPlayerEvent)gevent;
                 e.getPlayer().untop();
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.RESOLVE, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.RESOLVE, @gevent =>
             {
                 ResolveEvent e = (ResolveEvent)gevent;
                 var x = e.getStuff();
@@ -183,19 +187,19 @@ namespace stonekart
 
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.DAMAGEPLAYER, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGEPLAYER, @gevent =>
             {
                 DamagePlayerEvent e = (DamagePlayerEvent)gevent;
                 e.getPlayer().damage(e.getDamage());
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.DAMAGECREATURE, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGECREATURE, @gevent =>
             {
                 DamageCreatureEvent e = (DamageCreatureEvent)gevent;
                 e.getCreature().damage(e.getDamage());
             }));
 
-            kappa.addBaseHandler(new EventHandler(GameEventType.BURYCREATURE, @gevent =>
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, @gevent =>
             {
                 BuryCreature e = (BuryCreature)gevent;
                 raiseEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
@@ -305,11 +309,19 @@ namespace stonekart
 
         private bool chooseAttackersStep()
         {
-            Card[] attackers;
-
             if (active)
             {
-                attackers = chooseMultiple("Choose attackers", Color.Red, @c => c.getOwner() == hero && c.canAttack());
+                attackers = chooseMultiple("Choose attackers", (cb) =>
+                {
+                    Card c = cb.getCard();
+                    if (c.getOwner() == hero && c.canAttack())
+                    {
+                        cb.setBorder(Color.Red);
+                        return true;
+                    }
+
+                    return false;
+                });
                 raiseAction(new MultiSelectAction(attackers));
             }
             else
@@ -321,18 +333,35 @@ namespace stonekart
 
             foreach (var a in attackers)
             {
-                a.setAttacking(true);
+                a.attacking = true;
                 //todo attackers event
             }
-
-            //raiseEvent(new StepEvent(StepEvent.ATTACKERS));
+            
             givePriority(false);
             return true;
         }
 
         private void chooseDefendersStep()
         {
-            chooseDefenders();
+            if (active)
+            {
+                defenders = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
+                Card[] v = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
+
+                if (defenders.Length != v.Length) { throw new NetworkInformationException();}
+
+                for (int i = 0; i < defenders.Length; i++)
+                {
+                    defenders[i].defending = v[i];
+                }
+            }
+            else
+            {
+                Tuple<Card[], Card[]> ls = chooseDefenders();
+                defenders = ls.Item1;
+                raiseAction(new MultiSelectAction(defenders));
+                raiseAction(new MultiSelectAction(ls.Item2));
+            }
 
             givePriority(false);
         }
@@ -341,13 +370,12 @@ namespace stonekart
         {
             foreach (var v in activePlayer.getField().getCards())
             {
-                if (v.isAttacking())
+                if (v.attacking)
                 {
                     raiseEvent(new DamagePlayerEvent(inactivePlayer, v, v.getCurrentPower()));
                 }
             }
-
-            //raiseEvent(new StepEvent(StepEvent.DAMAGE));
+            
             givePriority(false);
         }
 
@@ -601,7 +629,7 @@ namespace stonekart
         }
 
 
-        private Card[] chooseMultiple(string message, Color c, Func<Card, bool> xd)
+        private Card[] chooseMultiple(string message, Func<CardButton, bool> xd)
         {
             GUI.setMessage(message);
 
@@ -619,15 +647,7 @@ namespace stonekart
                         {
                             GUI.clear();
 
-                            Card[] r = new Card[bs.Count];
-
-                            for (int i = 0; i < bs.Count; i++)
-                            {
-                                r[i] = bs[i].getCard();
-                                bs[i].setBorder(null);
-                            }
-
-                            return r;
+                            return bs.Select(bt => bt.getCard()).ToArray();
                         }
                     }
                     else if (f is CardButton)
@@ -636,7 +656,7 @@ namespace stonekart
 
                         Card crd = cb.getCard();
 
-                        if (!xd(crd)) { continue; }
+                        if (!xd(cb)) { continue; }
 
                         if (bs.Contains(cb))
                         {
@@ -646,41 +666,97 @@ namespace stonekart
                         else
                         {
                             bs.Add(cb);
-                            cb.setBorder(c);
                         }
                     }
                 }
             }
         }
 
-        private void chooseDefenders()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Defenders as the first list, defended as the second</returns>
+        private Tuple<Card[], Card[]> chooseDefenders()
         {
+            //todo(seba) could keep track of undefended attackers
+            List<Card> blockers = new List<Card>();
+
             GUI.showButtons(GUI.ACCEPT);
             while (true)
             {
-                Card blocker, blocked;
-
-                GUI.setMessage("Choose defenders");
-                //GUI.showButtons();
-
+                CardButton blocker, blocked;
+                
                 while (true)
                 {
-                    GameElement e = getGameElement();
-                    if (e is CardButton)
-                    {
-                        CardButton b = (CardButton)e;
-                        Card c = b.getCard();
+                    blocker = blocked = null;
+                    GUI.setMessage("Choose defenders");
+                    GUI.showButtons(GUI.ACCEPT);
 
-                        c.defending = c.defending == null ? c : null;
-                        
-                        b.setBorder(c.defending == null ? Color.Blue : (Color?)null);
-                    }
-                    else if (e is ChoiceButton)
+                    while (blocker == null)
                     {
-                        ChoiceButton c = (ChoiceButton)e;
+                        GameElement e = getGameElement();
+                        if (e is CardButton)
+                        {
+                            CardButton b = (CardButton)e;
+                            Card c = b.getCard();
+
+                            if (!c.canDefend()) { continue; }
+
+                            if (c.defending == null)
+                            {
+                                blocker = b;
+                                b.setBorder(Color.Blue);
+                            }
+                            else
+                            {
+                                blockers.Remove(c);
+                                c.defending = null;
+                                b.setBorder(null);
+                            }
+                        }
+                        else if (e is ChoiceButton)
+                        {
+                            ChoiceButton c = (ChoiceButton)e;
+                            if (c.getType() == GUI.ACCEPT)
+                            {
+                                goto end;   // *unzips fedora*
+                            }
+                        }
+                    }
+
+                    GUI.setMessage("Blocking what?");
+                    GUI.showButtons(GUI.CANCEL);
+
+                    while (blocked == null)
+                    {
+                        GameElement e = getGameElement();
+                        if (e is CardButton)
+                        {
+                            blocked = (CardButton)e;
+                        }
+                        else if (e is ChoiceButton)
+                        {
+                            ChoiceButton c = (ChoiceButton)e;
+                            if (c.getType() == GUI.CANCEL)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (blocked != null)
+                    {
+                        Card bkr = blocker.getCard();
+
+                        bkr.defending = bkr;
+                        blockers.Add(bkr);
                     }
                 }
             }
+
+            end:
+            Card[] bkds = blockers.Select(@c => c.defending).ToArray();
+            return new Tuple<Card[], Card[]>(blockers.ToArray(), bkds);
         }
 
         private void combatDamage()
@@ -811,16 +887,16 @@ namespace stonekart
             ACCEPTCANCEL = GUI.ACCEPT | GUI.CANCEL;
 
 
-        private class KappaMan
+        private class EventHandler
         {
-            private EventHandler[] xds;
+            private stonekart.EventHandler[] xds;
 
-            public KappaMan()
+            public EventHandler()
             {
-                xds = new EventHandler[100]; //1todo nope
+                xds = new stonekart.EventHandler[100]; //1todo nope
             }
 
-            public void addBaseHandler(EventHandler e)
+            public void addBaseHandler(stonekart.EventHandler e)
             {
                 int i = (int)e.type;
                 if (xds[i] != null) { throw new Exception("event already handled"); }

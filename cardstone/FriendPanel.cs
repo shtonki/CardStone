@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class FriendPanel : Panel
+    public class FriendPanel : SPanel
     {
         public List<string> friendList { get; set; }
         private static Dictionary<string, WindowedPanel> conv = new Dictionary<string, WindowedPanel>();
@@ -20,6 +20,7 @@ namespace stonekart
         private Panel friendListPanel;
         private Button[] friendListButtons;
         private Label[] friendListLabels;
+        private TextBox challengeName;
 
         public FriendPanel()
         {
@@ -97,7 +98,23 @@ namespace stonekart
 
                 GUI.showWindow(p);
             };
-            
+
+            challengeName = new TextBox();
+            challengeName.Location = new Point(150, 10);
+            challengeName.Size = new Size(80, 40);
+            challengeName.Visible = true;
+            challengeName.KeyDown += (sender, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    string s = challengeName.Text;
+                    challengeName.Text = "";
+                    Network.challenge(s);
+                }
+            };
+
+
+            Controls.Add(challengeName);
             Controls.Add(friendCount);
             Controls.Add(addFriendButton);
         }
@@ -199,7 +216,7 @@ namespace stonekart
             }
         }
 
-        internal class ConversationPanel : Panel
+        public class ConversationPanel : Panel
         {
             public string partner { get; private set; }
 

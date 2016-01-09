@@ -25,6 +25,7 @@ namespace stonekart
 
         static CardButton()
         {
+            //todo(seba) actually use the FontLoader class
             var a = new PrivateFontCollection();
 
             try
@@ -80,6 +81,7 @@ namespace stonekart
             };
         }
 
+        //todo(seba) make this a property
         public Card getCard()
         {
             return card;
@@ -87,8 +89,8 @@ namespace stonekart
 
         public void setVisible(bool v)
         {
-            if (InvokeRequired) { Invoke(new Action(() => { Size = v ? SHOW : HIDE; })); }
-            else { Size = v ? SHOW : HIDE; }
+            if (InvokeRequired) { Invoke(new Action(() => { Visible = v; })); }
+            else { Visible = v; }
         }
 
         public void setBorder(Color? c)

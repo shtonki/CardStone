@@ -16,7 +16,7 @@ namespace stonekart
         
         public DisplayPanel deckEditorPanel { get; private set; }
 
-        private FriendPanel friendPanel;
+        public FriendPanel friendPanel { get; private set; }
 
         private Panel activePanel;
         
@@ -172,7 +172,7 @@ namespace stonekart
             playOfflineButton.Text = "Play Offline";
             playOfflineButton.Click += (sender, args) =>
             {
-                GUI.loginOffline();
+                GUI.loginWithName(null);
             };
 
             startGamePanel = new SPanel();
