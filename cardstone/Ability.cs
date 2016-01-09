@@ -37,18 +37,12 @@ namespace stonekart
     public class ActivatedAbility : Ability
     {
         private Cost cost;
-        private List<int> from;
+        private LocationPile from;
         private bool instant;
-
-        public ActivatedAbility(Card ca, Cost c) : this(ca, c, new Effect())
+        
+        public ActivatedAbility(Card ca, Cost c, Effect e, LocationPile pile)
         {
-            
-        }
-
-        public ActivatedAbility(Card ca, Cost c, Effect e)
-        {
-            from = new List<int>();
-            from.Add(Location.HAND);
+            from = pile;
 
             card = ca;
             cost = c;
@@ -61,13 +55,9 @@ namespace stonekart
             return cost;
         }
 
-        public bool castableFrom(int i)
+        public bool castableFrom(LocationPile p)
         {
-            foreach (var v in from)
-            {
-                if (v == i) { return true;}
-            }
-            return false;
+            return from == p;
         }
 
         public void setInstant(bool b)

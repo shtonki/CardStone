@@ -13,7 +13,7 @@ namespace stonekart
     {
         private int id;
         private CardId cardId;
-        private Location location;
+        public Location location { get; set; }
         private Player owner, controller;
         
         private bool attacking;
@@ -25,7 +25,7 @@ namespace stonekart
 
         private int? power, toughness, currentPower, currentToughness;
         private bool summoningSick;
-        private Card defending;
+        public Card defending { get; set; }
 
         private List<Ability> abilities;
         private ManaCoster castingCost;
@@ -35,7 +35,7 @@ namespace stonekart
         public Card(CardId c)
         {
             cardId = c;
-            location = new Location(Location.NOWHERE);
+            location = null;
 
             List<Effecter> fx = new List<Effecter>();
             
@@ -129,7 +129,7 @@ namespace stonekart
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
             Cost cc = new Cost(castingCost);
-            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x);
+            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND);
             castAbility.setInstant(type == Type.Instant);
 
             abilities.Add(castAbility);
@@ -177,12 +177,7 @@ namespace stonekart
         {
             return owner;
         }
-
-        public Location getLocation()
-        {
-            return location;
-        }
-
+        
         public Ability getAbility(int i)
         {
             return abilities[i];
@@ -218,7 +213,7 @@ namespace stonekart
             {
                 if (!(v is ActivatedAbility)) { continue; }
                 ActivatedAbility a = v as ActivatedAbility;
-                if (!a.castableFrom(location.getLocation())) { continue; }
+                if (!a.castableFrom(location.pile)) { continue; }
                 if (!canSorc && !a.isInstant()) { continue; }
 
                 r.Add(a);
@@ -233,22 +228,7 @@ namespace stonekart
             setAttacking(false);
             summoningSick = false;
         }
-
-        public void moveTo(Location l)
-        {
-            Pile p = l.getPile();
-            moveTo(p);
-        }
-
-        public void moveTo(Pile d)
-        {
-            Pile p = location.getPile();
-            if (p != null) { p.remove(this); }
-            d.add(this);
-            location = d.getLocation();
-            summoningSick = true;
-        }
-
+        
         public void damage(int d)
         {
             currentToughness -= d;
@@ -261,17 +241,7 @@ namespace stonekart
         {
             return attacking;
         }
-
-        public bool isDefending()
-        {
-            return defending == null;
-        }
-
-        public void setDefending(Card o)
-        {
-            defending = o;
-        }
-
+        
         public bool hasPT()
         {
             return power != null;
@@ -294,7 +264,7 @@ namespace stonekart
 
         public bool canAttack()
         {
-            return location.getLocation() == Location.FIELD && (!summoningSick || has(KeyAbility.Fervor));
+            return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
         }
 
         public bool has(KeyAbility a)

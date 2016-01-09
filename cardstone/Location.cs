@@ -12,79 +12,42 @@ namespace stonekart
     /// </summary>
     public class Location
     {
+        public LocationPile pile { get; private set; }
+        public LocationPlayer side { get; private set; }
 
-        private const int PILES = 11;
-        private static Pile[] piles = new Pile[PILES];
-
-        public const byte
-            HAND = 0,
-            DECK = 1,
-            FIELD = 2,
-            GRAVEYARD = 3,
-            EXILE = 4,
-            STACK = 5,
-            NOWHERE = 6,
-
-            HEROSIDE = 0,
-            VILLAINSIDE = 1,
-            NOONE = 2;
-
-        private byte location;
-        private byte side;
-
-        /// <summary>
-        /// This isn't the contructor you're looking for
-        /// </summary>
-        /// <param name="location"></param>
-        public Location(byte location)
+        public Location(LocationPile p, LocationPlayer plr)
         {
-            this.location = location;
-            this.side = NOONE;
+            pile = p;
+            side = plr;
+        }
+        
+        public static bool operator ==(Location a, Location b)
+        {
+            if (a == null || b == null) { return a == null && b == null; }
+            return a.pile == b.pile && a.side == b.side;
         }
 
-        public Location(byte location, byte side)
+        public static bool operator !=(Location a, Location b)
         {
-            this.location = location;
-            this.side = side;
+            return !(a == b);
         }
+        
+    }
 
-        public static void setPile(byte location, byte side, Pile p)
-        {
-            piles[location*2 + side] = p;
-        }
+    public enum LocationPile
+    {
+        GRAVEYARD,
+        HAND,
+        DECK,
+        EXILE,
+        FIELD,
+        STACK,
+    }
 
-        public Pile getPile()
-        {
-            return getPile(location, side);
-        }
-
-        public byte getSide()
-        {
-            return side;
-        }
-
-        public byte getLocation()
-        {
-            return location;
-        }
-
-        public static Pile getPile(int location, int side)
-        {
-            if (location == NOWHERE || side == NOONE) { return null; }
-            return piles[location * 2 + side];
-        }
-
-        public static Location getLocation(Pile p)
-        {
-            for (int i = 0; i < PILES; i++)
-            {
-                if (piles[i] == p)
-                {
-                    return new Location((byte)(i/2), (byte)(i%2));
-                }
-            }
-            throw new Exception("I really hope the never happens");
-        }
-
+    public enum LocationPlayer
+    {
+        HERO,
+        VILLAIN,
+        NOONE,
     }
 }

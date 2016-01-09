@@ -142,7 +142,7 @@ namespace stonekart
             l = loc;
         }
 
-        public MoveCardEvent(Card card, byte pile) : this(card, new Location(pile, card.getOwner().getSide()))
+        public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.getOwner().getSide()))
         {
             
         }

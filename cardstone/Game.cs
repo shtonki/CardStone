@@ -25,9 +25,7 @@ namespace stonekart
         private KappaMan kappa;
 
         private Stack<StackWrapperFuckHopeGasTheKikes> stackxd;
-
-        private delegate bool xd(Card c);
-
+        
         public Game(GameConnection cn)
         {
             connection = cn;
@@ -36,15 +34,14 @@ namespace stonekart
 
             setupEventHandlers();
 
-            hero = new Player(Location.HEROSIDE);
-            villain = new Player(Location.VILLAINSIDE);
+            hero = new Player(this, LocationPlayer.HERO);
+            villain = new Player(this, LocationPlayer.VILLAIN);
             homePlayer = cn.asHomePlayer() ? hero : villain;
             awayPlayer = cn.asHomePlayer() ? villain : hero;
 
-            stack = new Pile();
+            stack = new Pile(new Location(LocationPile.STACK, LocationPlayer.NOONE));
             stackxd = new Stack<StackWrapperFuckHopeGasTheKikes>();
-
-            setLocations();
+            
 
             GUI.setObservers(hero, villain, stack);
         }
@@ -71,8 +68,8 @@ namespace stonekart
                 myDeck = cardFactory.makeList(hero, myCards);                
             }
 
-            hero.loadDeck(myDeck, new Location(Location.DECK, Location.HEROSIDE));
-            villain.loadDeck(otherDeck, new Location(Location.DECK, Location.VILLAINSIDE));
+            hero.loadDeck(myDeck);
+            villain.loadDeck(otherDeck);
 
 
             hero.shuffleDeck();
@@ -125,7 +122,7 @@ namespace stonekart
             {
                 CastEvent e = (CastEvent)gevent;
                 var v = e.getStuff();
-                v.card.moveTo(stack);
+                moveCardTo(v.card, stack);  //v.card.moveTo(stack);
                 stackxd.Push(v);
 
                 v.card.getOwner().notifyObserver();
@@ -134,7 +131,7 @@ namespace stonekart
             kappa.addBaseHandler(new EventHandler(GameEventType.MOVECARD, @gevent =>
             {
                 MoveCardEvent e = (MoveCardEvent)gevent;
-                e.getCard().moveTo(e.getLocation());
+                moveCardTo(e.getCard(), e.getLocation());//e.getCard().moveTo(e.getLocation());
                 e.getCard().getOwner().notifyObserver();
             }));
 
@@ -177,11 +174,11 @@ namespace stonekart
 
                 if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
                 {
-                    raiseEvent(new MoveCardEvent(card, Location.GRAVEYARD));
+                    raiseEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
                 }
                 else
                 {
-                    raiseEvent(new MoveCardEvent(card, Location.FIELD));
+                    raiseEvent(new MoveCardEvent(card, LocationPile.FIELD));
                 }
 
             }));
@@ -201,26 +198,10 @@ namespace stonekart
             kappa.addBaseHandler(new EventHandler(GameEventType.BURYCREATURE, @gevent =>
             {
                 BuryCreature e = (BuryCreature)gevent;
-                raiseEvent(new MoveCardEvent(e.getCard(), Location.GRAVEYARD));
+                raiseEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
             }));
         }
-
-        private void setLocations()
-        {
-            Location.setPile(Location.HAND, Location.HEROSIDE, hero.getHand());
-            Location.setPile(Location.DECK, Location.HEROSIDE, hero.getDeck());
-            Location.setPile(Location.FIELD, Location.HEROSIDE, hero.getField());
-            Location.setPile(Location.GRAVEYARD, Location.HEROSIDE, hero.getGraveyard());
-            Location.setPile(Location.EXILE, Location.HEROSIDE, hero.getExile());
-
-            Location.setPile(Location.HAND, Location.VILLAINSIDE, villain.getHand());
-            Location.setPile(Location.DECK, Location.VILLAINSIDE, villain.getDeck());
-            Location.setPile(Location.FIELD, Location.VILLAINSIDE, villain.getField());
-            Location.setPile(Location.GRAVEYARD, Location.VILLAINSIDE, villain.getGraveyard());
-            Location.setPile(Location.EXILE, Location.VILLAINSIDE, villain.getExile());
-
-            Location.setPile(Location.STACK, Location.HEROSIDE, stack);
-        }
+        
 
 
         private void loop()
@@ -254,7 +235,7 @@ namespace stonekart
                 advanceStep();
 
                 //defenders
-                if (b) { chooseDefendersStep(); }
+                if (b || true) { chooseDefendersStep(); }
                 advanceStep();
 
                 //combatDamage
@@ -328,7 +309,7 @@ namespace stonekart
 
             if (active)
             {
-                attackers = chooseMultiple("Choose attackers", Color.Red, Location.FIELD, @c => { return c.getOwner() == hero && c.canAttack(); });
+                attackers = chooseMultiple("Choose attackers", Color.Red, @c => c.getOwner() == hero && c.canAttack());
                 raiseAction(new MultiSelectAction(attackers));
             }
             else
@@ -351,9 +332,8 @@ namespace stonekart
 
         private void chooseDefendersStep()
         {
+            chooseDefenders();
 
-
-            //raiseEvent(new StepEvent(StepEvent.DEFENDERS));
             givePriority(false);
         }
 
@@ -621,7 +601,7 @@ namespace stonekart
         }
 
 
-        private Card[] chooseMultiple(string message, Color c, int location, xd xd)
+        private Card[] chooseMultiple(string message, Color c, Func<Card, bool> xd)
         {
             GUI.setMessage(message);
 
@@ -673,13 +653,14 @@ namespace stonekart
             }
         }
 
-        private void choseDefenders()
+        private void chooseDefenders()
         {
+            GUI.showButtons(GUI.ACCEPT);
             while (true)
             {
                 Card blocker, blocked;
 
-                GUI.setMessage("Choose blocker");
+                GUI.setMessage("Choose defenders");
                 //GUI.showButtons();
 
                 while (true)
@@ -690,7 +671,9 @@ namespace stonekart
                         CardButton b = (CardButton)e;
                         Card c = b.getCard();
 
+                        c.defending = c.defending == null ? c : null;
                         
+                        b.setBorder(c.defending == null ? Color.Blue : (Color?)null);
                     }
                     else if (e is ChoiceButton)
                     {
@@ -727,6 +710,30 @@ namespace stonekart
             connection.sendGameAction(a);
         }
 
+        public void moveCardTo(Card c, Pile to)
+        {
+            Pile from = pileFromLocation(c.location);
+            from.remove(c);
+            to.add(c);
+            c.location = to.location;
+        }
+
+        public void moveCardTo(Card c, Location l)
+        {
+            moveCardTo(c, pileFromLocation(l));
+        }
+        
+        private Pile pileFromLocation(Location l)
+        {
+            if (l.side == LocationPlayer.NOONE)
+            {
+                if (l.pile == LocationPile.STACK) { return stack; }
+                throw new ArgumentException();
+            }
+
+            Player p = l.side == LocationPlayer.HERO ? hero : villain;
+            return p.getPile(l.pile);
+        }
 
         public Card getCardById(int i)
         {

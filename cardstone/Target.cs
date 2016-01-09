@@ -79,13 +79,8 @@ namespace stonekart
 
                 case TargetRulex.ZAPPABLE:
                 {
-                    rt.Add(@t =>
-                    {
-                        if (t.isPlayer() ||
-                            t.getCard().getLocation().getLocation() == Location.FIELD) { return true; }
-
-                        return false;
-                    });
+                    rt.Add(@t => t.isPlayer() ||
+                                 t.getCard().location.pile == LocationPile.FIELD);
                 } break;
             }
 

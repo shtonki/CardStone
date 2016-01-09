@@ -12,11 +12,13 @@ namespace stonekart
     public class Pile : Observable
     {
         private List<Card> cards;
-
         public int Count { get { return cards.Count; }  }
 
-        public Pile()
+        public Location location { get; private set; }
+
+        public Pile(Location l)
         {
+            location = l;
             cards = new List<Card>();
         }
         
@@ -56,11 +58,7 @@ namespace stonekart
                 cards[n] = value;
             }
         }
-
-        public Location getLocation()
-        {
-            return Location.getLocation(this);
-        }
+        
 
     }
 }

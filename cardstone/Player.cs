@@ -13,18 +13,29 @@ namespace stonekart
         private int health;
 
         private Pile hand, graveyard, exile, field, deck;
+        private Pile[] piles;
 
-        private byte side;
+        private LocationPlayer side;
 
-        public Player(byte side)
+        private Game game;
+
+        public Player(Game g, LocationPlayer l)
         {
-            this.side = side;
+            game = g;
+            side = l;
 
-            hand = new Pile();
-            graveyard = new Pile();
-            exile = new Pile();
-            field = new Pile();
-            deck = new Pile();
+            hand = new Pile(new Location(LocationPile.HAND, l));
+            graveyard = new Pile(new Location(LocationPile.GRAVEYARD, l));
+            exile = new Pile(new Location(LocationPile.EXILE, l));
+            field = new Pile(new Location(LocationPile.FIELD, l));
+            deck = new Pile(new Location(LocationPile.DECK, l));
+
+            piles = new Pile[5];
+            piles[(int)LocationPile.DECK] = deck;
+            piles[(int)LocationPile.EXILE] = exile;
+            piles[(int)LocationPile.FIELD] = field;
+            piles[(int)LocationPile.GRAVEYARD] = graveyard;
+            piles[(int)LocationPile.HAND] = hand;
 
             curMana = new int[5];
             maxMana = new int[5];
@@ -45,7 +56,7 @@ namespace stonekart
             for (int i = 0; i < c; i++)
             {
                 if (deck.Count == 0) { return false; }
-                deck.peek().moveTo(hand);
+                game.moveCardTo(deck.peek(), hand); //deck.peek().moveTo(hand);
             }
 
             notifyObserver();
@@ -116,13 +127,14 @@ namespace stonekart
         }
 
 
-        public byte getSide()
+        public LocationPlayer getSide()
         {
             return side;
         }
 
-        public void loadDeck(List<Card> deckList, Location l)
+        public void loadDeck(List<Card> deckList)
         {
+            Location l = new Location(LocationPile.DECK, side);
             foreach (Card c in deckList)
             {
                 c.setOwner(this);
@@ -154,6 +166,11 @@ namespace stonekart
         public Pile getDeck()
         {
             return deck;
+        }
+
+        public Pile getPile(LocationPile p)
+        {
+            return piles[(int)p];
         }
     }
 }
