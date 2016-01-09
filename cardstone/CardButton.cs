@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    class CardButton : Button, GameElement, Observer
+    public class CardButton : Button, GameElement, Observer
     {
         public static int WIDTH = 180, HEIGHT = 280;
         private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
@@ -207,7 +207,11 @@ namespace stonekart
 
         public void notifyObserver(Observable o)
         {
-            card = (Card)o;
+            if (card == null)
+            {
+                card = (Card)o;
+                GUI.setCardButton(card, this);
+            }
             if (InvokeRequired)
             {
                 Invoke(new Action(() => { Visible = card != null; }));

@@ -17,7 +17,8 @@ namespace stonekart
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
 
-        private Card[] attackers, defenders;  
+        private Card[] attackers, defenders;
+        private List<CardButton> clearMe = new List<CardButton>(); //hack 
 
         private bool active;
         private int step;
@@ -239,7 +240,7 @@ namespace stonekart
                 advanceStep();
 
                 //defenders
-                if (b || true) { chooseDefendersStep(); }
+                if (b) { chooseDefendersStep(); }
                 advanceStep();
 
                 //combatDamage
@@ -311,16 +312,23 @@ namespace stonekart
         {
             if (active)
             {
-                attackers = chooseMultiple("Choose attackers", (cb) =>
+                attackers = chooseMultiple("Choose attackers", cb =>
                 {
                     Card c = cb.getCard();
-                    if (c.getOwner() == hero && c.canAttack())
+                    if (c.getOwner() == hero && c.canAttack() && !(c.attacking))
                     {
                         cb.setBorder(Color.Red);
+                        clearMe.Add(cb);
+                        c.attacking = true;
                         return true;
                     }
-
-                    return false;
+                    else
+                    {
+                        cb.setBorder(null);
+                        clearMe.Remove(cb);
+                        c.attacking = false;
+                        return false;
+                    }
                 });
                 raiseAction(new MultiSelectAction(attackers));
             }
@@ -333,7 +341,7 @@ namespace stonekart
 
             foreach (var a in attackers)
             {
-                a.attacking = true;
+                a.setTopped(true);  //todo(seba) use event and check for "vigilance"
                 //todo attackers event
             }
             
@@ -381,6 +389,16 @@ namespace stonekart
 
         private void endCombatStep()
         {
+            foreach (Card c in attackers)
+            {
+                GUI.getCardButtonByCard(c).setBorder(null);
+            }
+
+            foreach (Card c in defenders)
+            {
+                GUI.getCardButtonByCard(c).setBorder(null);
+            }
+
             raiseEvent(new StepEvent(StepEvent.ENDCOMBAT));
             givePriority(false);
         }
@@ -656,12 +674,15 @@ namespace stonekart
 
                         Card crd = cb.getCard();
 
-                        if (!xd(cb)) { continue; }
+                        if (!xd(cb))
+                        {
+                            bs.Remove(cb);
+                            continue;
+                        }
 
                         if (bs.Contains(cb))
                         {
                             bs.Remove(cb);
-                            cb.setBorder(null);
                         }
                         else
                         {
@@ -706,12 +727,14 @@ namespace stonekart
                             {
                                 blocker = b;
                                 b.setBorder(Color.Blue);
+                                clearMe.Add(b);
                             }
                             else
                             {
                                 blockers.Remove(c);
                                 c.defending = null;
                                 b.setBorder(null);
+                                clearMe.Remove(b);
                             }
                         }
                         else if (e is ChoiceButton)

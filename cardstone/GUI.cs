@@ -19,6 +19,8 @@ namespace stonekart
     {
         private static MainFrame frame;
 
+        private static Dictionary<Card, CardButton> killMeNow = new Dictionary<Card, CardButton>(); 
+
         public static ManualResetEvent frameLoaded = new ManualResetEvent(false);
 
         public static void createFrame()
@@ -125,6 +127,17 @@ namespace stonekart
         public static void setObservers(Player h, Player v, Pile s)
         {
             frame.setObservers(h, v, s);
+        }
+
+        public static void setCardButton(Card c, CardButton b)
+        {
+            killMeNow[c] = b;
+        }
+
+        public static CardButton getCardButtonByCard(Card c)
+        {
+            if (!killMeNow.ContainsKey(c)) { return null; }
+            return killMeNow[c];
         }
 
         private static WaitFor<string> logInAs = new WaitFor<string>(); 

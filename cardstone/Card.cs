@@ -17,7 +17,7 @@ namespace stonekart
         private Player owner, controller;
         
         public bool attacking { get; set; }
-        private bool topped;
+        public bool topped { get; private set; }
 
         private string name;
         private Type type;

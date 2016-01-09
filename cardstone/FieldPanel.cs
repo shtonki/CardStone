@@ -62,7 +62,7 @@ namespace stonekart
             base.notifyObserver(o);
 
             Card c = (Card)o;
-            Invoke(new Action(() => { Location = c.attacking ? att : def; }));
+            Invoke(new Action(() => { Location = c.topped ? att : def; }));
         }
 
         public void setLocation(int x, int y)
