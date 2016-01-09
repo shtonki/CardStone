@@ -1,4 +1,0 @@
-* Add a 'WaitForResult' class
-* Allow resizing of the game window
-* Colorless mana costs
-* Display targeting and defending
