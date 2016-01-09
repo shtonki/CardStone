@@ -53,12 +53,12 @@ namespace stonekart
 
         public static void setStep(int s, bool a)
         {
-            frame.setStep(s, a);
+            frame.gamePanel.setStep(s, a);
         }
 
         public static void setMessage(string s)
         {
-            frame.setMessage(s);
+            frame.gamePanel.setMessage(s);
         }
 
         public static void clear()
@@ -69,12 +69,12 @@ namespace stonekart
 
         public static void showButtons(int i)
         {
-            frame.showButtons(i);
+            frame.gamePanel.showButtons(i);
         }
 
         public static void showAddMana(bool b)
         {
-            frame.showAddMana(b);
+            frame.gamePanel.showAddMana(b);
         }
 
         public static WindowedPanel showWindow(Control p, string barTitle, bool closeable, Action closeCallback)

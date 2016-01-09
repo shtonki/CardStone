@@ -11,21 +11,9 @@ namespace stonekart
         //todo(jasin) sholdn't be const fam
         
         public MainMenuPanel mainMenuPanel { get; private set; }
-
-
-        #region gamepanel
-        public DisplayPanel gamePanel { get; private set; }
-        /*
-        private TextBox inputBox, outputBox;
-        private CardPanel handPanel;
-        private PlayerPanel heroPanel, villainPanel;
-        private ButtonPanel buttonPanel;
-        private CardBox stackPanel;
-        private FieldPanel heroFieldPanel, villainFieldPanel;
-        private TurnPanel turnPanel;
-        */
-        #endregion
-
+        
+        public GamePanel gamePanel { get; private set; }
+        
         public DisplayPanel deckEditorPanel { get; private set; }
 
         private FriendPanel friendPanel;
@@ -68,165 +56,7 @@ namespace stonekart
 
             GUI.frameLoaded.Set();
         }
-
-        private void setupGamePanel()
-        {
-            gamePanel = new DisplayPanel();
-            gamePanel.Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
-
-            inputBox = new TextBox();
-            inputBox.KeyDown += (sender, args) =>
-            {
-                if (args.KeyCode != Keys.Enter) { return; }
-
-                Console.WriteLine(inputBox.Text);
-                inputBox.Clear();
-            };
-            inputBox.Size = new Size(200, 40);
-
-            outputBox = new TextBox();
-            outputBox.ReadOnly = true;
-            outputBox.Location = new Point(100, 100);
-            outputBox.AcceptsReturn = true;
-            outputBox.Multiline = true;
-            outputBox.Size = new Size(200, 400);
-            outputBox.ScrollBars = ScrollBars.Vertical;
-
-            FlowLayoutPanel textPanel = new FlowLayoutPanel();
-            textPanel.FlowDirection = FlowDirection.LeftToRight;
-            textPanel.Size = new Size(200, 440);
-
-            textPanel.Controls.Add(outputBox);
-            textPanel.Controls.Add(inputBox);
-
-            handPanel = new CardPanel();
-            handPanel.Location = new Point(400, 660);
-
-            textPanel.Location = new Point(1550, 500);
-
-            buttonPanel = new ButtonPanel();
-            buttonPanel.Location = new Point(20, 370);
-
-            heroPanel = new PlayerPanel();
-            heroPanel.Location = new Point(20, 525);
-
-            villainPanel = new PlayerPanel();
-            villainPanel.Location = new Point(20, 10);
-
-            stackPanel = new CardBox(190, 500);
-            stackPanel.Location = new Point(400, 20);
-
-            heroFieldPanel = new FieldPanel(true);
-            heroFieldPanel.Location = new Point(600, 330);
-
-            villainFieldPanel = new FieldPanel(false);
-            villainFieldPanel.Location = new Point(600, 10);
-
-            gamePanel.Controls.Add(buttonPanel);
-            gamePanel.Controls.Add(heroPanel);
-            gamePanel.Controls.Add(handPanel);
-            gamePanel.Controls.Add(textPanel);
-            gamePanel.Controls.Add(stackPanel);
-            gamePanel.Controls.Add(heroFieldPanel);
-            gamePanel.Controls.Add(villainFieldPanel);
-            
-            turnPanel = new TurnPanel();
-            turnPanel.Location = new Point(325, 200);
-
-            gamePanel.Controls.Add(buttonPanel);
-            gamePanel.Controls.Add(heroPanel);
-            gamePanel.Controls.Add(handPanel);
-            gamePanel.Controls.Add(textPanel);
-            gamePanel.Controls.Add(stackPanel);
-            gamePanel.Controls.Add(heroFieldPanel);
-            gamePanel.Controls.Add(villainFieldPanel);
-            gamePanel.Controls.Add(turnPanel);
-            gamePanel.Controls.Add(villainPanel);
-
-            gamePanel.Visible = false;
-        }
-
-        /*
-        private void setupMainMenuPanel()
-        {
-            mainMenuPanel = new DisplayPanel();
-            mainMenuPanel.Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
-            mainMenuPanel.BackColor = Color.DarkRed;
-
-            loginPanel = new Panel();
-            loginPanel.Size = new Size(700, 400);
-            loginPanel.BackColor = Color.Silver;
-            loginPanel.Location = new Point((GUI.FRAMEWIDTH - 700) / 2, 200);
-            loginPanel.Hide();
-
-            Label usernameLabel = new Label();
-            usernameLabel.Size = new Size(400, 50);
-            usernameLabel.Location = new Point(280, 50);
-            usernameLabel.Font = new Font(new FontFamily("Comic Sans MS"), 20);
-            usernameLabel.Text = "Username";
-
-
-            usernameBox = new TextBox();
-            usernameBox.Font = new Font(new FontFamily("Comic Sans MS"), 30);
-            usernameBox.Size = new Size(400, 5);
-            usernameBox.Location = new Point(150, 100);
-            usernameBox.TextAlign = HorizontalAlignment.Center;
-
-            usernameBox.KeyDown += (sender, e) =>
-            {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    GUI.loginWithName(usernameBox.Text);
-                }
-            };
-            
-            Button b = new Button();
-            b.Location = new Point(300, 220);
-            b.Size = new Size(100, 50);
-            b.Font = new Font(new FontFamily("Comic Sans MS"), 20);
-            b.Text = "Login";
-            b.Click += (sender, args) =>
-            {
-                GUI.loginWithName(usernameBox.Text);
-            };
-
-            Button c = new Button();
-            c.Location = new Point(300, 320);
-            c.Size = new Size(100, 50);
-            c.Font = new Font(new FontFamily("Comic Sans MS"), 20);
-            c.Text = "Nyet";
-            c.Click += (sender, args) =>
-            {
-                Console.WriteLine("i'm not entirely sure what this button is supposed to do");
-            };
-
-            startGamePanel = new Panel();
-            startGamePanel.BackColor = Color.DarkKhaki;
-            startGamePanel.Size = new Size(200, 200);
-            startGamePanel.Location = new Point(400, 400);
-            startGamePanel.Hide();
-
-            Button botGameButton = new Button();
-            botGameButton.Location = new Point(20, 20);
-            botGameButton.Text = "Play against no one";
-            startGamePanel.Controls.Add(botGameButton);
-            botGameButton.Click += (a,aa) =>
-            {
-                GameController.newGame(new DummyConnection());
-            };
-
-            loginPanel.Controls.Add(usernameLabel);
-            loginPanel.Controls.Add(usernameBox);
-            loginPanel.Controls.Add(b);
-            loginPanel.Controls.Add(c);
-            
-
-            mainMenuPanel.Controls.Add(startGamePanel);
-            mainMenuPanel.Controls.Add(loginPanel);
-
-            mainMenuPanel.Visible = false;
-        }
-        */
+        
 
         private void setupDeckEditorPanel()
         {
@@ -269,38 +99,19 @@ namespace stonekart
         {
             friendPanel.getWhisper(user, message);
         }
-
-        public void setStep(int s, bool a)
-        {
-            turnPanel.setStep(s, a);
-        }
-
-        public void setMessage(string s)
-        {
-            buttonPanel.setText(s);
-        }
-
-        public void showButtons(int i)
-        {
-            buttonPanel.showButtons(i);
-        }
-
-        public void showAddMana(bool b)
-        {
-            heroPanel.showAddMana(b);
-        }
+        
 
         public void setObservers(Player hero, Player villain, Pile stack)
         {
-            hero.setObserver(heroPanel);
-            villain.setObserver(villainPanel);
+            hero.setObserver(gamePanel.heroPanel);
+            villain.setObserver(gamePanel.villainPanel);
 
-            hero.getHand().setObserver(handPanel);
+            hero.getHand().setObserver(gamePanel.handPanel);
 
-            stack.setObserver(stackPanel);
+            stack.setObserver(gamePanel.stackPanel);
 
-            hero.getField().setObserver(heroFieldPanel);
-            villain.getField().setObserver(villainFieldPanel);
+            hero.getField().setObserver(gamePanel.heroFieldPanel);
+            villain.getField().setObserver(gamePanel.villainFieldPanel);
         }
         
     }
@@ -396,15 +207,17 @@ namespace stonekart
     public class GamePanel : DisplayPanel
     {
         private TextBox inputBox, outputBox;
-        private CardPanel handPanel;
-        private PlayerPanel heroPanel, villainPanel;
+        public CardPanel handPanel;
+        public PlayerPanel heroPanel, villainPanel;
         private ButtonPanel buttonPanel;
-        private CardBox stackPanel;
-        private FieldPanel heroFieldPanel, villainFieldPanel;
+        public CardBox stackPanel;
+        public FieldPanel heroFieldPanel;
+        public FieldPanel villainFieldPanel;
         private TurnPanel turnPanel;
 
         public GamePanel()
         {
+            BackColor = Color.Silver;
             Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
 
             inputBox = new TextBox();
@@ -412,7 +225,7 @@ namespace stonekart
             {
                 if (args.KeyCode != Keys.Enter) { return; }
 
-                Console.WriteLine(inputBox.Text);
+                Console.WriteLine("user typed in chat box: " + inputBox.Text);
                 inputBox.Clear();
             };
             inputBox.Size = new Size(200, 40);
@@ -428,6 +241,7 @@ namespace stonekart
             FlowLayoutPanel textPanel = new FlowLayoutPanel();
             textPanel.FlowDirection = FlowDirection.LeftToRight;
             textPanel.Size = new Size(200, 440);
+            textPanel.Location = new Point(1550, 100);
 
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
@@ -435,7 +249,6 @@ namespace stonekart
             handPanel = new CardPanel();
             handPanel.Location = new Point(400, 660);
 
-            textPanel.Location = new Point(1550, 500);
 
             buttonPanel = new ButtonPanel();
             buttonPanel.Location = new Point(20, 370);
@@ -477,6 +290,26 @@ namespace stonekart
             Controls.Add(villainPanel);
 
             Visible = false;
+        }
+
+        public void setStep(int s, bool a)
+        {
+            turnPanel.setStep(s, a);
+        }
+
+        public void setMessage(string s)
+        {
+            buttonPanel.setText(s);
+        }
+
+        public void showButtons(int i)
+        {
+            buttonPanel.showButtons(i);
+        }
+
+        public void showAddMana(bool b)
+        {
+            heroPanel.showAddMana(b);
         }
     }
 

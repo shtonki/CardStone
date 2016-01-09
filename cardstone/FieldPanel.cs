@@ -4,8 +4,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-
-    class FieldPanel : Panel, GameElement, Observer
+    public class FieldPanel : Panel, GameElement, Observer
     {
         private SnapCardButton[] buttons;
         private const int BUTTONS = 10;

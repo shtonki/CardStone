@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    sealed class CardPanel : Panel, Observer
+    public sealed class CardPanel : Panel, Observer
     {
         //public static int WIDTH = CardButton.WIDTH*6 + 5, HEIGHT = CardButton.HEIGHT + 5;
         public static int WIDTH = 210*6+5, HEIGHT = 285;
