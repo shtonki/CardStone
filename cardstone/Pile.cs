@@ -11,7 +11,7 @@ namespace stonekart
     /// </summary>
     public class Pile : Observable
     {
-        private List<Card> cards;
+        public static List<Card> cards;
 
         public int Count { get { return cards.Count; }  }
 

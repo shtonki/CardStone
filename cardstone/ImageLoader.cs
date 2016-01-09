@@ -10,7 +10,7 @@ namespace stonekart
     /// <summary>
     /// It just werks
     /// </summary>
-    class ImageLoader
+    public class ImageLoader
     {
         private const string cardArtPath = @"res/IMG/card/";
         private const string framePath = @"res/IMG/frame/";

@@ -203,8 +203,6 @@ namespace stonekart
             owner = p;
         }
 
-
-
         public Type getType()
         {
             return type;
@@ -255,8 +253,6 @@ namespace stonekart
             notifyObserver();
         }
 
-
-        
         public bool isAttacking()
         {
             return attacking;

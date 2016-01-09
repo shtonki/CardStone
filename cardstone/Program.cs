@@ -34,7 +34,8 @@ namespace stonekart
 
             Network.connect();
 
-            GUI.transitionToMainMenu();
+            //GUI.transitionToMainMenu();
+            GUI.transitionToDeckEditor();
             //GUI.showLoginBox();
         }
 
