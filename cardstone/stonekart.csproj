@@ -85,6 +85,9 @@
     <Compile Include="GUI.Designer.cs">
       <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="MainFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Network.cs" />
     <Compile Include="NOTRSA.cs" />
     <Compile Include="Observable.cs" />
@@ -101,6 +104,7 @@
     <Compile Include="TurnPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WaitFor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -139,6 +143,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="todos.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -41,7 +41,7 @@ class Connection
     /// </summary>
     /// <param name="host">The remote host to which to connect</param>
     /// <param name="to">The timeout for the connection</param>
-    public Connection(string host, int to = 2) : this(anonymousFunction(host, to).Client)
+    public Connection(string host, int to = 1) : this(anonymousFunction(host, to).Client)
     {
     }
 

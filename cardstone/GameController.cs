@@ -10,7 +10,36 @@ namespace stonekart
     static class GameController
     {
         public static Game currentGame { get; private set; }
-        
+
+        public static void startGame()
+        {
+            setup();
+
+            start();
+        }
+
+        private static void setup()
+        {
+            Settings.loadSettings();
+
+            ImageLoader.init();
+            FontLoader.init();
+
+            GUI.createFrame();
+        }
+
+        private static void start()
+        {
+            bool connected = Network.connect();
+            
+            GUI.transitionToMainMenu();
+
+            
+            GUI.login();
+            
+            GUI.showPlayPanel();
+        }
+
         public static void newGame(GameConnection c)
         {
             Thread t = new Thread(newGameT);

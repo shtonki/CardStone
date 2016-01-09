@@ -12,17 +12,11 @@ namespace stonekart
 {
     class ButtonPanel : Panel
     {
-        private GameElementButton
+        private ChoiceButton
             cancel,
             accept;
 
-        public const int
-            NOTHING = 0,
-            CANCEL = 1,
-            ACCEPT = 2;
-
         private static Size
-            HIDE = new Size(0, 0),
             SHOW = new Size(90, 30);
 
         private Label textLabel;
@@ -37,8 +31,8 @@ namespace stonekart
             textLabel.Location = new Point(10, 10);
             textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
 
-            accept = new GameElementButton(ACCEPT);
-            accept.Size = HIDE;
+            accept = new ChoiceButton(GUI.ACCEPT);
+            accept.Visible = false;
             accept.BackColor = Color.GhostWhite;
             accept.Text = "Accept";
             accept.Font = new Font(new FontFamily("Comic Sans MS"), 12);
@@ -48,8 +42,8 @@ namespace stonekart
                 buttonPressed(accept);
             };
 
-            cancel = new GameElementButton(CANCEL);
-            cancel.Size = HIDE;
+            cancel = new ChoiceButton(GUI.CANCEL);
+            cancel.Visible = false;
             cancel.BackColor = Color.GhostWhite;
             cancel.Text = "Cancel";
             cancel.Font = new Font(new FontFamily("Comic Sans MS"), 12);
@@ -80,23 +74,23 @@ namespace stonekart
         {
             Invoke(new Action(() =>
             {
-                accept.Size = (i & ACCEPT) != 0 ? SHOW : HIDE;
-                cancel.Size = (i & CANCEL) != 0 ? SHOW : HIDE;
+                accept.Visible = (i & GUI.ACCEPT) != 0;
+                cancel.Visible = (i & GUI.CANCEL) != 0;
             }));
             
         }
 
-        private void buttonPressed(GameElementButton b)
+        private void buttonPressed(ChoiceButton b)
         {
             GameController.currentGame.fooPressed(b);
         }
     }
 
-    class GameElementButton : Button, GameElement
+    class ChoiceButton : Button, GameElement
     {
         private int type;
 
-        public GameElementButton(int i)
+        public ChoiceButton(int i)
         {
             type = i;
         }

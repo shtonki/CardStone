@@ -1,0 +1,2 @@
+* Add a 'WaitForResult' class
+* Allow resizing of the game window

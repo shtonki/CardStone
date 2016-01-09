@@ -18,24 +18,9 @@ namespace stonekart
     {
         static void Main(string[] args)
         {
-            //xd();
-
             CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
 
-            Settings.loadSettings();
-
-            //FontLoader.init();
-            
-            
-            ImageLoader.init();
-            FontLoader.init();
-
-            GUI.createFrame();
-
-            Network.connect();
-
-            GUI.transitionToMainMenu();
-            //GUI.showLoginBox();
+            GameController.startGame();
         }
 
         

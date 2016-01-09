@@ -476,11 +476,11 @@ namespace stonekart
                 GUI.showButtons(ACCEPT);
                 while (true)
                 {
-                    GameElement f = getFoo();
-                    if (f is GameElementButton)
+                    GameElement f = getGameElement();
+                    if (f is ChoiceButton)
                     {
-                        var b = (GameElementButton)f;
-                        if (b.getType() == ButtonPanel.ACCEPT)
+                        var b = (ChoiceButton)f;
+                        if (b.getType() == GUI.ACCEPT)
                         {
                             GUI.clear();
                             raiseAction(new CastAction());
@@ -564,7 +564,7 @@ namespace stonekart
             while (i < targets.Length)
             {
                 Target t = null;
-                GameElement f = getFoo();
+                GameElement f = getGameElement();
                 if (f is PlayerButton)
                 {
                     t = new Target(((PlayerButton)f).getPlayer());
@@ -631,11 +631,11 @@ namespace stonekart
                 GUI.showButtons(ACCEPT);
                 while (true)
                 {
-                    GameElement f = getFoo();
-                    if (f is GameElementButton)
+                    GameElement f = getGameElement();
+                    if (f is ChoiceButton)
                     {
-                        var b = (GameElementButton)f;
-                        if (b.getType() == ButtonPanel.ACCEPT)
+                        var b = (ChoiceButton)f;
+                        if (b.getType() == GUI.ACCEPT)
                         {
                             GUI.clear();
 
@@ -675,7 +675,29 @@ namespace stonekart
 
         private void choseDefenders()
         {
-            
+            while (true)
+            {
+                Card blocker, blocked;
+
+                GUI.setMessage("Choose blocker");
+                //GUI.showButtons();
+
+                while (true)
+                {
+                    GameElement e = getGameElement();
+                    if (e is CardButton)
+                    {
+                        CardButton b = (CardButton)e;
+                        Card c = b.getCard();
+
+                        
+                    }
+                    else if (e is ChoiceButton)
+                    {
+                        ChoiceButton c = (ChoiceButton)e;
+                    }
+                }
+            }
         }
 
         private void combatDamage()
@@ -722,7 +744,7 @@ namespace stonekart
         private GameElement f;
         private AutoResetEvent e = new AutoResetEvent(false);
 
-        private GameElement getFoo()
+        private GameElement getGameElement()
         {
             e.WaitOne();
             if (f == null) { throw new Exception("this should never happen kappa"); }
@@ -736,7 +758,7 @@ namespace stonekart
         {
             while (true)
             {
-                GameElement f = getFoo();
+                GameElement f = getGameElement();
                 if (f is CardButton)
                 {
                     return ((CardButton)f).getCard();
@@ -744,16 +766,16 @@ namespace stonekart
             }
         }
 
-        private GameElementButton getButton(int i)
+        private ChoiceButton getButton(int i)
         {
             GUI.showButtons(i);
             while (true)
             {
-                GameElement f = getFoo();
-                if (f is GameElementButton)
+                GameElement f = getGameElement();
+                if (f is ChoiceButton)
                 {
                     GUI.showButtons(NONE);
-                    return (GameElementButton)f;
+                    return (ChoiceButton)f;
                 }
             }
         }
@@ -762,7 +784,7 @@ namespace stonekart
         {
             while (true)
             {
-                GameElement f = getFoo();
+                GameElement f = getGameElement();
                 if (f is PlayerPanel.ManaButton)
                 {
                     return ((PlayerPanel.ManaButton)f).getColor();
@@ -777,9 +799,9 @@ namespace stonekart
         }
 
         private const int
-            NONE = ButtonPanel.NOTHING,
-            ACCEPT = ButtonPanel.ACCEPT,
-            ACCEPTCANCEL = ButtonPanel.ACCEPT | ButtonPanel.CANCEL;
+            NONE = GUI.NOTHING,
+            ACCEPT = GUI.ACCEPT,
+            ACCEPTCANCEL = GUI.ACCEPT | GUI.CANCEL;
 
 
         private class KappaMan
