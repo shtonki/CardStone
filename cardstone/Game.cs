@@ -337,7 +337,11 @@ namespace stonekart
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
             }
 
-            if (attackers.Length == 0) { return false; }
+            if (attackers.Length == 0)
+            {
+                attackers = null;
+                return false;
+            }
 
             foreach (var a in attackers)
             {
