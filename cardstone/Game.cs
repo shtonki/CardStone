@@ -130,14 +130,14 @@ namespace stonekart
                 moveCardTo(v.card, stack);  //v.card.moveTo(stack);
                 stackxd.Push(v);
 
-                v.card.getOwner().notifyObserver();
+                v.card.owner.notifyObserver();
             }));
 
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.MOVECARD, @gevent =>
             {
                 MoveCardEvent e = (MoveCardEvent)gevent;
                 moveCardTo(e.getCard(), e.getLocation());//e.getCard().moveTo(e.getLocation());
-                e.getCard().getOwner().notifyObserver();
+                e.getCard().owner.notifyObserver();
             }));
 
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.GAINMANA, @gevent =>
@@ -315,7 +315,7 @@ namespace stonekart
                 attackers = chooseMultiple("Choose attackers", cb =>
                 {
                     Card c = cb.getCard();
-                    if (c.getOwner() == hero && c.canAttack() && !(c.attacking))
+                    if (c.owner == hero && c.canAttack() && !(c.attacking))
                     {
                         cb.setBorder(Color.Red);
                         clearMe.Add(cb);
@@ -335,6 +335,10 @@ namespace stonekart
             else
             {
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
+                foreach (Card c in attackers)
+                {
+                    GUI.getCardButtonByCard(c).setBorder(Color.Red);
+                }
             }
 
             if (attackers.Length == 0)
@@ -563,25 +567,6 @@ namespace stonekart
             }
         }
 
-        private bool cmp(CastAction a, CastAction b)
-        {
-            if (a.isPass() != b.isPass()) { return false; }
-
-            StackWrapperFuckHopeGasTheKikes sa = a.getStackWrapper(), sb = b.getStackWrapper();
-
-            if (sa.ability != sb.ability ||
-                sa.card != sb.card ||
-                sa.targets.Length != sb.targets.Length) { return false; }
-
-            for (int i = 0; i < sa.targets.Length; i++)
-            {
-                Target ta = sa.targets[i], tb = sb.targets[i];
-                if (ta.getPlayer() != tb.getPlayer() || ta.getCard() != tb.getCard()) { return false; }
-            }
-
-            return true;
-        }
-
         private bool checkAutoPass()
         {
             return false;
@@ -729,7 +714,7 @@ namespace stonekart
                             CardButton b = (CardButton)e;
                             Card c = b.getCard();
 
-                            if (!c.canDefend()) { continue; }
+                            if (c.owner == hero && !c.canDefend()) { continue; }
 
                             if (c.defending == null)
                             {

@@ -14,8 +14,9 @@ namespace stonekart
         private int id;
         private CardId cardId;
         public Location location { get; set; }
-        private Player owner, controller;
-        
+        public Player owner { get; private set; }
+        public Player controller { get; private set; }
+
         public bool attacking { get; set; }
         public bool topped { get; private set; }
 
@@ -164,10 +165,6 @@ namespace stonekart
             return castingCost;
         }
 
-        public Player getOwner()
-        {
-            return owner;
-        }
 
         public Player getController()
         {
@@ -269,7 +266,6 @@ namespace stonekart
 
         public bool canDefend()
         {
-            throw new NotImplementedException();
             return location.pile == LocationPile.FIELD;
         }
 

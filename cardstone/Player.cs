@@ -21,6 +21,8 @@ namespace stonekart
 
         public Player(Game g, LocationPlayer l)
         {
+            Console.WriteLine("created a player");
+
             game = g;
             side = l;
 

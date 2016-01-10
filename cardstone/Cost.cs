@@ -112,7 +112,7 @@ namespace stonekart
 
         public override int[] check(Card card)
         {
-            Player p = card.getOwner();
+            Player p = card.owner;
 
             int[] cs = new int[5];
 
@@ -131,7 +131,7 @@ namespace stonekart
 
         public override void pay(Card card, int[] i)
         {
-            card.getOwner().spendMana(i);
+            card.owner.spendMana(i);
         }
 
         public int[] getColours()
