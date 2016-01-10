@@ -187,12 +187,25 @@ namespace stonekart
             frame.mainMenuPanel.startGamePanel.setVisible(true);
         }
         
+        public static void globalEscape()
+        {
+            if (!frame.focusCleared())
+            {
+                frame.clearFocus();
+            }
+            else
+            {
+                frame.handleGlobalKeyDown(Keys.Escape);
+            }
+        }
+        
 
         public const int
             NOTHING = 0,
             CANCEL = 1,
             ACCEPT = 2;
 
+        //todo(jasin) sholdn't be const fam
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
     }
 
@@ -287,11 +300,24 @@ namespace stonekart
     class GlobalMouseHandler : IMessageFilter
     {
 
-        private const int left = 0x201, right = 0x205;
+        private const int left = 0x201, right = 0x205, keydown = 0x0100;
+
+        private const int escape = 0x1B;
 
         public bool PreFilterMessage(ref Message m)
         {
-            if (m.Msg == left || m.Msg == right)
+            if (m.Msg == keydown)
+            {
+                int v = m.WParam.ToInt32();
+                //Console.WriteLine(v);
+                if (v == escape)
+                {
+                    GUI.globalEscape();
+                    return true;
+                }
+            }
+
+            else if (m.Msg == left || m.Msg == right)
             {
                 
             }

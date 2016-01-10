@@ -11,6 +11,8 @@ namespace stonekart
     //todo(seba) make this entire thing serializable
     public abstract class GameAction
     {
+
+        //todo(seba) just rename these ToString and Parse because we aren't actually imbeciles we just pretend for the sake of irony
         /// <summary>
         /// Translates the GameAction to a string which can be sent to the other player
         /// </summary>
@@ -179,7 +181,7 @@ namespace stonekart
                 if (t.isPlayer())
                 {
                     ts.Append("p");
-                    ts.Append(t.getPlayer().getSide());
+                    ts.Append((int)t.getPlayer().getSide());
                 }
                 else if (t.isCreature())
                 {

@@ -527,7 +527,6 @@ namespace stonekart
                         CardButton b = (CardButton)f;
                         Card c = b.getCard();
                         var abilities = c.getAvailableActivatedAbilities(main);
-
                         ActivatedAbility a;
                         if (abilities.Count == 0)
                         {

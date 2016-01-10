@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Resources;
 using System.Windows.Forms;
 
 namespace stonekart
@@ -8,8 +9,7 @@ namespace stonekart
 
     public partial class MainFrame : Form
     {
-        //todo(jasin) sholdn't be const fam
-        
+
         public MainMenuPanel mainMenuPanel { get; private set; }
         
         public GamePanel gamePanel { get; private set; }
@@ -18,10 +18,18 @@ namespace stonekart
 
         public FriendPanel friendPanel { get; private set; }
 
-        private Panel activePanel;
-        
+        private DisplayPanel activePanel;
+        private Button labelx;
+
         public MainFrame()
         {
+            labelx = new Button();
+            labelx.Size = new Size(0, 0);
+            labelx.KeyDown += (sender, args) =>
+            {
+                handleGlobalKeyDown(args.KeyCode);
+            };
+
             //InitializeComponent();
             BackColor = Color.Fuchsia;
             Application.AddMessageFilter(new GlobalMouseHandler());
@@ -44,10 +52,11 @@ namespace stonekart
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
 
-
+            Controls.Add(labelx);       //todo(seba) figure out why the fuck the game just actually stops working if you add this last instead of first like what the fuck is even going on at this point microsoft
             Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
             Controls.Add(friendPanel);
+            Controls.Add(deckEditorPanel);
             Controls.Add(deckEditorPanel);
 
             friendPanel.BringToFront();
@@ -56,7 +65,11 @@ namespace stonekart
 
             GUI.frameLoaded.Set();
         }
-        
+
+        public void handleGlobalKeyDown(Keys key)
+        {
+            activePanel?.handleKeyPress(key);
+        }
 
         private void setupDeckEditorPanel()
         {
@@ -65,7 +78,7 @@ namespace stonekart
             deckEditorPanel.Visible = false;
         }
 
-        public void transitionTo(Panel p)
+        public void transitionTo(DisplayPanel p)
         {
             activePanel = p;
             if (activePanel.InvokeRequired)
@@ -99,7 +112,16 @@ namespace stonekart
         {
             friendPanel.getWhisper(user, message);
         }
-        
+
+        public void clearFocus()
+        {
+            if (!labelx.Focus()) { throw new MissingSatelliteAssemblyException(); }
+        }
+
+        public bool focusCleared()
+        {
+            return labelx.Focused;
+        }
 
         public void setObservers(Player hero, Player villain, Pile stack)
         {
@@ -202,6 +224,10 @@ namespace stonekart
             Visible = false;
         }
 
+        public override void handleKeyPress(Keys key)
+        {
+            Console.WriteLine("Pressed {0} in main menu", key);
+        }
     }
 
     public class GamePanel : DisplayPanel
@@ -406,7 +432,10 @@ namespace stonekart
 
     public class DisplayPanel : Panel
     {
-
+        public virtual void handleKeyPress(Keys key)
+        {
+            
+        }
     }
 
 }
