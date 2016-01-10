@@ -389,14 +389,19 @@ namespace stonekart
 
         private void endCombatStep()
         {
-            foreach (Card c in attackers)
+            if (attackers != null)
             {
-                GUI.getCardButtonByCard(c).setBorder(null);
-            }
 
-            foreach (Card c in defenders)
-            {
-                GUI.getCardButtonByCard(c).setBorder(null);
+                foreach (Card c in attackers)
+                {
+                    GUI.getCardButtonByCard(c).setBorder(null);
+                }
+
+                foreach (Card c in defenders)
+                {
+                    GUI.getCardButtonByCard(c).setBorder(null);
+                }
+                attackers = defenders = null;
             }
 
             raiseEvent(new StepEvent(StepEvent.ENDCOMBAT));
