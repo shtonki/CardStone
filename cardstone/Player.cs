@@ -122,7 +122,8 @@ namespace stonekart
 
             foreach (Card c in field.getCards())
             {
-                c.unTop();
+                c.topped = false;
+                c.summoningSick = false;
             }
         }
 

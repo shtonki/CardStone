@@ -12,6 +12,8 @@ namespace stonekart
 {
     public class Game
     {
+        private GameUI gui;
+
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
 
@@ -28,8 +30,9 @@ namespace stonekart
 
         private Stack<StackWrapper> stackxd;
         
-        public Game(GameConnection cn)
+        public Game(GameConnection cn, GameUI g)
         {
+            gui = g;
             connection = cn;
             connection.setGame(this);
             cardFactory = new CardFactory();
@@ -45,7 +48,7 @@ namespace stonekart
             stackxd = new Stack<StackWrapper>();
             
 
-            GUI.setObservers(hero, villain, stack);
+            gui.setObservers(hero, villain, stack);
         }
 
         public void start()
@@ -108,6 +111,7 @@ namespace stonekart
         {
             kappa = new EventHandler();
 
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.TOPCARD, _topcard));
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.STEP, _step));
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DRAW, _draw));
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.CAST, _cast));
@@ -120,6 +124,11 @@ namespace stonekart
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, _buryCreature));
         }
 
+        private void _topcard(GameEvent gevent)
+        {
+            TopEvent e = (TopEvent)gevent;
+            e.getCard().topped = true;
+        }
         private void _step(GameEvent gevent)
         {
             
@@ -213,7 +222,7 @@ namespace stonekart
         private void loop()
         {
             active = connection.asHomePlayer();
-            GUI.setStep(0, active);
+            gui.setStep(0, active);
 
             while (true)
             {
@@ -270,13 +279,13 @@ namespace stonekart
             int s;
             if (active)
             {
-                GUI.showAddMana(true);
+                gui.showAddMana(true);
                 int c;
                 do
                 {
                     c = getManaColor();
                 } while (hero.getMaxMana(c) == 6);
-                GUI.showAddMana(false);
+                gui.showAddMana(false);
                 s = c;
                 raiseAction(new SelectAction(c));
             }
@@ -338,7 +347,7 @@ namespace stonekart
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
                 foreach (Card c in attackers)
                 {
-                    GUI.getCardButton(c).setBorder(Color.Red);
+                    gui.getCardButton(c).setBorder(Color.Red);
                 }
             }
 
@@ -350,7 +359,7 @@ namespace stonekart
 
             foreach (var a in attackers)
             {
-                a.setTopped(true);  //todo(seba) use event and check for "vigilance"
+                raiseEvent(new TopEvent(a));
                 //todo attackers event
             }
             
@@ -403,12 +412,12 @@ namespace stonekart
 
                 foreach (Card c in attackers)
                 {
-                    GUI.getCardButton(c).setBorder(null);
+                    gui.getCardButton(c).setBorder(null);
                 }
 
                 foreach (Card c in defenders)
                 {
-                    GUI.getCardButton(c).setBorder(null);
+                    gui.getCardButton(c).setBorder(null);
                 }
                 attackers = defenders = null;
             }
@@ -481,7 +490,7 @@ namespace stonekart
         private void advanceStep()
         {
             step = (step + 1)%10;
-            GUI.setStep(step, active);
+            gui.setStep(step, active);
         }
 
         private void checkGameState()
@@ -517,8 +526,14 @@ namespace stonekart
         /// <returns>A Card if a card was selected, null otherwise</returns>
         private CastAction castOrPass(bool main)
         {
+            gui.setMessage("You have priority");
+            gui.setChoiceButtons(ACCEPT);
+
             CastAction a = _castOrPass(main);
             raiseAction(a ?? new CastAction());
+
+            gui.clear();
+
             return a;
         }
 
@@ -528,19 +543,17 @@ namespace stonekart
             {
                 return null;
             }
-            GUI.setMessage("You have priority");
             while (true)
             {
-                GUI.showButtons(ACCEPT);
                 while (true)
                 {
                     GameElement f = getGameElement();
                     if (f is ChoiceButton)
                     {
                         var b = (ChoiceButton)f;
-                        if (b.getType() == GUI.ACCEPT)
+                        if (b.choice == GUI.ACCEPT)
                         {
-                            GUI.clear();
+                            gui.clear();
                             return null;
                         }
                     }
@@ -552,7 +565,7 @@ namespace stonekart
                         ActivatedAbility a;
                         if (abilities.Count == 0)
                         {
-                            a = null;
+                            continue;
                         }
                         else if (abilities.Count == 1)
                         {
@@ -564,18 +577,16 @@ namespace stonekart
                         }
 
 
+                        
+                        var v = a.getCost().check(c);
+                        if (v == null) { continue; }
 
-                        if (a != null)
-                        {
-                            var v = a.getCost().check(c);
-                            if (v != null)
-                            {
-                                var targets = getTargets(a); 
-                                GUI.clear();
-                                var sw = new StackWrapper(c, a, targets);
-                                return new CastAction(sw, v);
-                            }
-                        }
+                        Target[] targets = getTargets(a); 
+                        if (targets == null) { continue; }
+
+                        gui.clear();
+                        var sw = new StackWrapper(c, a, targets);
+                        return new CastAction(sw, v);
                     }
                 }
             }
@@ -589,7 +600,9 @@ namespace stonekart
         //todo(seba) allow canceling
         private Target[] getTargets(Ability a)
         {
-            GUI.setMessage("Select target(s)");
+            gui.push();
+            gui.setMessage("Select target(s)");
+            gui.setChoiceButtons(GUI.CANCEL);
 
             Target[] targets = new Target[a.countTargets()];
             TargetRule[] rules = a.getTargetRules();
@@ -607,7 +620,11 @@ namespace stonekart
                 {
                     t = new Target(((CardButton)f).getCard());
                 }
-
+                else if (f is ChoiceButton && ((ChoiceButton)f).choice == GUI.CANCEL)
+                {
+                    targets = null;
+                    break;
+                }
                 //add option to cancel this shit
 
                 if (t != null && rules[i].check(t))
@@ -615,14 +632,15 @@ namespace stonekart
                     targets[i++] = t;
                 }
             }
+            gui.pop();
             return targets;
         }
 
         private CastAction demandCastOrPass()
         {
-            GUI.setMessage("Opponent has priority");
+            gui.setMessage("Opponent has priority");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            GUI.setMessage("");
+            gui.setMessage("");
             return v.isPass() ? null : v;
         }
 
@@ -647,21 +665,21 @@ namespace stonekart
 
         private Card[] chooseMultiple(string message, Func<CardButton, bool> xd)
         {
-            GUI.setMessage(message);
+            gui.setMessage(message);
 
             List<CardButton> bs = new List<CardButton>();
             while (true) 
             {
-                GUI.showButtons(ACCEPT);
+                gui.setChoiceButtons(ACCEPT);
                 while (true)
                 {
                     GameElement f = getGameElement();
                     if (f is ChoiceButton)
                     {
                         var b = (ChoiceButton)f;
-                        if (b.getType() == GUI.ACCEPT)
+                        if (b.choice == GUI.ACCEPT)
                         {
-                            GUI.clear();
+                            gui.clear();
 
                             return bs.Select(bt => bt.getCard()).ToArray();
                         }
@@ -700,7 +718,7 @@ namespace stonekart
             //todo(seba) could keep track of undefended attackers
             List<Card> blockers = new List<Card>();
 
-            GUI.showButtons(GUI.ACCEPT);
+            gui.setChoiceButtons(GUI.ACCEPT);
             while (true)
             {
                 CardButton blocker, blocked;
@@ -708,8 +726,8 @@ namespace stonekart
                 while (true)
                 {
                     blocker = blocked = null;
-                    GUI.setMessage("Choose defenders");
-                    GUI.showButtons(GUI.ACCEPT);
+                    gui.setMessage("Choose defenders");
+                    gui.setChoiceButtons(GUI.ACCEPT);
 
                     while (blocker == null)
                     {
@@ -738,15 +756,15 @@ namespace stonekart
                         else if (e is ChoiceButton)
                         {
                             ChoiceButton c = (ChoiceButton)e;
-                            if (c.getType() == GUI.ACCEPT)
+                            if (c.choice == GUI.ACCEPT)
                             {
                                 goto end;   // *unzips fedora*
                             }
                         }
                     }
 
-                    GUI.setMessage("Blocking what?");
-                    GUI.showButtons(GUI.CANCEL);
+                    gui.setMessage("Blocking what?");
+                    gui.setChoiceButtons(GUI.CANCEL);
 
                     while (blocked == null)
                     {
@@ -758,7 +776,7 @@ namespace stonekart
                         else if (e is ChoiceButton)
                         {
                             ChoiceButton c = (ChoiceButton)e;
-                            if (c.getType() == GUI.CANCEL)
+                            if (c.choice == GUI.CANCEL)
                             {
                                 break;
                             }
@@ -872,13 +890,13 @@ namespace stonekart
 
         private ChoiceButton getButton(int i)
         {
-            GUI.showButtons(i);
+            gui.setChoiceButtons(i);
             while (true)
             {
                 GameElement f = getGameElement();
                 if (f is ChoiceButton)
                 {
-                    GUI.showButtons(NONE);
+                    gui.setChoiceButtons(NONE);
                     return (ChoiceButton)f;
                 }
             }
@@ -896,7 +914,7 @@ namespace stonekart
             }
         }
 
-        public void fooPressed(GameElement gameElement)
+        public void gameElementPressed(GameElement gameElement)
         {
             f = gameElement;
             e.Set();

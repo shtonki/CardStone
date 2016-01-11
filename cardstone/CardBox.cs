@@ -13,7 +13,7 @@ namespace stonekart
         private const int BUTTONS = 30;
         private CardButton[] buttons;
 
-        public CardBox(int width, int height)
+        public CardBox(GameUI g, int width, int height)
         {
             Size = new Size(width, height);
             BackColor = Color.LightGreen;
@@ -21,7 +21,7 @@ namespace stonekart
 
             for (int i = 0; i < BUTTONS; i++)
             {
-                CardButton b = new CardButton();
+                CardButton b = new CardButton(g);
                 buttons[BUTTONS - i - 1] = b;
                 b.Location = new Point(5, -10 + 22 * (BUTTONS - i));
                 Controls.Add(b);

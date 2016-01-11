@@ -14,6 +14,7 @@ namespace stonekart
         private Player player;
         private Label health;
         public PlayerButton playerButton { get; private set; }
+        private GameUI game;
 
         private string
             hlt = "x",
@@ -24,8 +25,10 @@ namespace stonekart
         private static Font f = new Font(new FontFamily("Comic Sans MS"), 20);
 
         private static int x = 0;
-        public PlayerPanel()
+        public PlayerPanel(GameUI g)
         {
+            game = g;
+
             for (int i = 0; i < 5; i++)
             {
                 manaButtons[i] = new ManaButton[6];
@@ -81,7 +84,7 @@ namespace stonekart
                     playerButton.Location = new Point(220, 260);
                     playerButton.Click += (_, __) =>
                     {
-                        GameController.currentGame.fooPressed(playerButton);
+                        game.gameElementPressed(playerButton);
                     };
                     Controls.Add(playerButton);
 
@@ -97,10 +100,10 @@ namespace stonekart
             
         }
 
-        private static void manaButtonPressed(int i, ManaButton b)
+        private void manaButtonPressed(int i, ManaButton b)
         {
             if (b.getState() == ManaButton.HIDDEN) { return; }
-            GameController.currentGame.fooPressed(b);
+            game.gameElementPressed(b);
         }
 
         public void showAddMana(bool y)

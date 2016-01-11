@@ -74,6 +74,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameAction.cs" />
     <Compile Include="GameEvent.cs" />
+    <Compile Include="GameUI.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="GameElement.cs" />

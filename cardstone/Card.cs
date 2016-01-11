@@ -18,7 +18,17 @@ namespace stonekart
         public Player controller { get; private set; }
 
         public bool attacking { get; set; }
-        public bool topped { get; private set; }
+
+        private bool _topped;
+        public bool topped
+        {
+            get { return _topped; }
+            set
+            {
+                _topped = value;
+                notifyObserver();
+            }
+        }
 
         private string name;
         private Type type;
@@ -27,7 +37,7 @@ namespace stonekart
         public StackWrapper stackWrapper;
 
         private int? power, toughness, currentPower, currentToughness;
-        private bool summoningSick;
+        public bool summoningSick { get; set; }
         public Card defending { get; set; }
 
         private List<Ability> abilities;
@@ -215,17 +225,7 @@ namespace stonekart
             return r;
         }
 
-        public void setTopped(bool b)
-        {
-            topped = b;
-            notifyObserver();
-        }
-
-        public void unTop()
-        {
-            setTopped(false);
-            summoningSick = false;
-        }
+        
         
         public void damage(int d)
         {

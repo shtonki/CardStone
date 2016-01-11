@@ -14,9 +14,10 @@ namespace stonekart
         GAINMANAORB,
         ATTACK,
         DEFEND,
-        TOP,
+        TOPCARD,
         UNTOP,
         UNTOPPLAYER,
+        UNTOPCARD,
         MOVECARD,
         STEP,
         RESOLVE,
@@ -117,9 +118,9 @@ namespace stonekart
         }
     }
 
-    class TopEvent : MultiCardEvent
+    class TopEvent : CardEvent
     {
-        public TopEvent(Card c) : base(c, GameEventType.TOP)
+        public TopEvent(Card c) : base(c, GameEventType.TOPCARD)
         {
         }
     }

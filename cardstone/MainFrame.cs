@@ -16,8 +16,10 @@ namespace stonekart
 
         public MainMenuPanel mainMenuPanel { get; private set; }
         
-        public GamePanel gamePanel { get; private set; }
-        
+        //public GamePanel gamePanel { get; private set; }
+
+        private List<GamePanel> gamePanels = new List<GamePanel>(); 
+
         public DisplayPanel deckEditorPanel { get; private set; }
 
         public FriendPanel friendPanel { get; private set; }
@@ -49,7 +51,7 @@ namespace stonekart
             mainMenuPanel = new MainMenuPanel();
 
             //setupGamePanel();
-            gamePanel = new GamePanel();
+            //gamePanel = new GamePanel();
 
             setupDeckEditorPanel();
             
@@ -57,7 +59,7 @@ namespace stonekart
             friendPanel.Location = new Point(10, 880);
 
             Controls.Add(labelx);       //todo(seba) figure out why the fuck the game just actually stops working if you add this last instead of first like what the fuck is even going on at this point microsoft
-            Controls.Add(gamePanel);
+            //Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
             Controls.Add(friendPanel);
             Controls.Add(deckEditorPanel);
@@ -82,20 +84,37 @@ namespace stonekart
             deckEditorPanel.Visible = false;
         }
 
+        /// <summary>
+        /// Creates and binds a new GamePanel to the given GameUI
+        /// </summary>
+        /// <param name="g"></param>
+        public void createGamePanel(GameUI g)
+        {
+            GamePanel r = new GamePanel(g);
+            g.setPanel(r);
+            Invoke(new Action(() => { Controls.Add(r); }));
+        }
+        
         public void transitionTo(DisplayPanel p)
         {
-            activePanel = p;
-            if (activePanel.InvokeRequired)
+            if (activePanel != null)
             {
-                activePanel.Invoke(new Action(() =>
+
+                if (activePanel.InvokeRequired)
+                {
+                    activePanel.Invoke(new Action(() =>
+                    {
+                        activePanel.Visible = false;
+                    }));
+                }
+                else
                 {
                     activePanel.Visible = false;
-                }));
+                }
             }
-            else
-            {
-                activePanel.Visible = false;
-            }
+
+            activePanel = p;
+
             if (p.InvokeRequired)
             {
                 p.Invoke(new Action(() =>
@@ -126,18 +145,7 @@ namespace stonekart
             return labelx.Focused;
         }
 
-        public void setObservers(Player hero, Player villain, Pile stack)
-        {
-            hero.setObserver(gamePanel.heroPanel);
-            villain.setObserver(gamePanel.villainPanel);
-
-            hero.getHand().setObserver(gamePanel.handPanel);
-
-            stack.setObserver(gamePanel.stackPanel);
-
-            hero.getField().setObserver(gamePanel.heroFieldPanel);
-            villain.getField().setObserver(gamePanel.villainFieldPanel);
-        }
+        
         
     }
 
@@ -333,15 +341,16 @@ namespace stonekart
         private TextBox inputBox, outputBox;
         public CardPanel handPanel;
         public PlayerPanel heroPanel, villainPanel;
-        private ButtonPanel buttonPanel;
+        private ChoicePanel choicePanel;
         public CardBox stackPanel;
         public FieldPanel heroFieldPanel;
         public FieldPanel villainFieldPanel;
         private TurnPanel turnPanel;
         private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
 
+        public string message { get { return choicePanel.Text; } set { choicePanel.Text = value; } }
 
-        public GamePanel()
+        public GamePanel(GameUI g)
         {
             BackColor = Color.Silver;
             Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
@@ -372,26 +381,26 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
 
-            handPanel = new CardPanel();
+            handPanel = new CardPanel(g);
             handPanel.Location = new Point(400, 660);
 
 
-            buttonPanel = new ButtonPanel();
-            buttonPanel.Location = new Point(20, 370);
+            choicePanel = new ChoicePanel(g);
+            choicePanel.Location = new Point(20, 370);
 
-            heroPanel = new PlayerPanel();
+            heroPanel = new PlayerPanel(g);
             heroPanel.Location = new Point(20, 525);
 
-            villainPanel = new PlayerPanel();
+            villainPanel = new PlayerPanel(g);
             villainPanel.Location = new Point(20, 10);
 
-            stackPanel = new CardBox(190, 500);
+            stackPanel = new CardBox(g, 190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            heroFieldPanel = new FieldPanel(true);
+            heroFieldPanel = new FieldPanel(g, true);
             heroFieldPanel.Location = new Point(600, 330);
 
-            villainFieldPanel = new FieldPanel(false);
+            villainFieldPanel = new FieldPanel(g ,false);
             villainFieldPanel.Location = new Point(600, 10);
             
             
@@ -401,7 +410,7 @@ namespace stonekart
             turnPanel.Location = new Point(325, 200);
 
             
-            Controls.Add(buttonPanel);
+            Controls.Add(choicePanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
             Controls.Add(textPanel);
@@ -412,21 +421,29 @@ namespace stonekart
             Controls.Add(villainPanel);
             Visible = false;
         }
-        
+
+        public void setObservers(Player hero, Player villain, Pile stack)
+        {
+            hero.setObserver(heroPanel);
+            villain.setObserver(villainPanel);
+
+            hero.getHand().setObserver(handPanel);
+
+            stack.setObserver(stackPanel);
+
+            hero.getField().setObserver(heroFieldPanel);
+            villain.getField().setObserver(villainFieldPanel);
+        }
 
         public void setStep(int s, bool a)
         {
             turnPanel.setStep(s, a);
         }
-
-        public void setMessage(string s)
-        {
-            buttonPanel.setText(s);
-        }
+        
 
         public void showButtons(int i)
         {
-            buttonPanel.showButtons(i);
+            choicePanel.showButtons(i);
         }
 
         public void showAddMana(bool b)
@@ -445,6 +462,7 @@ namespace stonekart
             a.BringToFront();
         }
 
+        //finds center of control relative to the form it's in hence the name fn
         private static Point fn(Control control)
         {
             Point r = control.FindForm().PointToClient(control.Parent.PointToScreen(control.Location));
@@ -453,6 +471,10 @@ namespace stonekart
             return r;
         }
 
+        public override void handleKeyPress(Keys key)
+        {
+
+        }
 
         public void clearArrows()
         {
@@ -463,16 +485,26 @@ namespace stonekart
             arrows.Clear();
         }
 
-        class ButtonPanel : Panel
+        class ChoicePanel : Panel
         {
+            private GameUI game;
+
             private ChoiceButton
                 cancel,
                 accept;
             
             private Label textLabel;
 
-            public ButtonPanel()
+            public override string Text
             {
+                get { return textLabel.Text; }
+                set { setText(value); }
+            }
+
+            public ChoicePanel(GameUI g)
+            {
+                game = g;
+
                 BackColor = Color.CornflowerBlue;
                 Size = new Size(300, 140);
 
@@ -510,7 +542,7 @@ namespace stonekart
 
             }
 
-            public void setText(string s)
+            private void setText(string s)
             {
                 if (s == null)
                 {
@@ -532,7 +564,7 @@ namespace stonekart
 
             private void buttonPressed(ChoiceButton b)
             {
-                GameController.currentGame.fooPressed(b);
+                game.gameElementPressed(b);
             }
         }
     }
@@ -541,18 +573,14 @@ namespace stonekart
 
     class ChoiceButton : Button, GameElement
     {
-        private int type;
+        public int choice { get; private set; }
 
         public ChoiceButton(int i)
         {
-            type = i;
+            choice = i;
             Size = new Size(80, 40);
         }
-
-        public int getType()
-        {
-            return type;
-        }
+        
     }
 
     public class DisplayPanel : Panel

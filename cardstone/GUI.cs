@@ -37,9 +37,9 @@ namespace stonekart
             frameLoaded.WaitOne();
         }   
 
-        public static void transitionToGame()
+        public static void transitionToGame(GameUI g)
         {
-            frame.transitionTo(frame.gamePanel);
+            frame.transitionTo(g.gamePanel);
         }
 
         public static void transitionToMainMenu()
@@ -52,31 +52,17 @@ namespace stonekart
             frame.transitionTo(frame.deckEditorPanel);
         }
 
-        public static void setStep(int s, bool a)
+        /// <summary>
+        /// Creates a GameUI and binds it to a new GamePanel created
+        /// in the current frame.
+        /// </summary>
+        public static GameUI createGameUI()
         {
-            frame.gamePanel.setStep(s, a);
+            GameUI r = new GameUI(nonsense);
+            frame.createGamePanel(r);
+            return r;
         }
 
-        public static void setMessage(string s)
-        {
-            frame.gamePanel.setMessage(s);
-        }
-
-        public static void clear()
-        {
-            setMessage("");
-            showButtons(NOTHING);
-        }
-
-        public static void showButtons(int i)
-        {
-            frame.gamePanel.showButtons(i);
-        }
-
-        public static void showAddMana(bool b)
-        {
-            frame.gamePanel.showAddMana(b);
-        }
 
         public static WindowedPanel showWindow(Control p, string barTitle, bool closeable, Action closeCallback)
         {
@@ -123,23 +109,9 @@ namespace stonekart
             frame.showTell(f, m);
         }
 
-        public static void setObservers(Player h, Player v, Pile s)
-        {
-            frame.setObservers(h, v, s);
-        }
+        
         private static readonly ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense = new ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense();
 
-        public static CardButton getCardButton(Card c)
-        {
-            return c.getObserver(nonsense) as CardButton;
-        }
-
-        public static PlayerButton getPlayerButton(Player p)
-        {
-            PlayerPanel o = p.getObserver(nonsense) as PlayerPanel;
-            return o.playerButton;
-        }
-        
         private static WaitFor<string> logInAs = new WaitFor<string>(); 
 
         public static bool login()
@@ -179,17 +151,6 @@ namespace stonekart
         public static void loginWithName(string x)
         {
             logInAs.signal(x);
-        }
-
-        public static void addArrow(GameElement from, GameElement to)
-        {
-            if (frame.activePanel != frame.gamePanel) { throw new Exception(); }
-            frame.gamePanel.addArrow(from, to);
-        }
-
-        public static void clearArrows()
-        {
-            frame.gamePanel.clearArrows();
         }
 
         public static void showPlayPanel()
@@ -350,8 +311,6 @@ namespace stonekart
             return false;
         }
     }
-
-
 
     //todo(seba) overhaul so that everything uses SPanel
     public class SPanel : Panel

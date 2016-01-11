@@ -16,7 +16,7 @@ namespace stonekart
         private const int NOOFBUTTONS = 20;
         CardButton[] cardButtons;
 
-        public CardPanel()
+        public CardPanel(GameUI g)
         {
             BackColor = Color.Pink;
             Size = new Size(WIDTH, HEIGHT);
@@ -25,7 +25,7 @@ namespace stonekart
 
             for (int i = 0; i < NOOFBUTTONS; i++)
             {
-                cardButtons[i] = new CardButton();
+                cardButtons[i] = new CardButton(g);
                 Controls.Add(cardButtons[i]);
                 cardButtons[i].dbg = i;
             }

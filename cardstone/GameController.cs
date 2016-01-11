@@ -9,8 +9,6 @@ namespace stonekart
 {
     static class GameController
     {
-        public static Game currentGame { get; private set; }
-
         public static void startGame()
         {
             setup();
@@ -63,10 +61,11 @@ namespace stonekart
         private static void newGameT(object o)
         {
             GameConnection c = (GameConnection)o;
-            GUI.transitionToGame();
-            currentGame = new Game(c);
-            currentGame.start();
-            
+            GameUI gui = GUI.createGameUI();
+            Game g = new Game(c, gui);
+            gui.setGame(g);
+            GUI.transitionToGame(gui);
+            g.start();
         }
     }
 }
