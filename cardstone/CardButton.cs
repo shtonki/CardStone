@@ -10,15 +10,10 @@ namespace stonekart
     public class CardButton : Button, GameElement, Observer
     {
         public static int WIDTH = 180, HEIGHT = 280;
-        private static Size HIDE = new Size(0, 0), SHOW = new Size(WIDTH, HEIGHT);
+        private readonly Size size = new Size(WIDTH, HEIGHT);
 
         private static FontFamily fontFamilyA;
-
-        private static int idCtr = 0;
-
-        private int prevIndex;  //for draw order purposes
-
-        private int id;
+        
         private Card card;
 
         private Pen borderPen;
@@ -61,24 +56,39 @@ namespace stonekart
         public CardButton()
         {
             Visible = true;
-            id = idCtr++;
-            Size = SHOW;
-            /*
+            Size = size;
+            
             MouseEnter += (sender, args) =>
             {
-                prevIndex = Parent.Controls.GetChildIndex(this);
-                Parent.Controls.SetChildIndex(this, 0);
+                if (card?.stackWrapper?.targets == null || card.stackWrapper.targets.Length == 0) { return; }
+                foreach (Target t in card.stackWrapper.targets)
+                {
+                    GUI.addArrow(this, targetToGameElement(t));
+                }
             };
 
             MouseLeave += (sender, args) =>
             {
-                Parent.Controls.SetChildIndex(this, prevIndex);
+                GUI.clearArrows();
             };
-            */
+            
             Click += (sender, args) =>
             {
                 GameController.currentGame.fooPressed(this);
             };
+        }
+
+        public int dbg;
+        private GameElement targetToGameElement(Target t)
+        {
+            if (t.isCard())
+            {
+                return GUI.getCardButton(t.getCard());
+            }
+            else
+            {
+                return GUI.getPlayerButton(t.getPlayer());
+            }
         }
 
         //todo(seba) make this a property
@@ -207,11 +217,8 @@ namespace stonekart
 
         public void notifyObserver(Observable o)
         {
-            if (card == null)
-            {
                 card = (Card)o;
-                GUI.setCardButton(card, this);
-            }
+            
             if (InvokeRequired)
             {
                 Invoke(new Action(() => { Visible = card != null; }));

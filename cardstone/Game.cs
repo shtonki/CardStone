@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-
-
 namespace stonekart
 {
     public class Game
@@ -28,7 +26,7 @@ namespace stonekart
 
         private EventHandler kappa;
 
-        private Stack<StackWrapperFuckHopeGasTheKikes> stackxd;
+        private Stack<StackWrapper> stackxd;
         
         public Game(GameConnection cn)
         {
@@ -44,7 +42,7 @@ namespace stonekart
             awayPlayer = cn.asHomePlayer() ? villain : hero;
 
             stack = new Pile(new Location(LocationPile.STACK, LocationPlayer.NOONE));
-            stackxd = new Stack<StackWrapperFuckHopeGasTheKikes>();
+            stackxd = new Stack<StackWrapper>();
             
 
             GUI.setObservers(hero, villain, stack);
@@ -87,16 +85,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.FrothingGoblin,  
-                CardId.FrothingGoblin,  
-                CardId.FrothingGoblin,  
-                CardId.FrothingGoblin,  
-                CardId.FrothingGoblin,  
                 CardId.LightningBolt,
                 CardId.LightningBolt,
                 CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
+                CardId.LightningBolt, 
+                CardId.FrothingGoblin,
+                CardId.FrothingGoblin,
+                CardId.FrothingGoblin,
+                CardId.FrothingGoblin,
             };
         }
 
@@ -106,108 +102,113 @@ namespace stonekart
 
             loop();
         }
-
+        
+        #region eventHandlers
         private void setupEventHandlers()
         {
             kappa = new EventHandler();
 
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.STEP, @g =>
-            {
-                
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DRAW, @gevent =>
-            {
-                DrawEvent e = (DrawEvent)gevent;
-                e.getPlayer().draw(e.getCards());
-                e.getPlayer().notifyObserver();
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.CAST, @gevent =>
-            {
-                CastEvent e = (CastEvent)gevent;
-                var v = e.getStuff();
-                moveCardTo(v.card, stack);  //v.card.moveTo(stack);
-                stackxd.Push(v);
-
-                v.card.owner.notifyObserver();
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.MOVECARD, @gevent =>
-            {
-                MoveCardEvent e = (MoveCardEvent)gevent;
-                moveCardTo(e.getCard(), e.getLocation());//e.getCard().moveTo(e.getLocation());
-                e.getCard().owner.notifyObserver();
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.GAINMANA, @gevent =>
-            {
-                GainManaOrbEvent e = (GainManaOrbEvent)gevent;
-                e.getPlayer().addMana(e.getColor());
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.UNTOPPLAYER, @gevent =>
-            {
-                UntopPlayerEvent e = (UntopPlayerEvent)gevent;
-                e.getPlayer().untop();
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.RESOLVE, @gevent =>
-            {
-                ResolveEvent e = (ResolveEvent)gevent;
-                var x = e.getStuff();
-
-                if (!stackxd.Pop().Equals(x) || stack.peek() != x.card)
-                {
-                    throw new CannotUnloadAppDomainException("we don't need to deal with the immigration \"problem\" that's not politically correct xddd");
-                }
-
-                Ability a = x.ability;
-                Card card = x.card;
-
-                List<GameEvent> es = a.getEffect().resolve(card, x.targets);
-
-                foreach (var v in es)
-                {
-                    kappa.handle(v);
-                }
-
-                if (card.isDummy())
-                {
-                    throw new NotImplementedException();
-                }
-
-                if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
-                {
-                    raiseEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
-                }
-                else
-                {
-                    raiseEvent(new MoveCardEvent(card, LocationPile.FIELD));
-                }
-
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGEPLAYER, @gevent =>
-            {
-                DamagePlayerEvent e = (DamagePlayerEvent)gevent;
-                e.getPlayer().damage(e.getDamage());
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGECREATURE, @gevent =>
-            {
-                DamageCreatureEvent e = (DamageCreatureEvent)gevent;
-                e.getCreature().damage(e.getDamage());
-            }));
-
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, @gevent =>
-            {
-                BuryCreature e = (BuryCreature)gevent;
-                raiseEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
-            }));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.STEP, _step));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DRAW, _draw));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.CAST, _cast));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.MOVECARD, _moveCard));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.GAINMANAORB, _gainManaOrb));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.UNTOPPLAYER, _untopPlayer));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.RESOLVE, _resolve));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGEPLAYER, _damagePlayer));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGECREATURE, _damageCreature));
+            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, _buryCreature));
         }
-        
 
+        private void _step(GameEvent gevent)
+        {
+            
+        }
+        private void _draw(GameEvent gevent)
+        {
+            DrawEvent e = (DrawEvent)gevent;
+            e.getPlayer().draw(e.getCards());
+            e.getPlayer().notifyObserver();
+        }
+        private void _cast(GameEvent gevent)
+        {
+            CastEvent e = (CastEvent)gevent;
+            StackWrapper v = e.getStackWrapper();
+            moveCardTo(v.card, stack); 
+            stackxd.Push(v);
+            v.card.stackWrapper = v;
+
+            v.card.owner.notifyObserver();
+        }
+        private void _resolve(GameEvent gevent)
+        {
+            ResolveEvent e = (ResolveEvent)gevent;
+            var x = e.getStackWrapper();
+
+            if (!stackxd.Pop().Equals(x) || stack.peek() != x.card)
+            {
+                throw new CannotUnloadAppDomainException("we don't need to deal with the immigration \"problem\" that's not politically correct xddd");
+            }
+
+            Ability a = x.ability;
+            Card card = x.card;
+
+            List<GameEvent> es = a.getEffect().resolve(card, x.targets);
+
+            foreach (var v in es)
+            {
+                kappa.handle(v);
+            }
+
+            if (card.isDummy())
+            {
+                throw new NotImplementedException();
+            }
+
+            if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+            {
+                raiseEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
+            }
+            else
+            {
+                raiseEvent(new MoveCardEvent(card, LocationPile.FIELD));
+            }
+
+            card.stackWrapper = null;
+        }
+        private void _moveCard(GameEvent gevent)
+        {
+            MoveCardEvent e = (MoveCardEvent)gevent;
+            moveCardTo(e.getCard(), e.getLocation());
+            e.getCard().owner.notifyObserver();
+        }
+        private void _gainManaOrb(GameEvent gevent)
+        {
+            GainManaOrbEvent e = (GainManaOrbEvent)gevent;
+            e.getPlayer().addMana(e.getColor());
+        }
+        private void _untopPlayer(GameEvent gevent)
+        {
+            //todo(seba) make this raise UNTOPCARD events
+            UntopPlayerEvent e = (UntopPlayerEvent)gevent;
+            e.getPlayer().untop();
+        }
+        private void _damagePlayer(GameEvent gevent)
+        {
+            DamagePlayerEvent e = (DamagePlayerEvent)gevent;
+            e.getPlayer().damage(e.getDamage());
+        }
+        private void _buryCreature(GameEvent gevent)
+        {
+            BuryCreature e = (BuryCreature)gevent;
+            raiseEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
+        }
+        private void _damageCreature(GameEvent gevent)
+        {
+            DamageCreatureEvent e = (DamageCreatureEvent)gevent;
+            e.getCreature().damage(e.getDamage());
+        }
+        #endregion
 
         private void loop()
         {
@@ -337,7 +338,7 @@ namespace stonekart
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
                 foreach (Card c in attackers)
                 {
-                    GUI.getCardButtonByCard(c).setBorder(Color.Red);
+                    GUI.getCardButton(c).setBorder(Color.Red);
                 }
             }
 
@@ -402,12 +403,12 @@ namespace stonekart
 
                 foreach (Card c in attackers)
                 {
-                    GUI.getCardButtonByCard(c).setBorder(null);
+                    GUI.getCardButton(c).setBorder(null);
                 }
 
                 foreach (Card c in defenders)
                 {
-                    GUI.getCardButtonByCard(c).setBorder(null);
+                    GUI.getCardButton(c).setBorder(null);
                 }
                 attackers = defenders = null;
             }
@@ -425,34 +426,41 @@ namespace stonekart
 
         private void givePriority(bool main)
         {
-            //todo make it check toggleboxes and autopass
+            //todo(seba) make it check toggleboxes and autopass
+            //todo(seba) make it a PassAction instead of a fucking null pointer just waiting to raise an exception and rain on my parade
             while (true)
             {
                 checkGameState();
-                StackWrapperFuckHopeGasTheKikes a;
+                CastAction action;
                 if (active)
                 {
-                    a = castOrPass(main && stack.Count == 0);
+                    action = castOrPass(main && stack.Count == 0);
                 }
                 else
                 {
-                    a = demandCastOrPass();
+                    action = demandCastOrPass();
                 }
 
-                if (a == null)  //active player passed
+                if (action == null)  //active player passed
                 {
                     if (active)
                     {
-                        a = demandCastOrPass();
+                        action = demandCastOrPass();
                     }
                     else
                     {
-                        a = castOrPass(false);
+                        action = castOrPass(false);
                     }
                 }
-                if (a != null)
+                if (action != null)
                 {
-                    raiseEvent(new CastEvent(a));
+                    StackWrapper stackWrapper = action.getStackWrapper();
+                    Ability a = stackWrapper.ability;
+                    if (a is ActivatedAbility)
+                    {
+                        ((ActivatedAbility)a).getCost().pay(stackWrapper.card, action.getCosts());
+                    }
+                    raiseEvent(new CastEvent(action.getStackWrapper()));
                 }
                 else //both passed
                 {
@@ -468,6 +476,7 @@ namespace stonekart
 
             }
         }
+        
 
         private void advanceStep()
         {
@@ -495,7 +504,7 @@ namespace stonekart
                 }
             }
 
-            foreach (var v in xd)
+            foreach (GameEvent v in xd)
             {
                 raiseEvent(v);
             }
@@ -506,9 +515,19 @@ namespace stonekart
         /// </summary>
         /// <param name="main"></param>
         /// <returns>A Card if a card was selected, null otherwise</returns>
-        private StackWrapperFuckHopeGasTheKikes castOrPass(bool main)
+        private CastAction castOrPass(bool main)
         {
-            if (checkAutoPass()) { return null; }
+            CastAction a = _castOrPass(main);
+            raiseAction(a ?? new CastAction());
+            return a;
+        }
+
+        private CastAction _castOrPass(bool main)
+        {
+            if (checkAutoPass())
+            {
+                return null;
+            }
             GUI.setMessage("You have priority");
             while (true)
             {
@@ -522,7 +541,6 @@ namespace stonekart
                         if (b.getType() == GUI.ACCEPT)
                         {
                             GUI.clear();
-                            raiseAction(new CastAction());
                             return null;
                         }
                     }
@@ -545,21 +563,17 @@ namespace stonekart
                             throw new Exception("we don't support these things yet");
                         }
 
-                        
+
 
                         if (a != null)
                         {
                             var v = a.getCost().check(c);
                             if (v != null)
                             {
-                                var targets = getTargets(a);    //todo allow canceling xd
-                                a.getCost().pay(c, v);
+                                var targets = getTargets(a); 
                                 GUI.clear();
-                                var sw = new StackWrapperFuckHopeGasTheKikes(c, a, targets);
-                                CastAction ca = new CastAction(sw, v);
-                                //CastAction cb = GameAction.fromString("cast," + ca.toString(), this) as CastAction;
-                                raiseAction(new CastAction(sw, v)); //todo (seba) not even an anti pattern just horrible
-                                return sw;
+                                var sw = new StackWrapper(c, a, targets);
+                                return new CastAction(sw, v);
                             }
                         }
                     }
@@ -572,6 +586,7 @@ namespace stonekart
             return false;
         }
 
+        //todo(seba) allow canceling
         private Target[] getTargets(Ability a)
         {
             GUI.setMessage("Select target(s)");
@@ -603,22 +618,12 @@ namespace stonekart
             return targets;
         }
 
-        private StackWrapperFuckHopeGasTheKikes demandCastOrPass()
+        private CastAction demandCastOrPass()
         {
             GUI.setMessage("Opponent has priority");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
             GUI.setMessage("");
-            if (v.isPass()) { return null; }
-            if (v.getStackWrapper().ability is ActivatedAbility)
-            {
-                ActivatedAbility aa = v.getStackWrapper().ability as ActivatedAbility;
-                aa.getCost().pay(v.getStackWrapper().card, v.getCosts());
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-            return v.getStackWrapper();
+            return v.isPass() ? null : v;
         }
 
         private int demandSelection()
@@ -959,13 +964,14 @@ namespace stonekart
     }
 
     //the fact that making this a struct creates 20 lines of code shows what a fucking joke this language is
-    public class StackWrapperFuckHopeGasTheKikes
+    //the artiste formerly known as StackWrapperFuckHopeGasTheKikes
+    public class StackWrapper
     {
         public Card card;
         public Ability ability;
         public Target[] targets;
 
-        public StackWrapperFuckHopeGasTheKikes(Card c, Ability a, Target[] cs)
+        public StackWrapper(Card c, Ability a, Target[] cs)
         {
             card = c;
             ability = a;

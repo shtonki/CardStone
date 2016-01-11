@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -21,7 +22,7 @@ namespace stonekart
 
         public FriendPanel friendPanel { get; private set; }
 
-        private DisplayPanel activePanel;
+        public DisplayPanel activePanel { get; private set; }
         private Button labelx;
 
         public MainFrame()
@@ -106,8 +107,7 @@ namespace stonekart
             {
                 p.Visible = true;
             }
-
-
+            
             Invalidate();
         }
 
@@ -118,7 +118,7 @@ namespace stonekart
 
         public void clearFocus()
         {
-            if (!labelx.Focus()) { throw new MissingSatelliteAssemblyException(); }
+            if (!labelx.Focus()) {  }
         }
 
         public bool focusCleared()
@@ -237,9 +237,6 @@ namespace stonekart
 
     class Xd : Panel
     {
-        private const bool x = false;
-        private Point[] ps;
-
         private readonly byte[] types = {
             0,
             1,
@@ -252,26 +249,26 @@ namespace stonekart
             1, 
             1, 
             };
+            
+        int width = 10;
 
-        int wfactor = 10;
-
-        int wtf = 20;
+        int wingThickness = 20;
 
         public Xd()
         {
             BackColor = Color.Fuchsia;
+            Size = new Size(2000, 1500);
+            Enabled = false;
         }
-        
+
 
         public void setStartAndEnd(Point start, Point end)
         {
-            //setStartAndEnd(start.X, start.Y, end.X, end.Y);
+            setStartAndEnd(start.X, start.Y, end.X, end.Y);
         }
 
         private static void rotatePointAround(ref Point p, int x, int y, double angle)
         {
-            angle *= 0.0174533;
-
             int px = p.X, py = p.Y;
 
             double sin = Math.Sin(angle);
@@ -280,58 +277,56 @@ namespace stonekart
             px -= x;
             py -= y;
 
-            int nx = (int)Math.Round(px * cos + py * sin);
+            int nx = (int)Math.Round(px * cos - py * sin);
             int ny = (int)Math.Round(py * cos + px * sin);
 
             p.X = nx + x;
             p.Y = ny + y;
         }
-
-        //public void setStartAndEnd(int x1, int y1, int x2, int y2)
-        public void setStartAndEnd(double angle)
+        
+        //todo(seba) make this not cover enitire sceen
+        public void setStartAndEnd(int x1, int y1, int x2, int y2)
         {
-            Size = new Size(500, 500);
-
-            int length = 70;
+            int dx = x2 - x1;
+            int dy = y2 - y1;
+            double angle = Math.Atan2(dy, dx);
+            int length = (int)(Math.Sqrt(dx*dx + dy*dy)*0.70710678118);
+            
             Point[] pts = {
             new Point(0, 0),
-            new Point(wfactor, 0),
-            new Point(length - wfactor, length - 2*wfactor),
-            new Point(length - wfactor, length - wfactor - wtf),
-            new Point(length, length - wfactor - wtf),
+            new Point(width, 0),
+            new Point(length - width, length - 2*width),
+            new Point(length - width, length - width - wingThickness),
+            new Point(length, length - width - wingThickness),
             new Point(length, length) ,
-            new Point(length - wfactor - wtf, length),
-            new Point(length - wfactor - wtf, length - wfactor),
-            new Point(length - 2*wfactor, length - wfactor),
-            new Point(0, wfactor),
+            new Point(length - width - wingThickness, length),
+            new Point(length - width - wingThickness, length - width),
+            new Point(length - 2*width, length - width),
+            new Point(0, width),
             };
+
+            
 
             for (int i = 0; i < pts.Length; i++)
             {
-                pts[i].X += 100;
-                pts[i].Y += 100;
-                rotatePointAround(ref pts[i], 100, 100, angle);
+                rotatePointAround(ref pts[i], 0, 0, angle - 0.785398f);
+                pts[i].X += x1;
+                pts[i].Y += y1;
             }
 
             GraphicsPath path = new GraphicsPath(pts, types);
             this.Region = new Region(path);
         }
+        
+    }
 
-        protected override void OnPaint(PaintEventArgs e)
+    class ArrowPanel : Xd
+    {
+        public ArrowPanel()
         {
-            if (x)
-            {
-                Font f = DefaultFont;
-                Brush b = new SolidBrush(Color.Black);
-                base.OnPaint(e);
-                for (int i = 0; i < ps.Length; i++)
-                {
-                    e.Graphics.DrawString(i.ToString(), f, b, ps[i]);
-                }
-            }
+            
         }
     }
-    
 
     public class GamePanel : DisplayPanel
     {
@@ -343,6 +338,8 @@ namespace stonekart
         public FieldPanel heroFieldPanel;
         public FieldPanel villainFieldPanel;
         private TurnPanel turnPanel;
+        private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
+
 
         public GamePanel()
         {
@@ -397,26 +394,13 @@ namespace stonekart
             villainFieldPanel = new FieldPanel(false);
             villainFieldPanel.Location = new Point(600, 10);
             
-
-            xd = new Xd();
-            xd.Location = new Point(300, 300);
-            //xd.Size = new Size(600, 600);
-            //xd.Location = new Point(600, 600);
-            //xd.setStartAndEnd(30, 30, 200, 321);
-            Timer t = new Timer();
-            t.Tick += (_, __) =>
-            {
-                xd.setStartAndEnd(d++);
-                Invalidate();
-            };
-            t.Interval = 25;
-            t.Start();
+            
+            
 
             turnPanel = new TurnPanel();
             turnPanel.Location = new Point(325, 200);
 
             
-            Controls.Add(xd);
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
@@ -428,9 +412,8 @@ namespace stonekart
             Controls.Add(villainPanel);
             Visible = false;
         }
+        
 
-        private static Xd xd;
-        private static double d = 0;
         public void setStep(int s, bool a)
         {
             turnPanel.setStep(s, a);
@@ -449,6 +432,35 @@ namespace stonekart
         public void showAddMana(bool b)
         {
             heroPanel.showAddMana(b);
+        }
+
+        public void addArrow(GameElement from, GameElement to)
+        {
+            ArrowPanel a = new ArrowPanel();
+            Control f = (Control)from;
+            Control t = (Control)to;
+            a.setStartAndEnd(fn(f), fn(t));
+            arrows.Add(a);
+            Controls.Add(a);
+            a.BringToFront();
+        }
+
+        private static Point fn(Control control)
+        {
+            Point r = control.FindForm().PointToClient(control.Parent.PointToScreen(control.Location));
+            r.X += control.Width/2;
+            r.Y += control.Height/2;
+            return r;
+        }
+
+
+        public void clearArrows()
+        {
+            foreach (ArrowPanel a in arrows)
+            {
+                Controls.Remove(a);
+            }
+            arrows.Clear();
         }
 
         class ButtonPanel : Panel

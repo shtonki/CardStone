@@ -18,11 +18,13 @@ namespace stonekart
             notifyObserver();
         }
 
-        public void clearObserver()
+        //todo(seba) drink bleach
+        public Observer getObserver(ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense g)
         {
-            observer = null;
-            observer.notifyObserver(null);
+            if (g == null) { throw new Exception("even naughty naughtier"); }
+            return observer;
         }
+
 
         public void notifyObserver()
         {

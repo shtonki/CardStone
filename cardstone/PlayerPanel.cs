@@ -13,7 +13,7 @@ namespace stonekart
         private ManaButton[][] manaButtons = new ManaButton[5][];
         private Player player;
         private Label health;
-        private PlayerButton playerButton;
+        public PlayerButton playerButton { get; private set; }
 
         private string
             hlt = "x",

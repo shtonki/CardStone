@@ -19,7 +19,6 @@ namespace stonekart
     {
         private static MainFrame frame;
 
-        private static Dictionary<Card, CardButton> killMeNow = new Dictionary<Card, CardButton>(); 
 
         public static ManualResetEvent frameLoaded = new ManualResetEvent(false);
 
@@ -128,18 +127,19 @@ namespace stonekart
         {
             frame.setObservers(h, v, s);
         }
+        private static readonly ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense = new ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense();
 
-        public static void setCardButton(Card c, CardButton b)
+        public static CardButton getCardButton(Card c)
         {
-            killMeNow[c] = b;
+            return c.getObserver(nonsense) as CardButton;
         }
 
-        public static CardButton getCardButtonByCard(Card c)
+        public static PlayerButton getPlayerButton(Player p)
         {
-            if (!killMeNow.ContainsKey(c)) { return null; }
-            return killMeNow[c];
+            PlayerPanel o = p.getObserver(nonsense) as PlayerPanel;
+            return o.playerButton;
         }
-
+        
         private static WaitFor<string> logInAs = new WaitFor<string>(); 
 
         public static bool login()
@@ -180,7 +180,17 @@ namespace stonekart
         {
             logInAs.signal(x);
         }
-        
+
+        public static void addArrow(GameElement from, GameElement to)
+        {
+            if (frame.activePanel != frame.gamePanel) { throw new Exception(); }
+            frame.gamePanel.addArrow(from, to);
+        }
+
+        public static void clearArrows()
+        {
+            frame.gamePanel.clearArrows();
+        }
 
         public static void showPlayPanel()
         {
@@ -207,6 +217,22 @@ namespace stonekart
 
         //todo(jasin) sholdn't be const fam
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
+
+        
+    }
+
+    public class ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense
+    {
+        private bool xd;
+
+        public ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense()
+        {
+            if (xd)
+            {
+                throw new Exception("naughty naughty");
+            }
+            xd = true;
+        }
     }
 
     public class WindowedPanel : Panel

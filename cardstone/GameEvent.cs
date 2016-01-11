@@ -11,7 +11,7 @@ namespace stonekart
     {
         DRAW,
         CAST,
-        GAINMANA,
+        GAINMANAORB,
         ATTACK,
         DEFEND,
         TOP,
@@ -70,19 +70,19 @@ namespace stonekart
 
     class CastEvent : GameEvent
     {
-        private StackWrapperFuckHopeGasTheKikes xd;
+        private StackWrapper xd;
 
         public CastEvent(Card c, Ability ability, params Target[] cs) : base(GameEventType.CAST)
         {
-            xd = new StackWrapperFuckHopeGasTheKikes(c, ability , cs);
+            xd = new StackWrapper(c, ability , cs);
         }
 
-        public CastEvent(StackWrapperFuckHopeGasTheKikes x) : base(GameEventType.CAST)
+        public CastEvent(StackWrapper x) : base(GameEventType.CAST)
         {
             xd = x;
         }
 
-        public StackWrapperFuckHopeGasTheKikes getStuff()
+        public StackWrapper getStackWrapper()
         {
             return xd;
         }
@@ -92,7 +92,7 @@ namespace stonekart
     {
         private int c;
 
-        public GainManaOrbEvent(Player player, int color) : base(player, GameEventType.GAINMANA)
+        public GainManaOrbEvent(Player player, int color) : base(player, GameEventType.GAINMANAORB)
         {
             c = color;
         }
@@ -188,14 +188,14 @@ namespace stonekart
 
     class ResolveEvent : GameEvent
     {
-        private StackWrapperFuckHopeGasTheKikes xdd;
+        private StackWrapper xdd;
 
-        public ResolveEvent(StackWrapperFuckHopeGasTheKikes xd) : base(GameEventType.RESOLVE)
+        public ResolveEvent(StackWrapper xd) : base(GameEventType.RESOLVE)
         {
             xdd = xd;
         }
 
-        public StackWrapperFuckHopeGasTheKikes getStuff()
+        public StackWrapper getStackWrapper()
         {
             return xdd;
         }

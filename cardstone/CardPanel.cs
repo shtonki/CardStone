@@ -27,12 +27,13 @@ namespace stonekart
             {
                 cardButtons[i] = new CardButton();
                 Controls.Add(cardButtons[i]);
+                cardButtons[i].dbg = i;
             }
         }
 
         public void notifyObserver(Observable o)
         {
-            Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh
+            Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh, actually entire function is a hack
             Pile p = (Pile)o;
 
             int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.getCards().Count) ? CardButton.WIDTH : WIDTH/(1+p.getCards().Count));

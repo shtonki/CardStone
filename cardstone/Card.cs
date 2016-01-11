@@ -24,7 +24,7 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
-        private Effect resolveEffect;
+        public StackWrapper stackWrapper;
 
         private int? power, toughness, currentPower, currentToughness;
         private bool summoningSick;

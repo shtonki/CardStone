@@ -106,7 +106,7 @@ namespace stonekart
                         csts[i] = xx;
                     }
 
-                    var sw = new StackWrapperFuckHopeGasTheKikes(c, a, targets.ToArray());
+                    var sw = new StackWrapper(c, a, targets.ToArray());
                     r = new CastAction(sw, csts);
 
                 } break;
@@ -139,7 +139,7 @@ namespace stonekart
         //todo seba this entire class is about as current as internet exploder
 
 
-        private StackWrapperFuckHopeGasTheKikes sw;
+        private StackWrapper sw;
         private int[][] costs;
 
         public CastAction()
@@ -148,7 +148,7 @@ namespace stonekart
             costs = null;
         }
 
-        public CastAction(StackWrapperFuckHopeGasTheKikes s, int[][] cs)
+        public CastAction(StackWrapper s, int[][] cs)
         {
             sw = s;
             costs = cs;
@@ -164,7 +164,7 @@ namespace stonekart
             return costs;
         }
 
-        public StackWrapperFuckHopeGasTheKikes getStackWrapper()
+        public StackWrapper getStackWrapper()
         {
             return sw;
         }
@@ -183,7 +183,7 @@ namespace stonekart
                     ts.Append("p");
                     ts.Append((int)t.getPlayer().getSide());
                 }
-                else if (t.isCreature())
+                else if (t.isCard())
                 {
                     ts.Append("c");
                     ts.Append(t.getCard().getId());

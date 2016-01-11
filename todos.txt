@@ -1,3 +1,4 @@
-* Allow resizing of the game window
-* Colorless mana costs
-* Display targeting and defending
+* allow resizing of the game window
+* colorless mana costs
+* display targeting and defending
+* call ClearFocus after transitioning to another DisplayPanel without crashing

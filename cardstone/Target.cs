@@ -26,7 +26,7 @@ namespace stonekart
             return p != null;
         }
 
-        public bool isCreature()
+        public bool isCard()
         {
             return c != null;
         }
