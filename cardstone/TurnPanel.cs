@@ -28,7 +28,7 @@ namespace stonekart
 
         public TurnPanel()
         {
-            BackColor = Color.Black;
+            BackColor = Color.Red;
             Size = new Size(70, 700);
 
             refill = Image.FromFile(resPath + "refill.png");
@@ -41,8 +41,7 @@ namespace stonekart
             endCombat = Image.FromFile(resPath + "endcombat.png");
             main2 = Image.FromFile(resPath + "main2.png");
             end = Image.FromFile(resPath + "end.png");
-
-
+            
             for (int i = 0; i < 20; i++)
             {
                 ToggleBox b = new ToggleBox();
@@ -68,13 +67,13 @@ namespace stonekart
         {
             base.OnPaint(e);
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
+            
             e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,   70, 140);
             e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 140, 70, 70);
             e.Graphics.FillRectangle(new SolidBrush(Color.DarkRed),     0, 210, 70, 350);
             e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 560,   70, 70);
             e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 630,   70, 70);
-
+            
             e.Graphics.DrawImage(refill, 4, 4);
             e.Graphics.DrawImage(draw, 4, 74);
             e.Graphics.DrawImage(main1, 4, 144);
@@ -89,7 +88,6 @@ namespace stonekart
             
             e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.LightGray, 4), 1, 1 + step*70, 67, 67);
         }
-
         class ToggleBox : Panel
         {
             private bool t;

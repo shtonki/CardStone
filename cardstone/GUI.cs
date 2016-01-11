@@ -309,7 +309,7 @@ namespace stonekart
             if (m.Msg == keydown)
             {
                 int v = m.WParam.ToInt32();
-                //Console.WriteLine(v);
+
                 if (v == escape)
                 {
                     GUI.globalEscape();

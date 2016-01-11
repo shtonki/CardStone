@@ -1,5 +1,8 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
 using System.Resources;
 using System.Windows.Forms;
 
@@ -216,19 +219,119 @@ namespace stonekart
             loginPanel.Controls.Add(usernameBox);
             loginPanel.Controls.Add(loginButton);
             loginPanel.Controls.Add(playOfflineButton);
-
-
+            
             Controls.Add(startGamePanel);
             Controls.Add(loginPanel);
 
             Visible = false;
         }
-
+        
         public override void handleKeyPress(Keys key)
         {
             Console.WriteLine("Pressed {0} in main menu", key);
         }
+        
     }
+    
+
+
+    class Xd : Panel
+    {
+        private const bool x = false;
+        private Point[] ps;
+
+        private readonly byte[] types = {
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1, 
+            1, 
+            1, 
+            1, 
+            };
+
+        int wfactor = 10;
+
+        int wtf = 20;
+
+        public Xd()
+        {
+            BackColor = Color.Fuchsia;
+        }
+        
+
+        public void setStartAndEnd(Point start, Point end)
+        {
+            //setStartAndEnd(start.X, start.Y, end.X, end.Y);
+        }
+
+        private static void rotatePointAround(ref Point p, int x, int y, double angle)
+        {
+            angle *= 0.0174533;
+
+            int px = p.X, py = p.Y;
+
+            double sin = Math.Sin(angle);
+            double cos = Math.Cos(angle);
+
+            px -= x;
+            py -= y;
+
+            int nx = (int)Math.Round(px * cos + py * sin);
+            int ny = (int)Math.Round(py * cos + px * sin);
+
+            p.X = nx + x;
+            p.Y = ny + y;
+        }
+
+        //public void setStartAndEnd(int x1, int y1, int x2, int y2)
+        public void setStartAndEnd(double angle)
+        {
+            Size = new Size(500, 500);
+
+            int length = 70;
+            Point[] pts = {
+            new Point(0, 0),
+            new Point(wfactor, 0),
+            new Point(length - wfactor, length - 2*wfactor),
+            new Point(length - wfactor, length - wfactor - wtf),
+            new Point(length, length - wfactor - wtf),
+            new Point(length, length) ,
+            new Point(length - wfactor - wtf, length),
+            new Point(length - wfactor - wtf, length - wfactor),
+            new Point(length - 2*wfactor, length - wfactor),
+            new Point(0, wfactor),
+            };
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                pts[i].X += 100;
+                pts[i].Y += 100;
+                rotatePointAround(ref pts[i], 100, 100, angle);
+            }
+
+            GraphicsPath path = new GraphicsPath(pts, types);
+            this.Region = new Region(path);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (x)
+            {
+                Font f = DefaultFont;
+                Brush b = new SolidBrush(Color.Black);
+                base.OnPaint(e);
+                for (int i = 0; i < ps.Length; i++)
+                {
+                    e.Graphics.DrawString(i.ToString(), f, b, ps[i]);
+                }
+            }
+        }
+    }
+    
 
     public class GamePanel : DisplayPanel
     {
@@ -293,18 +396,27 @@ namespace stonekart
 
             villainFieldPanel = new FieldPanel(false);
             villainFieldPanel.Location = new Point(600, 10);
+            
 
-            Controls.Add(buttonPanel);
-            Controls.Add(heroPanel);
-            Controls.Add(handPanel);
-            Controls.Add(textPanel);
-            Controls.Add(stackPanel);
-            Controls.Add(heroFieldPanel);
-            Controls.Add(villainFieldPanel);
+            xd = new Xd();
+            xd.Location = new Point(300, 300);
+            //xd.Size = new Size(600, 600);
+            //xd.Location = new Point(600, 600);
+            //xd.setStartAndEnd(30, 30, 200, 321);
+            Timer t = new Timer();
+            t.Tick += (_, __) =>
+            {
+                xd.setStartAndEnd(d++);
+                Invalidate();
+            };
+            t.Interval = 25;
+            t.Start();
 
             turnPanel = new TurnPanel();
             turnPanel.Location = new Point(325, 200);
 
+            
+            Controls.Add(xd);
             Controls.Add(buttonPanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
@@ -314,10 +426,11 @@ namespace stonekart
             Controls.Add(villainFieldPanel);
             Controls.Add(turnPanel);
             Controls.Add(villainPanel);
-
             Visible = false;
         }
 
+        private static Xd xd;
+        private static double d = 0;
         public void setStep(int s, bool a)
         {
             turnPanel.setStep(s, a);
