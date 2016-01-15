@@ -17,8 +17,8 @@ namespace stonekart
         public Player owner { get; private set; }
         public Player controller { get; private set; }
 
-        public bool attacking { get; set; }
-
+        private bool Attacking;
+        
         private bool _topped;
         public bool topped
         {
@@ -38,7 +38,18 @@ namespace stonekart
 
         private int? power, toughness, currentPower, currentToughness;
         public bool summoningSick { get; set; }
-        public Card defending { get; set; }
+        public bool attacking
+        {
+            get { return Attacking; }
+            set
+            {
+                Attacking = value;
+                notifyObserver();
+            }
+        }
+
+        public bool defending => combatOpponent != null;
+        public Card combatOpponent { get; set; }
 
         private List<Ability> abilities;
         private ManaCoster castingCost;

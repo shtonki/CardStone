@@ -36,36 +36,37 @@ namespace stonekart
 
             Size = new Size(300, 350);
             BackColor = Color.Aquamarine;
-
+            
             for (int i = 0; i < 5; i++)
             {
+                ManaColour colour = (ManaColour)i;
                 for (int j = 0; j < 6; j++)
                 {
                     Color c = Color.Chartreuse;
-                    switch (i)
+                    switch (colour)
                     {
-                        case ManaCoster.WHITE:
+                        case ManaColour.WHITE:
                         {
                             c = Color.White;
                         } break;
-                        case ManaCoster.BLUE:
+                        case ManaColour.BLUE:
                         {
                             c = Color.Blue;
                         } break;
-                        case ManaCoster.BLACK:
+                        case ManaColour.BLACK:
                         {
                             c = Color.Black;
                         } break;
-                        case ManaCoster.RED:
+                        case ManaColour.RED:
                         {
                             c = Color.Red;
                         } break;
-                        case ManaCoster.GREEN:
+                        case ManaColour.GREEN:
                         {
                             c = Color.Green;
                         } break;
                     }
-                    ManaButton b = new ManaButton(i);
+                    ManaButton b = new ManaButton(colour);
                     b.Location = new Point(10 + 45*j, 10 + 50*i);
                     b.setState(ManaButton.HIDDEN);
                     manaButtons[i][j] = b;
@@ -73,20 +74,13 @@ namespace stonekart
                     var i1 = i;
                     b.Click += (sender, args) =>
                     {
-                        manaButtonPressed(i1*6 + j1, b);
+                        manaButtonPressed(b);
                     };
 
                     Controls.Add(b);
 
 
-                    playerButton = new PlayerButton();
-                    playerButton.Size = new Size(70, 70);
-                    playerButton.Location = new Point(220, 260);
-                    playerButton.Click += (_, __) =>
-                    {
-                        game.gameElementPressed(playerButton);
-                    };
-                    Controls.Add(playerButton);
+                    
 
                     //health = new Label();
                     //health.Size = new Size(100, 100);
@@ -97,13 +91,21 @@ namespace stonekart
                 }
             }
 
-            
+            playerButton = new PlayerButton();
+            playerButton.Size = new Size(70, 70);
+            playerButton.Location = new Point(220, 260);
+            playerButton.Click += (_, __) =>
+            {
+                game.gameElementPressed(playerButton.getElement());
+            };
+            Controls.Add(playerButton);
+
         }
 
-        private void manaButtonPressed(int i, ManaButton b)
+        private void manaButtonPressed(ManaButton b)
         {
             if (b.getState() == ManaButton.HIDDEN) { return; }
-            game.gameElementPressed(b);
+            game.gameElementPressed(b.getElement());
         }
 
         public void showAddMana(bool y)
@@ -132,7 +134,7 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             player = (Player)o;
-            playerButton.setPlayer(player);
+            playerButton.player = player;
 
             for (int c = 0; c < 5; c++)
             {
@@ -188,14 +190,15 @@ namespace stonekart
             private const int thickness = 4;
 
             private int state = 0;
-            private ManaColor color;
+            private ManaColour color;
 
-            public ManaButton(int c)
+            public ManaButton(ManaColour c)
             {
                 Size = new Size(40, 40);
                 color = c;
                 state = FILLED;
             }
+            
 
             public void setState(int i)
             {
@@ -208,9 +211,9 @@ namespace stonekart
                 return state;
             }
 
-            public int getColor()
+            public GameElement getElement()
             {
-                return color;
+                return new GameElement(color);
             }
 
             protected override void OnPaint(PaintEventArgs e)
@@ -220,11 +223,11 @@ namespace stonekart
 
                 if (state == FILLED)
                 {
-                    graphics.FillEllipse(brushes[color], 0, 0, 39, 39);
+                    graphics.FillEllipse(brushes[(int)color], 0, 0, 39, 39);
                 }
                 else if (state == HOLLOW)
                 {
-                    graphics.DrawEllipse(pens[color], thickness - 2, thickness - 2, 39 - thickness, 39 - thickness);
+                    graphics.DrawEllipse(pens[(int)color], thickness - 2, thickness - 2, 39 - thickness, 39 - thickness);
                 }
                 else if (state == HIDDEN)
                 {
@@ -238,20 +241,29 @@ namespace stonekart
         }
     }
 
-    public enum ManaColor
+    public enum ManaColour
     {
-        
+        WHITE,
+        BLUE,
+        BLACK,
+        RED,
+        GREEN,
     }
 
     public class PlayerButton : Button, GameUIElement
     {
-        private Player p;
+        public Player player;
 
         public PlayerButton()
         {
             
         }
 
+        public GameElement getElement()
+        {
+            return new GameElement(player);
+        }
+        /*
         public void setPlayer(Player player)
         {
             p = player;
@@ -261,5 +273,6 @@ namespace stonekart
         {
             return p;
         }
+        */
     }
 }

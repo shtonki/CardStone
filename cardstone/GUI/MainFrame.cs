@@ -457,7 +457,7 @@ namespace stonekart
         }
         
 
-        public void showButtons(int i)
+        public void showButtons(uint i)
         {
             choicePanel.showButtons(i);
         }

@@ -11,7 +11,8 @@ namespace stonekart
 
         private ChoiceButton
             cancel,
-            accept;
+            accept,
+            pass;
 
         private Label textLabel;
 
@@ -55,9 +56,21 @@ namespace stonekart
                 buttonPressed(cancel);
             };
 
+            pass = new ChoiceButton(Choice.PASS);
+            pass.Visible = false;
+            pass.BackColor = Color.GhostWhite;
+            pass.Text = "Pass";
+            pass.Font = new Font(new FontFamily("Comic Sans MS"), 12);
+            pass.Location = new Point(140, 100);
+            pass.Click += (sender, args) =>
+            {
+                buttonPressed(pass);
+            };
+
             Controls.Add(textLabel);
             Controls.Add(accept);
             Controls.Add(cancel);
+            Controls.Add(pass);
 
 
         }
@@ -72,19 +85,20 @@ namespace stonekart
 
         }
 
-        public void showButtons(int i)
+        public void showButtons(uint i)
         {
             Invoke(new Action(() =>
             {
                 accept.Visible = (i & (int)Choice.ACCEPT) != 0;
                 cancel.Visible = (i & (int)Choice.CANCEL) != 0;
+                pass.Visible   = (i & (int)Choice.PASS)   != 0;
             }));
 
         }
 
         private void buttonPressed(ChoiceButton b)
         {
-            gameInterface.gameElementPressed(b);
+            gameInterface.gameElementPressed(b.getElement());
         }
     }
 
@@ -111,6 +125,7 @@ namespace stonekart
     {
         ACCEPT = 1,
         CANCEL = 2,
+        PASS   = 4,
         //... = 4, 8, 16
     }
 }

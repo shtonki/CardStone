@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace stonekart
@@ -88,25 +89,25 @@ namespace stonekart
 
     public class ManaCoster : Coster
     {
-        public const int
-            WHITE = 0,
-            BLUE = 1,
-            BLACK = 2,
-            RED = 3,
-            GREEN = 4;
-
-        private List<int> cost;
+        //todo(seba) reconsider how we store this information yet again
+        private List<ManaColour> cost;
 
         public ManaCoster(int white, int blue, int black, int red, int green)
         {
-            cost = new List<int>();
-            int[] _ = new[] {white, blue, black, red, green};
-            for (int c = 0; c < 5; c++)
+            cost = new List<ManaColour>();
+
+            cantIntoLambda(white, ManaColour.WHITE, ref cost);
+            cantIntoLambda(blue, ManaColour.BLUE, ref cost);
+            cantIntoLambda(black, ManaColour.BLACK, ref cost);
+            cantIntoLambda(red, ManaColour.RED, ref cost);
+            cantIntoLambda(green, ManaColour.GREEN, ref cost);
+        }
+
+        private void cantIntoLambda(int cnt, ManaColour clr, ref List<ManaColour> l)
+        {
+            while (cnt-- > 0)
             {
-                for (int i = 0; i < _[c]; c++)
-                {
-                    cost.Add(c);
-                }
+                l.Add(clr);
             }
         }
 
@@ -116,9 +117,9 @@ namespace stonekart
 
             int[] cs = new int[5];
 
-            foreach (var b in cost)
+            foreach (ManaColour b in cost)
             {
-                cs[b]++;
+                cs[(int)b]++;
             }
 
             for (int i = 0; i < 5; i++)
@@ -126,7 +127,7 @@ namespace stonekart
                 if (p.getCurrentMana(i) < cs[i]) { return null; }
             }
             
-            return cost.ToArray();
+            return cost.Select(c => (int)c).ToArray();      //hack untested
         }
 
         public override void pay(Card card, int[] i)
@@ -136,7 +137,7 @@ namespace stonekart
 
         public int[] getColours()
         {
-            return cost.ToArray();
+            return cost.Select(c => (int)c).ToArray();      //hack untested
         }
     }
 }

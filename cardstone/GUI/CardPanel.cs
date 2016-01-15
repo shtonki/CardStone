@@ -27,7 +27,6 @@ namespace stonekart
             {
                 cardButtons[i] = new CardButton(g);
                 Controls.Add(cardButtons[i]);
-                cardButtons[i].dbg = i;
             }
         }
 

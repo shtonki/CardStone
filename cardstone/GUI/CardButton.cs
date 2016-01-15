@@ -84,7 +84,7 @@ namespace stonekart
 
         public GameElement getElement()
         {
-            throw new NotImplementedException();
+            return new GameElement(card);
         }
 
         private GameUIElement targetToGameElement(Target t)
@@ -225,7 +225,15 @@ namespace stonekart
 
         public void notifyObserver(Observable o)
         {
-                card = (Card)o;
+            card = (Card)o;
+            if (card.attacking)
+            {
+                setBorder(Color.Red);
+            }
+            else
+            {
+                setBorder(null);
+            }
             
             if (InvokeRequired)
             {

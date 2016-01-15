@@ -12,8 +12,8 @@ namespace stonekart
     {
         //todo(seba) make this an actual stack and not just retarded
         private string poppedMessage;
-        private int poppedButtons;
-        private int currentButtons;
+        private uint poppedButtons;
+        private uint currentButtons;
 
         public Game game { get; private set; }
         public GamePanel gamePanel { get; private set; }
@@ -41,7 +41,7 @@ namespace stonekart
         public void clear()
         {
             gamePanel.message = "";
-            setChoiceButtons(GUI.NOTHING);
+            setChoiceButtons();
         }
 
         public void setMessage(string s)
@@ -51,14 +51,17 @@ namespace stonekart
 
         public void setChoiceButtons(params Choice[] cs)
         {
-            //hack
-            return;
-            /*
+            uint i = 0;
+            foreach (Choice choice in cs)
+            {
+                i |= (uint)choice;
+            }
+
             currentButtons = i;
             gamePanel.showButtons(i);
-            */
         }
 
+        //hack overhaul this
         public void showAddMana(bool b)
         {
             gamePanel.showAddMana(b);
@@ -107,19 +110,18 @@ namespace stonekart
             GameElement r = waitForGameElement.wait();
             return r;
         }
-        /*
-        public Card getPressedCard()
+
+        public ManaColour getManaColour()
         {
             while (true)
             {
-                GameUIElement e = getNextGameElementPress();
-                if (e is CardButton)
+                GameElement g = getNextGameElementPress();
+                if (g.manaColor != null)
                 {
-                    return ((CardButton)e).getCard();
+                    return g.manaColor.Value;
                 }
             }
         }
-        */
 
         public void setGame(Game g)
         {

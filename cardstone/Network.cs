@@ -197,7 +197,7 @@ namespace stonekart
 
         public void receiveMessage(SMessage m)
         {
-            System.Console.WriteLine(m.ToString());
+            //Console.WriteLine(m.ToString());
             
             switch (m.header)
             {
@@ -334,7 +334,7 @@ namespace stonekart
 
         public override void sendGameAction(GameAction e)
         {
-            System.Console.WriteLine(">" + e.toString());
+
         }
 
         public override GameAction demandAction(System.Type t)

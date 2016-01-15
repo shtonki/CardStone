@@ -14,7 +14,7 @@ namespace stonekart
         public Card card => element as Card;
         public Choice? choice => element as Choice?;
         public Player player => element as Player;
-        //public Card manaColor => element as Card;
+        public ManaColour? manaColor => element as ManaColour?;
 
         public GameElement(Card c)
         {
@@ -32,6 +32,12 @@ namespace stonekart
         {
             element = p;
             type = GameElementType.PLAYER;
+        }
+
+        public GameElement(ManaColour c)
+        {
+            element = c;
+            type = GameElementType.MANACOLOR;
         }
 
         public enum GameElementType
