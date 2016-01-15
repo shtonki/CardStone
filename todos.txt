@@ -3,3 +3,4 @@
 * display targeting and defending
 * call ClearFocus after transitioning to another DisplayPanel without crashing
 * the card size just isn't realistic quit daydreamin' kid
+* have the mana buttons be six actual buttons then an 'add button' to the right

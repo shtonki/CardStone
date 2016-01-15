@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    //todo(seba) make it work more like a union
     public class Target
     {
         private Player p;

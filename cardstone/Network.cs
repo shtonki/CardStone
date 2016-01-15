@@ -13,6 +13,7 @@ namespace stonekart
     static class Network
     {
         public const string SERVER = "server";
+        public const string SERVERIP = "46.239.124.155";
 
         private static ServerConnection serverConnection;
         private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
@@ -146,7 +147,7 @@ namespace stonekart
         /// Creates a connection to the server
         /// </summary>
         public ServerConnection()
-            : base("155.4.125.53")
+            : base(Network.SERVERIP)
         {
 
         }

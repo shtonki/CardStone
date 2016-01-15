@@ -12,7 +12,7 @@ namespace stonekart
 {
     public class Game
     {
-        private GameInterface gui;
+        private GameInterface gameInterface;
 
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
@@ -23,6 +23,8 @@ namespace stonekart
         private bool active;
         private int step;
 
+        public bool autoPass { get; set; }
+
         private GameConnection connection;
         private CardFactory cardFactory;
 
@@ -32,7 +34,7 @@ namespace stonekart
         
         public Game(GameConnection cn, GameInterface g)
         {
-            gui = g;
+            gameInterface = g;
             connection = cn;
             connection.setGame(this);
             cardFactory = new CardFactory();
@@ -48,7 +50,7 @@ namespace stonekart
             stackxd = new Stack<StackWrapper>();
             
 
-            gui.setObservers(hero, villain, stack);
+            gameInterface.setObservers(hero, villain, stack);
         }
 
         public void start()
@@ -222,12 +224,14 @@ namespace stonekart
         private void loop()
         {
             active = connection.asHomePlayer();
-            gui.setStep(0, active);
+            gameInterface.setStep(0, active);
 
             while (true)
             {
                 activePlayer =   active ? hero : villain;
                 inactivePlayer = active ? villain : hero;
+
+                autoPass = false;
 
                 //untop step
                 untopStep();
@@ -279,13 +283,13 @@ namespace stonekart
             int s;
             if (active)
             {
-                gui.showAddMana(true);
+                gameInterface.showAddMana(true);
                 int c;
                 do
                 {
                     c = getManaColor();
                 } while (hero.getMaxMana(c) == 6);
-                gui.showAddMana(false);
+                gameInterface.showAddMana(false);
                 s = c;
                 raiseAction(new SelectAction(c));
             }
@@ -347,7 +351,7 @@ namespace stonekart
                 attackers = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
                 foreach (Card c in attackers)
                 {
-                    gui.getCardButton(c).setBorder(Color.Red);
+                    gameInterface.getCardButton(c).setBorder(Color.Red);
                 }
             }
 
@@ -412,12 +416,12 @@ namespace stonekart
 
                 foreach (Card c in attackers)
                 {
-                    gui.getCardButton(c).setBorder(null);
+                    gameInterface.getCardButton(c).setBorder(null);
                 }
 
                 foreach (Card c in defenders)
                 {
-                    gui.getCardButton(c).setBorder(null);
+                    gameInterface.getCardButton(c).setBorder(null);
                 }
                 attackers = defenders = null;
             }
@@ -450,7 +454,7 @@ namespace stonekart
                     action = demandCastOrPass();
                 }
 
-                if (action == null)  //active player passed
+                if (action.isPass())  //active player passed
                 {
                     if (active)
                     {
@@ -461,7 +465,7 @@ namespace stonekart
                         action = castOrPass(false);
                     }
                 }
-                if (action != null)
+                if (!action.isPass())
                 {
                     StackWrapper stackWrapper = action.getStackWrapper();
                     Ability a = stackWrapper.ability;
@@ -490,7 +494,7 @@ namespace stonekart
         private void advanceStep()
         {
             step = (step + 1)%10;
-            gui.setStep(step, active);
+            gameInterface.setStep(step, active);
         }
 
         private void checkGameState()
@@ -526,35 +530,40 @@ namespace stonekart
         /// <returns>A Card if a card was selected, null otherwise</returns>
         private CastAction castOrPass(bool main)
         {
-            gui.setMessage("You have priority");
-            gui.setChoiceButtons(ACCEPT);
+            CastAction a;
+            if (autoPass)
+            {
+                a = new CastAction();
+            }
+            else
+            {
+                gameInterface.setMessage("You have priority");
+                gameInterface.setChoiceButtons(ACCEPT);
 
-            CastAction a = _castOrPass(main);
-            raiseAction(a ?? new CastAction());
+                a = _castOrPass(main);
 
-            gui.clear();
+                gameInterface.clear();
+            }
 
+            raiseAction(a);
+            
             return a;
         }
 
         private CastAction _castOrPass(bool main)
         {
-            if (checkAutoPass())
-            {
-                return null;
-            }
             while (true)
             {
                 while (true)
                 {
-                    GameElement f = getGameElement();
+                    GameUIElement f = gameInterface.getNextGameElementPress();
                     if (f is ChoiceButton)
                     {
                         var b = (ChoiceButton)f;
                         if (b.choice == GUI.ACCEPT)
                         {
-                            gui.clear();
-                            return null;
+                            gameInterface.clear();
+                            return new CastAction();
                         }
                     }
                     else if (f is CardButton)
@@ -584,7 +593,7 @@ namespace stonekart
                         Target[] targets = getTargets(a); 
                         if (targets == null) { continue; }
 
-                        gui.clear();
+                        gameInterface.clear();
                         var sw = new StackWrapper(c, a, targets);
                         return new CastAction(sw, v);
                     }
@@ -600,9 +609,9 @@ namespace stonekart
         //todo(seba) allow canceling
         private Target[] getTargets(Ability a)
         {
-            gui.push();
-            gui.setMessage("Select target(s)");
-            gui.setChoiceButtons(GUI.CANCEL);
+            gameInterface.push();
+            gameInterface.setMessage("Select target(s)");
+            gameInterface.setChoiceButtons(GUI.CANCEL);
 
             Target[] targets = new Target[a.countTargets()];
             TargetRule[] rules = a.getTargetRules();
@@ -611,7 +620,7 @@ namespace stonekart
             while (i < targets.Length)
             {
                 Target t = null;
-                GameElement f = getGameElement();
+                GameUIElement f = gameInterface.getNextGameElementPress();
                 if (f is PlayerButton)
                 {
                     t = new Target(((PlayerButton)f).getPlayer());
@@ -632,16 +641,16 @@ namespace stonekart
                     targets[i++] = t;
                 }
             }
-            gui.pop();
+            gameInterface.pop();
             return targets;
         }
 
         private CastAction demandCastOrPass()
         {
-            gui.setMessage("Opponent has priority");
+            gameInterface.setMessage("Opponent has priority");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            gui.setMessage("");
-            return v.isPass() ? null : v;
+            gameInterface.setMessage("");
+            return v;
         }
 
         private int demandSelection()
@@ -665,21 +674,21 @@ namespace stonekart
 
         private Card[] chooseMultiple(string message, Func<CardButton, bool> xd)
         {
-            gui.setMessage(message);
+            gameInterface.setMessage(message);
 
             List<CardButton> bs = new List<CardButton>();
             while (true) 
             {
-                gui.setChoiceButtons(ACCEPT);
+                gameInterface.setChoiceButtons(ACCEPT);
                 while (true)
                 {
-                    GameElement f = getGameElement();
+                    GameUIElement f = gameInterface.getNextGameElementPress();
                     if (f is ChoiceButton)
                     {
                         var b = (ChoiceButton)f;
                         if (b.choice == GUI.ACCEPT)
                         {
-                            gui.clear();
+                            gameInterface.clear();
 
                             return bs.Select(bt => bt.getCard()).ToArray();
                         }
@@ -718,7 +727,7 @@ namespace stonekart
             //todo(seba) could keep track of undefended attackers
             List<Card> blockers = new List<Card>();
 
-            gui.setChoiceButtons(GUI.ACCEPT);
+            gameInterface.setChoiceButtons(GUI.ACCEPT);
             while (true)
             {
                 CardButton blocker, blocked;
@@ -726,12 +735,12 @@ namespace stonekart
                 while (true)
                 {
                     blocker = blocked = null;
-                    gui.setMessage("Choose defenders");
-                    gui.setChoiceButtons(GUI.ACCEPT);
+                    gameInterface.setMessage("Choose defenders");
+                    gameInterface.setChoiceButtons(GUI.ACCEPT);
 
                     while (blocker == null)
                     {
-                        GameElement e = getGameElement();
+                        GameUIElement e = gameInterface.getNextGameElementPress();
                         if (e is CardButton)
                         {
                             CardButton b = (CardButton)e;
@@ -763,12 +772,12 @@ namespace stonekart
                         }
                     }
 
-                    gui.setMessage("Blocking what?");
-                    gui.setChoiceButtons(GUI.CANCEL);
+                    gameInterface.setMessage("Blocking what?");
+                    gameInterface.setChoiceButtons(GUI.CANCEL);
 
                     while (blocked == null)
                     {
-                        GameElement e = getGameElement();
+                        GameUIElement e = gameInterface.getNextGameElementPress();
                         if (e is CardButton)
                         {
                             blocked = (CardButton)e;
@@ -861,26 +870,12 @@ namespace stonekart
         {
             return i == 0 ? homePlayer : awayPlayer;
         }
-
-        //todo seba this really shouldn't be here
-        private GameElement f;
-        private AutoResetEvent e = new AutoResetEvent(false);
-
-        private GameElement getGameElement()
-        {
-            e.WaitOne();
-            if (f == null) { throw new Exception("this should never happen kappa"); }
-            GameElement r = f;
-            f = null;
-
-            return r;
-        }
-
+        
         private Card getCard()
         {
             while (true)
             {
-                GameElement f = getGameElement();
+                GameUIElement f = gameInterface.getNextGameElementPress();
                 if (f is CardButton)
                 {
                     return ((CardButton)f).getCard();
@@ -890,40 +885,31 @@ namespace stonekart
 
         private ChoiceButton getButton(int i)
         {
-            gui.setChoiceButtons(i);
+            gameInterface.setChoiceButtons(i);
             while (true)
             {
-                GameElement f = getGameElement();
+                GameUIElement f = gameInterface.getNextGameElementPress();
                 if (f is ChoiceButton)
                 {
-                    gui.setChoiceButtons(NONE);
+                    gameInterface.setChoiceButtons(NONE);
                     return (ChoiceButton)f;
                 }
             }
         }
-
+        /*
         private int getManaColor()
         {
             while (true)
             {
-                GameElement f = getGameElement();
+                GameUIElement f = gameInterface.getNextGameElementPress();
                 if (f is PlayerPanel.ManaButton)
                 {
                     return ((PlayerPanel.ManaButton)f).getColor();
                 }
             }
         }
-
-        public void gameElementPressed(GameElement gameElement)
-        {
-            f = gameElement;
-            e.Set();
-        }
-
-        private const int
-            NONE = GUI.NOTHING,
-            ACCEPT = GUI.ACCEPT,
-            ACCEPTCANCEL = GUI.ACCEPT | GUI.CANCEL;
+        */
+        
 
 
         private class EventHandler

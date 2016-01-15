@@ -50,43 +50,47 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ability.cs" />
-    <Compile Include="ButtonPanel.cs" />
+    <Compile Include="GameElement.cs" />
+    <Compile Include="GUI\ButtonPanel.cs" />
     <Compile Include="Card.cs" />
-    <Compile Include="CardBox.cs">
+    <Compile Include="GUI\CardBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CardButton.cs">
+    <Compile Include="GUI\CardButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Connection.cs" />
     <Compile Include="Cost.cs" />
-    <Compile Include="DeckEditorPanel.cs">
+    <Compile Include="GUI\ChoicePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\DeckEditorPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Effect.cs" />
-    <Compile Include="FieldPanel.cs">
+    <Compile Include="GUI\FieldPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FontLoader.cs" />
-    <Compile Include="FriendPanel.cs">
+    <Compile Include="GUI\FriendPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="GameAction.cs" />
     <Compile Include="GameEvent.cs" />
-    <Compile Include="GameUI.cs" />
+    <Compile Include="GameInterface.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="GameElement.cs" />
+    <Compile Include="GUI\GameUIElement.cs" />
     <Compile Include="GameController.cs" />
-    <Compile Include="CardPanel.cs">
+    <Compile Include="GUI\CardPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI.cs" />
-    <Compile Include="GUI.Designer.cs">
+    <Compile Include="GUI\GUI.cs" />
+    <Compile Include="GUI\GUI.Designer.cs">
       <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainFrame.cs">
+    <Compile Include="GUI\MainFrame.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Network.cs" />
@@ -95,14 +99,14 @@
     <Compile Include="Observer.cs" />
     <Compile Include="Pile.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="PlayerPanel.cs">
+    <Compile Include="GUI\PlayerPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Target.cs" />
-    <Compile Include="TurnPanel.cs">
+    <Compile Include="GUI\TurnPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WaitFor.cs" />
@@ -112,7 +116,7 @@
     <None Include="bin\Debug\settings" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GUI.resx">
+    <EmbeddedResource Include="GUI\GUI.resx">
       <DependentUpon>GUI.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

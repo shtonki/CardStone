@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Windows.Forms;
 
 namespace stonekart
 {
@@ -48,10 +49,14 @@ namespace stonekart
             gamePanel.message = s;
         }
 
-        public void setChoiceButtons(int i)
+        public void setChoiceButtons(params Choice[] cs)
         {
+            //hack
+            return;
+            /*
             currentButtons = i;
             gamePanel.showButtons(i);
+            */
         }
 
         public void showAddMana(bool b)
@@ -70,7 +75,7 @@ namespace stonekart
             return o.playerButton;
         }
 
-        public void addArrow(GameElement from, GameElement to)
+        public void addArrow(GameUIElement from, GameUIElement to)
         {
             gamePanel.addArrow(@from, to);
         }
@@ -89,11 +94,32 @@ namespace stonekart
         {
             gamePanel.setStep(s, a);
         }
+        
+
+        private WaitFor<GameElement> waitForGameElement = new WaitFor<GameElement>();
 
         public void gameElementPressed(GameElement e)
         {
-            game.gameElementPressed(e);
+            waitForGameElement.signal(e);
         }
+        public GameElement getNextGameElementPress()
+        {
+            GameElement r = waitForGameElement.wait();
+            return r;
+        }
+        /*
+        public Card getPressedCard()
+        {
+            while (true)
+            {
+                GameUIElement e = getNextGameElementPress();
+                if (e is CardButton)
+                {
+                    return ((CardButton)e).getCard();
+                }
+            }
+        }
+        */
 
         public void setGame(Game g)
         {
@@ -106,5 +132,18 @@ namespace stonekart
             if (gamePanel != null) { throw new RowNotInTableException(); }
             gamePanel = p;
         }
+
+        public void keyPressed(Keys key)
+        {
+            switch (key)
+            {
+                case  Keys.F6:
+                {
+                    game.autoPass = !game.autoPass;
+                } break;
+            }
+        }
     }
+
+    
 }

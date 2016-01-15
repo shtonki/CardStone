@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    public class Card : Observable
+    public class Card : Observable, GameElement
     {
         private int id;
         private CardId cardId;

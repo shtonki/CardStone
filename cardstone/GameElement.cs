@@ -2,17 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace stonekart
 {
-    /// <summary>
-    /// Needed because it is.
-    /// </summary>
-    public interface GameElement
+    public class GameElement
     {
+        private object element;
+        public GameElementType type { get; private set; }
 
+        public Card card => element as Card;
+        public Choice? choice => element as Choice?;
+        public Player player => element as Player;
+        //public Card manaColor => element as Card;
+
+        public GameElement(Card c)
+        {
+            element = c;
+            type = GameElementType.CARD;
+        }
+
+        public GameElement(Choice? c)
+        {
+            element = c;
+            type = GameElementType.CHOICE;
+        }
+
+        public GameElement(Player p)
+        {
+            element = p;
+            type = GameElementType.PLAYER;
+        }
+
+        public enum GameElementType
+        {
+            CARD,
+            CHOICE,
+            PLAYER,
+            MANACOLOR,
+        }
     }
 }
-

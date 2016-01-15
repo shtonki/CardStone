@@ -172,7 +172,7 @@ namespace stonekart
              
         }
 
-        public class ManaButton : UserControl, GameElement
+        public class ManaButton : UserControl, GameUIElement
         {
             public const int
                 FILLED = 0,
@@ -188,7 +188,7 @@ namespace stonekart
             private const int thickness = 4;
 
             private int state = 0;
-            private int color;
+            private ManaColor color;
 
             public ManaButton(int c)
             {
@@ -238,7 +238,12 @@ namespace stonekart
         }
     }
 
-    public class PlayerButton : Button, GameElement
+    public enum ManaColor
+    {
+        
+    }
+
+    public class PlayerButton : Button, GameUIElement
     {
         private Player p;
 

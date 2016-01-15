@@ -170,13 +170,13 @@ namespace stonekart
             }
         }
         
-
+        /*
         public const int
             NOTHING = 0,
             CANCEL = 1,
             ACCEPT = 2;
-
-        //todo(jasin) sholdn't be const fam
+            */
+        //todo(notme) sholdn't be const fam
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
         

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    public class CardButton : Button, GameElement, Observer
+    public class CardButton : Button, GameUIElement, Observer
     {
         public static int WIDTH = 180, HEIGHT = 280;
         private readonly Size size = new Size(WIDTH, HEIGHT);
@@ -73,15 +73,17 @@ namespace stonekart
             {
                 gameInterface.clearArrows();
             };
-            
-            Click += (sender, args) =>
-            {
-                gameInterface.gameElementPressed(this);
-            };
+
+            Click += clicked;
+        }
+
+        private void clicked(object o, EventArgs a)
+        {
+            gameInterface.gameElementPressed(new GameElement(card));
         }
 
         public int dbg;
-        private GameElement targetToGameElement(Target t)
+        private GameUIElement targetToGameElement(Target t)
         {
             if (t.isCard())
             {
