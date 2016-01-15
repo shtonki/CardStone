@@ -79,10 +79,14 @@ namespace stonekart
 
         private void clicked(object o, EventArgs a)
         {
-            gameInterface.gameElementPressed(new GameElement(card));
+            gameInterface.gameElementPressed(getElement());
         }
 
-        public int dbg;
+        public GameElement getElement()
+        {
+            throw new NotImplementedException();
+        }
+
         private GameUIElement targetToGameElement(Target t)
         {
             if (t.isCard())
