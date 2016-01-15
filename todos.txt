@@ -2,3 +2,4 @@
 * colorless mana costs
 * display targeting and defending
 * call ClearFocus after transitioning to another DisplayPanel without crashing
+* the card size just isn't realistic quit daydreamin' kid

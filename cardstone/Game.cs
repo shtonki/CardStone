@@ -12,7 +12,7 @@ namespace stonekart
 {
     public class Game
     {
-        private GameUI gui;
+        private GameInterface gui;
 
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
@@ -30,7 +30,7 @@ namespace stonekart
 
         private Stack<StackWrapper> stackxd;
         
-        public Game(GameConnection cn, GameUI g)
+        public Game(GameConnection cn, GameInterface g)
         {
             gui = g;
             connection = cn;

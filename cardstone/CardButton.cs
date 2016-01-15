@@ -14,7 +14,7 @@ namespace stonekart
 
         private static FontFamily fontFamilyA;
 
-        private GameUI gameUI;
+        private GameInterface gameInterface;
         private Card card;
 
         private Pen borderPen;
@@ -54,9 +54,9 @@ namespace stonekart
              */
         }
 
-        public CardButton(GameUI g)
+        public CardButton(GameInterface g)
         {
-            gameUI = g;
+            gameInterface = g;
             Visible = true;
             Size = size;
             
@@ -65,18 +65,18 @@ namespace stonekart
                 if (card?.stackWrapper?.targets == null || card.stackWrapper.targets.Length == 0) { return; }
                 foreach (Target t in card.stackWrapper.targets)
                 {
-                    gameUI.addArrow(this, targetToGameElement(t));
+                    gameInterface.addArrow(this, targetToGameElement(t));
                 }
             };
 
             MouseLeave += (sender, args) =>
             {
-                gameUI.clearArrows();
+                gameInterface.clearArrows();
             };
             
             Click += (sender, args) =>
             {
-                gameUI.gameElementPressed(this);
+                gameInterface.gameElementPressed(this);
             };
         }
 
@@ -85,11 +85,11 @@ namespace stonekart
         {
             if (t.isCard())
             {
-                return gameUI.getCardButton(t.getCard());
+                return gameInterface.getCardButton(t.getCard());
             }
             else
             {
-                return gameUI.getPlayerButton(t.getPlayer());
+                return gameInterface.getPlayerButton(t.getPlayer());
             }
         }
 

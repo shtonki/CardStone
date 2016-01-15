@@ -16,7 +16,7 @@ namespace stonekart
         private const int NOOFBUTTONS = 20;
         CardButton[] cardButtons;
 
-        public CardPanel(GameUI g)
+        public CardPanel(GameInterface g)
         {
             BackColor = Color.Pink;
             Size = new Size(WIDTH, HEIGHT);

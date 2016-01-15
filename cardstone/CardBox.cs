@@ -13,7 +13,7 @@ namespace stonekart
         private const int BUTTONS = 30;
         private CardButton[] buttons;
 
-        public CardBox(GameUI g, int width, int height)
+        public CardBox(GameInterface g, int width, int height)
         {
             Size = new Size(width, height);
             BackColor = Color.LightGreen;

@@ -14,7 +14,7 @@ namespace stonekart
         private Player player;
         private Label health;
         public PlayerButton playerButton { get; private set; }
-        private GameUI game;
+        private GameInterface game;
 
         private string
             hlt = "x",
@@ -25,7 +25,7 @@ namespace stonekart
         private static Font f = new Font(new FontFamily("Comic Sans MS"), 20);
 
         private static int x = 0;
-        public PlayerPanel(GameUI g)
+        public PlayerPanel(GameInterface g)
         {
             game = g;
 

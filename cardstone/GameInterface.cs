@@ -7,7 +7,7 @@ namespace stonekart
     /// Basically just a wrapper for the gamePanel class so 
     /// that a Game can draw what it needs to draw.
     /// </summary>
-    public class GameUI
+    public class GameInterface
     {
         //todo(seba) make this an actual stack and not just retarded
         private string poppedMessage;
@@ -19,7 +19,7 @@ namespace stonekart
 
         private ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense;
 
-        public GameUI(ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense n)
+        public GameInterface(ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense n)
         {
             nonsense = n;
         }

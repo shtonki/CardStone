@@ -37,7 +37,7 @@ namespace stonekart
             frameLoaded.WaitOne();
         }   
 
-        public static void transitionToGame(GameUI g)
+        public static void transitionToGame(GameInterface g)
         {
             frame.transitionTo(g.gamePanel);
         }
@@ -53,12 +53,12 @@ namespace stonekart
         }
 
         /// <summary>
-        /// Creates a GameUI and binds it to a new GamePanel created
+        /// Creates a GameInterface and binds it to a new GamePanel created
         /// in the current frame.
         /// </summary>
-        public static GameUI createGameUI()
+        public static GameInterface createGameUI()
         {
-            GameUI r = new GameUI(nonsense);
+            GameInterface r = new GameInterface(nonsense);
             frame.createGamePanel(r);
             return r;
         }

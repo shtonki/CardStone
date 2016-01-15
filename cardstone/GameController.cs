@@ -61,7 +61,7 @@ namespace stonekart
         private static void newGameT(object o)
         {
             GameConnection c = (GameConnection)o;
-            GameUI gui = GUI.createGameUI();
+            GameInterface gui = GUI.createGameUI();
             Game g = new Game(c, gui);
             gui.setGame(g);
             GUI.transitionToGame(gui);

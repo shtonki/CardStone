@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 
 /// <summary>
 /// Definately not RSA
+/// Definately needs refactoring
 /// </summary>
 abstract class RSA
 {

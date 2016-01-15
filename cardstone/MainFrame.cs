@@ -85,10 +85,10 @@ namespace stonekart
         }
 
         /// <summary>
-        /// Creates and binds a new GamePanel to the given GameUI
+        /// Creates and binds a new GamePanel to the given GameInterface
         /// </summary>
         /// <param name="g"></param>
-        public void createGamePanel(GameUI g)
+        public void createGamePanel(GameInterface g)
         {
             GamePanel r = new GamePanel(g);
             g.setPanel(r);
@@ -350,7 +350,7 @@ namespace stonekart
 
         public string message { get { return choicePanel.Text; } set { choicePanel.Text = value; } }
 
-        public GamePanel(GameUI g)
+        public GamePanel(GameInterface g)
         {
             BackColor = Color.Silver;
             Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
@@ -487,7 +487,7 @@ namespace stonekart
 
         class ChoicePanel : Panel
         {
-            private GameUI game;
+            private GameInterface game;
 
             private ChoiceButton
                 cancel,
@@ -501,7 +501,7 @@ namespace stonekart
                 set { setText(value); }
             }
 
-            public ChoicePanel(GameUI g)
+            public ChoicePanel(GameInterface g)
             {
                 game = g;
 

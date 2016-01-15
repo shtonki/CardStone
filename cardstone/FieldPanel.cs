@@ -9,7 +9,7 @@ namespace stonekart
         private SnapCardButton[] buttons;
         private const int BUTTONS = 10;
 
-        public FieldPanel(GameUI g, bool asHero)
+        public FieldPanel(GameInterface g, bool asHero)
         {
             Size = new Size(900, 320);
             BackColor = Color.DarkKhaki;
@@ -52,7 +52,7 @@ namespace stonekart
 
         private int xdd;
 
-        public SnapCardButton(GameUI g, bool b) : base(g)
+        public SnapCardButton(GameInterface g, bool b) : base(g)
         {
             xdd = b ? -40 : 40;
         }
