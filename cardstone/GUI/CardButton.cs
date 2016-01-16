@@ -62,10 +62,17 @@ namespace stonekart
             
             MouseEnter += (sender, args) =>
             {
-                if (card?.stackWrapper?.targets == null || card.stackWrapper.targets.Length == 0) { return; }
-                foreach (Target t in card.stackWrapper.targets)
+                if (card?.stackWrapper?.targets != null)
                 {
-                    gameInterface.addArrow(this, targetToGameElement(t));
+                    foreach (Target t in card.stackWrapper.targets)
+                    {
+                        gameInterface.addArrow(this, targetToGameElement(t));
+                    }
+                }
+
+                if (card?.defenderOf != null)
+                {
+                    gameInterface.addArrow(this, gameInterface.getCardButton(card.defenderOf));
                 }
             };
 
@@ -98,6 +105,7 @@ namespace stonekart
                 return gameInterface.getPlayerButton(t.getPlayer());
             }
         }
+        
 
         //todo(seba) make this a property
         public Card getCard()
@@ -206,7 +214,7 @@ namespace stonekart
 
                     pevent.Graphics.FillEllipse(p, -w, 280 - w, 2 * w, 2 * w);
                     pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
-                    pevent.Graphics.DrawString(card.getCurrentPower().ToString(), PTFont, pt, 4, 250);
+                    pevent.Graphics.DrawString(card.currentPower.ToString(), PTFont, pt, 4, 250);
                     pevent.Graphics.DrawString(card.getCurrentToughness().ToString(), PTFont, card.isDamaged() ? damaged : pt, 154, 250);
                 }
 
@@ -226,7 +234,12 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             card = (Card)o;
-            if (card.attacking)
+
+            if (card.inCombat)
+            {
+                setBorder(Color.Blue);
+            }
+            else if (card.attacking)
             {
                 setBorder(Color.Red);
             }

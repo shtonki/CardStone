@@ -1,8 +1,5 @@
-*.exe
-*.exe.config
-*.Cache
-*.manifest
-*.pdb
+/cardstone/bin/*
+!/carstone/bin/Debug/cardstone.exe
 /cardstone/obj/Debug/*
 /obj/Debug/*.cs
 pushaT.bat

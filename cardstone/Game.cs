@@ -125,7 +125,7 @@ namespace stonekart
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGECREATURE, _damageCreature));
             kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, _buryCreature));
         }
-
+        
         private void _topcard(GameEvent gevent)
         {
             TopEvent e = (TopEvent)gevent;
@@ -380,14 +380,14 @@ namespace stonekart
 
                 for (int i = 0; i < defenders.Length; i++)
                 {
-                    defenders[i].combatOpponent = v[i];
+                    defenders[i].defenderOf = v[i];
+                    v[i].defendedBy = defenders[i];
                 }
             }
             else
             {
                 Tuple<Card[], Card[]> ls = chooseDefenders();
-                defenders = ls.Item1;
-                raiseAction(new MultiSelectAction(defenders));
+                raiseAction(new MultiSelectAction(ls.Item1));
                 raiseAction(new MultiSelectAction(ls.Item2));
             }
 
@@ -396,11 +396,20 @@ namespace stonekart
 
         private void combatDamageStep()
         {
-            foreach (var v in activePlayer.getField().getCards())
+            foreach (var attacker in activePlayer.getField().getCards())
             {
-                if (v.attacking)
+                if (attacker.attacking)
                 {
-                    raiseEvent(new DamagePlayerEvent(inactivePlayer, v, v.getCurrentPower()));
+                    if (attacker.defended)
+                    {
+                        Card defender = attacker.defendedBy;
+                        raiseEvent(new DamageCreatureEvent(defender, attacker, attacker.currentPower));
+                        raiseEvent(new DamageCreatureEvent(attacker, defender, defender.currentPower));
+                    }
+                    else
+                    {
+                        raiseEvent(new DamagePlayerEvent(inactivePlayer, attacker, attacker.currentPower));
+                    }
                 }
             }
             
@@ -741,14 +750,15 @@ namespace stonekart
 
                             if (c.owner == hero && !c.canDefend()) { continue; }
 
-                            if (c.combatOpponent == null)
+                            if (c.defenderOf == null)
                             {
                                 blocker = c;
                             }
                             else
                             {
                                 blockers.Remove(c);
-                                c.combatOpponent = null;
+                                c.defenderOf.defendedBy = null;
+                                c.defenderOf = null;
                             }
                         }
                         else if (chosenGameElement.choice != null)
@@ -781,7 +791,8 @@ namespace stonekart
 
                     if (blocked != null)
                     {
-                        blocker.combatOpponent = blocked;
+                        blocker.defenderOf = blocked;
+                        blocked.defendedBy = blocker;
                         blockers.Add(blocker);
                     }
                 }
@@ -789,7 +800,7 @@ namespace stonekart
 
             end:
             gameInterface.setChoiceButtons();
-            Card[] bkds = blockers.Select(@c => c.combatOpponent).ToArray();
+            Card[] bkds = blockers.Select(@c => c.defenderOf).ToArray();
             return new Tuple<Card[], Card[]>(blockers.ToArray(), bkds);
         }
 

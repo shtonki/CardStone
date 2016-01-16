@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace stonekart
@@ -51,11 +52,7 @@ namespace stonekart
 
         public void setChoiceButtons(params Choice[] cs)
         {
-            uint i = 0;
-            foreach (Choice choice in cs)
-            {
-                i |= (uint)choice;
-            }
+            uint i = cs.Aggregate<Choice, uint>(0, (current, choice) => current | (uint)choice);
 
             currentButtons = i;
             gamePanel.showButtons(i);
@@ -103,6 +100,7 @@ namespace stonekart
 
         public void gameElementPressed(GameElement e)
         {
+            GUI.globalEscape();
             waitForGameElement.signal(e);
         }
         public GameElement getNextGameElementPress()
@@ -142,6 +140,7 @@ namespace stonekart
                 case  Keys.F6:
                 {
                     game.autoPass = !game.autoPass;
+                    gameElementPressed(new GameElement(Choice.PASS));
                 } break;
             }
         }

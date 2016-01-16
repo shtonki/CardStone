@@ -18,6 +18,8 @@ namespace stonekart
         public Player controller { get; private set; }
 
         private bool Attacking;
+        private Card DefenderOf;
+        private Card DefendedBy;
         
         private bool _topped;
         public bool topped
@@ -36,7 +38,7 @@ namespace stonekart
         private SubType? subType;
         public StackWrapper stackWrapper;
 
-        private int? power, toughness, currentPower, currentToughness;
+        private int? power, toughness, CurrentPower, currentToughness;
         public bool summoningSick { get; set; }
         public bool attacking
         {
@@ -48,8 +50,28 @@ namespace stonekart
             }
         }
 
-        public bool defending => combatOpponent != null;
-        public Card combatOpponent { get; set; }
+        public bool inCombat => defended || defending;
+        public bool defended => defendedBy != null;
+        public bool defending => defenderOf != null;
+        public Card defenderOf
+        {
+            get { return DefenderOf; }
+            set
+            {
+                DefenderOf = value;
+                notifyObserver();
+            }
+        }
+
+        public Card defendedBy
+        {
+            get { return DefendedBy; }
+            set
+            {
+                DefendedBy = value;
+                notifyObserver();
+            }
+        }
 
         private List<Ability> abilities;
         private ManaCoster castingCost;
@@ -144,7 +166,7 @@ namespace stonekart
 
             if (power != null)
             {
-                currentPower = power;
+                CurrentPower = power;
                 currentToughness = toughness;
             }
 
@@ -255,10 +277,7 @@ namespace stonekart
             return power != null;
         }
 
-        public int getCurrentPower()
-        {
-            return currentPower.GetValueOrDefault();
-        }
+        public int currentPower => CurrentPower.GetValueOrDefault();
 
         public int getCurrentToughness()
         {
