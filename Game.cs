@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+//x
 namespace stonekart
 {
     public class Game
@@ -38,7 +39,7 @@ namespace stonekart
             connection = cn;
             connection.setGame(this);
             cardFactory = new CardFactory();
-
+               
             setupEventHandlers();
 
             hero = new Player(this, LocationPlayer.HERO);
