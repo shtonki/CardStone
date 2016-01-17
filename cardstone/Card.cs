@@ -38,7 +38,9 @@ namespace stonekart
         private SubType? subType;
         public StackWrapper stackWrapper;
 
-        private int? power, toughness, CurrentPower, currentToughness;
+        private int? basePower, baseToughness, CurrentPower, CurrentToughness;
+        public int currentPower => CurrentPower.GetValueOrDefault();
+        public int currentToughness => CurrentToughness.GetValueOrDefault();
         public bool summoningSick { get; set; }
         public bool attacking
         {
@@ -107,8 +109,8 @@ namespace stonekart
                 case CardId.Kappa:
                 {
                     blueCost = 2;
-                    power = 1;
-                    toughness = 3;
+                    basePower = 1;
+                    baseToughness = 3;
                     type = Type.Creature;
                     race = Race.Salamander;
                 } break;
@@ -119,8 +121,8 @@ namespace stonekart
                     type = Type.Creature;
                     race = Race.Bear;
                     subType = SubType.Warrior;
-                    power = 2;
-                    toughness = 3;
+                    basePower = 2;
+                    baseToughness = 3;
                 } break;
 
                 case CardId.LightningBolt:
@@ -142,8 +144,8 @@ namespace stonekart
                     blackCost = 1;
                     type = Type.Creature;
                     race = Race.Zombie;
-                    power = 2;
-                    toughness = 2;
+                    basePower = 2;
+                    baseToughness = 2;
                 } break;
 
                 case CardId.PropheticVision:
@@ -157,17 +159,17 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Creature;
-                    power = 1;
-                    toughness = 1;
+                    basePower = 1;
+                    baseToughness = 2;
                     keyAbilities.Add(KeyAbility.Fervor);
                 } break;
 
             }
 
-            if (power != null)
+            if (basePower != null)
             {
-                CurrentPower = power;
-                currentToughness = toughness;
+                CurrentPower = basePower;
+                CurrentToughness = baseToughness;
             }
 
             abilities = new List<Ability>();
@@ -180,7 +182,7 @@ namespace stonekart
 
             abilities.Add(castAbility);
 
-            if ((power == null) != (toughness == null))
+            if ((basePower == null) != (baseToughness == null))
             {
                 throw new Exception("bad thing b0ss");
             }
@@ -262,7 +264,7 @@ namespace stonekart
         
         public void damage(int d)
         {
-            currentToughness -= d;
+            CurrentToughness -= d;
             notifyObserver();
         }
         
@@ -274,19 +276,14 @@ namespace stonekart
 
         public bool hasPT()
         {
-            return power != null;
+            return basePower != null;
         }
 
-        public int currentPower => CurrentPower.GetValueOrDefault();
-
-        public int getCurrentToughness()
-        {
-            return currentToughness.GetValueOrDefault();
-        }
+        
 
         public bool isDamaged()
         {
-            return currentToughness != toughness;
+            return CurrentToughness != baseToughness;
         }
 
         public bool canAttack()
@@ -304,6 +301,11 @@ namespace stonekart
             return keyAbilities.Contains(a);
         }
 
+        public void moveReset()
+        {
+            CurrentPower = basePower;
+            CurrentToughness = baseToughness;
+        }
 
         public int getAbilityIndex(Ability a)
         {

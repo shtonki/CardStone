@@ -191,6 +191,7 @@ namespace stonekart
         {
             MoveCardEvent e = (MoveCardEvent)gevent;
             moveCardTo(e.getCard(), e.getLocation());
+            e.getCard().moveReset();
             e.getCard().owner.notifyObserver();
         }
         private void _gainManaOrb(GameEvent gevent)
@@ -387,6 +388,7 @@ namespace stonekart
             else
             {
                 Tuple<Card[], Card[]> ls = chooseDefenders();
+                defenders = ls.Item1;
                 raiseAction(new MultiSelectAction(ls.Item1));
                 raiseAction(new MultiSelectAction(ls.Item2));
             }
@@ -424,11 +426,13 @@ namespace stonekart
                 foreach (Card c in attackers)
                 {
                     gameInterface.getCardButton(c).setBorder(null);
+                    c.defendedBy = null;
                 }
 
                 foreach (Card c in defenders)
                 {
                     gameInterface.getCardButton(c).setBorder(null);
+                    c.defenderOf = null;
                 }
                 attackers = defenders = null;
             }
@@ -510,7 +514,7 @@ namespace stonekart
 
             foreach (var v in hero.getField().getCards())
             {
-                if (v.getCurrentToughness() <= 0)
+                if (v.currentToughness <= 0)
                 {
                     xd.Add(new BuryCreature(v));
                 }
@@ -518,7 +522,7 @@ namespace stonekart
 
             foreach (var v in villain.getField().getCards())
             {
-                if (v.getCurrentToughness() <= 0)
+                if (v.currentToughness <= 0)
                 {
                     xd.Add(new BuryCreature(v));
                 }

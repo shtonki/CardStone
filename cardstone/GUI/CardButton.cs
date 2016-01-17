@@ -215,7 +215,7 @@ namespace stonekart
                     pevent.Graphics.FillEllipse(p, -w, 280 - w, 2 * w, 2 * w);
                     pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
                     pevent.Graphics.DrawString(card.currentPower.ToString(), PTFont, pt, 4, 250);
-                    pevent.Graphics.DrawString(card.getCurrentToughness().ToString(), PTFont, card.isDamaged() ? damaged : pt, 154, 250);
+                    pevent.Graphics.DrawString(card.currentToughness.ToString(), PTFont, card.isDamaged() ? damaged : pt, 154, 250);
                 }
 
                 if (borderPen != null)
