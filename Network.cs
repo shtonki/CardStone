@@ -12,8 +12,6 @@ namespace stonekart
 {
     static class Network
     {
-        public const string SERVER = "server";
-        public const string SERVERIP = "46.239.124.155";
 
         private static ServerConnection serverConnection;
         private static Dictionary<string, GameConnection> gameConnections = new Dictionary<string, GameConnection>();
@@ -83,7 +81,7 @@ namespace stonekart
         /// <param name="s">The username of the friend to add</param>
         public static void addFriend(string s)
         {
-            serverConnection.sendMessage(SERVER, "friend", s);
+            serverConnection.sendMessage(Connection.SERVER, "friend", s);
         }
         
         /// <summary>
@@ -92,7 +90,7 @@ namespace stonekart
         /// <param name="s">The username of the friend to remove</param>
         public static void removeFriend(string s)
         {
-            serverConnection.sendMessage(SERVER, "unfriend", s);
+            serverConnection.sendMessage(Connection.SERVER, "unfriend", s);
         }
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace stonekart
         /// <param name="s">The user to 'challenge'</param>
         public static void challenge(string s)
         {
-            serverConnection.sendMessage(SERVER, "requestgame", s);
+            serverConnection.sendMessage(Connection.SERVER, "requestgame", s);
         }
 
         /// <summary>
@@ -147,7 +145,7 @@ namespace stonekart
         /// Creates a connection to the server
         /// </summary>
         public ServerConnection()
-            : base(Network.SERVERIP)
+            : base(Connection.SERVERIP)
         {
 
         }
@@ -169,7 +167,7 @@ namespace stonekart
         {
             name = username;
 
-            sendMessage(Network.SERVER, "login", name);
+            sendMessage(Connection.SERVER, "login", name);
 
             SMessage m = waitForMessage();
 

@@ -9,6 +9,10 @@ using Console = System.Console;
 
 class Connection
 {
+
+    public const string SERVERIP = "46.239.124.155";
+    public const string SERVER = "server";
+
     public delegate void DataReceived(Connection c, SMessage m);
     public delegate void ConnectionClosed(Connection c);
 
@@ -259,21 +263,33 @@ public class SMessage
     /// <param name="f">The name of the sender</param>
     /// <param name="h">The header of the message</param>
     /// <param name="m">The content of the message</param>
-    public SMessage(string t, string f, string h, string m)
+    public SMessage(string t, string f, string h, string m) : this(t, f, h, Encoding.ASCII.GetBytes(m ?? ""))
     {
-        from = f;
-        to = t;
-        header = h;
-        message = m ?? "";
+    }
+
+    public SMessage(string t, string f, string h, byte[] m)
+    {
+        bfrom = Encoding.ASCII.GetBytes(f);
+        bto = Encoding.ASCII.GetBytes(t);
+        bheader = Encoding.ASCII.GetBytes(h);
+        bmessage = m;
     }
     
     public override string ToString()
     {
         return from + "->" + to + '\'' + header + ';' + message + '\'';
     }
+    
 
-    public readonly string from;
-    public readonly string to;
-    public readonly string header;
-    public readonly string message;
+    public string from => ASCIIEncoding.ASCII.GetString(bfrom);
+    public string to => ASCIIEncoding.ASCII.GetString(bto);
+    public string header => ASCIIEncoding.ASCII.GetString(bheader);
+    public string message => ASCIIEncoding.ASCII.GetString(bmessage);
+
+    
+    public readonly byte[] bfrom;
+    public readonly byte[] bto;
+    public readonly byte[] bheader;
+    public readonly byte[] bmessage;
+    
 }

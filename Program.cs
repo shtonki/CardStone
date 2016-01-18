@@ -20,6 +20,8 @@ namespace stonekart
         {
             CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
 
+            
+
             GameController.startGame();
         }
 
