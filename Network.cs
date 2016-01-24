@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using connection;
 
 namespace stonekart
 {
@@ -166,7 +167,7 @@ namespace stonekart
         public bool handshake(string username)
         {
             name = username;
-
+            
             sendMessage(Connection.SERVER, "login", name);
 
             SMessage m = waitForMessage();
