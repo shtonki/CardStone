@@ -80,7 +80,7 @@ namespace stonekart
         //private List<Ability> abilities;
         private readonly List<ActivatedAbility> baseActivatedAbilities;
         private readonly List<TriggeredAbility> baseTriggeredAbilities;
-        private ManaCoster castingCost;
+        private ManaCost castingCost;
         private List<KeyAbility> keyAbilities;
 
         public List<Ability> abilities => ((IEnumerable<Ability>)activatedAbilities).Concat(triggeredAbilities).ToList();
@@ -89,7 +89,9 @@ namespace stonekart
 
         protected Card()
         {
-            
+            baseActivatedAbilities = new List<ActivatedAbility>();
+            baseTriggeredAbilities = new List<TriggeredAbility>();
+            keyAbilities = new List<KeyAbility>();
         }
 
         //todo(seba) move this entire constructor to a XML document
@@ -102,7 +104,7 @@ namespace stonekart
             
             keyAbilities = new List<KeyAbility>();
 
-            int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0;
+            int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0, greyCost = 0;
 
             string s = cardId.ToString();
             StringBuilder b = new StringBuilder();
@@ -203,7 +205,7 @@ namespace stonekart
 
 
             Effect x = new Effect(fx.ToArray());
-            castingCost = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
+            castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
             Cost cc = new Cost(castingCost);
             ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND);
             castAbility.setInstant(type == Type.Instant);
@@ -253,15 +255,12 @@ namespace stonekart
             return name;
         }
 
-        public ManaCoster getManaCost()
+        public ManaCost getManaCost()
         {
             return castingCost;
         }
-        
-        public bool isDummy()
-        {
-            return false;
-        }
+
+        public bool isDummy { get; private set; }
 
         public void setLocationRaw(Location l)
         {
@@ -378,11 +377,15 @@ namespace stonekart
 
         public Card createDummy()
         {
+
             Card r = new Card();
 
             r.name = name;
             r.cardId = cardId;
             r.castingCost = castingCost;
+            r.isDummy = true;
+            r.controller = controller;
+            r.owner = owner;
 
             return r;
         }
@@ -406,6 +409,7 @@ namespace stonekart
 
         public string getAbilitiesString()
         {
+
             StringBuilder b = new StringBuilder();
 
             foreach (Ability v in abilities)

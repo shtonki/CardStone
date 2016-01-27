@@ -103,6 +103,8 @@ namespace stonekart
                 CardId.TempleCleric,
                 CardId.TempleCleric,
                 CardId.TempleCleric,
+                CardId.TempleCleric,
+                CardId.TempleCleric,
             };
         }
 
@@ -124,7 +126,6 @@ namespace stonekart
             addBaseHandler(GameEventType.MOVECARD, _movecard);
             addBaseHandler(GameEventType.GAINMANAORB, _gainmanaorb);
             addBaseHandler(GameEventType.UNTOPPLAYER, _untopplayer);
-            addBaseHandler(GameEventType.RESOLVE, _resolve);
             addBaseHandler(GameEventType.DAMAGEPLAYER, _damageplayer);
             addBaseHandler(GameEventType.DAMAGECREATURE, _damagecreature);
             addBaseHandler(GameEventType.BURYCREATURE, _burycreature);
@@ -174,47 +175,24 @@ namespace stonekart
         {
             CastEvent e = (CastEvent)gevent;
             StackWrapper v = e.getStackWrapper();
-            moveCardTo(v.card, stack); 
+            //v.card = v.card.createDummy();
+            Card card = v.card;
+            
+            
+            if (card.location != null)
+            {
+                pileFromLocation(card.location).remove(card);
+            }
+
+            
+            stack.add(card);
+            card.location = stack.location;
+
+            //moveCardTo(v.card.createDummy(), stack); 
             stackxd.Push(v);
             v.card.stackWrapper = v;
 
-            v.card.owner.notifyObserver();
-        }
-        private void _resolve(GameEvent gevent)
-        {
-            ResolveEvent e = (ResolveEvent)gevent;
-            var x = e.getStackWrapper();
-
-            if (!stackxd.Pop().Equals(x) || stack.peek() != x.card)
-            {
-                throw new CannotUnloadAppDomainException("we don't need to deal with the immigration \"problem\" that's not politically correct xddd");
-            }
-
-            Ability a = x.ability;
-            Card card = x.card;
-
-            List<GameEvent> es = a.resolve(card, x.targets);
-
-            foreach (var v in es)
-            {
-                handleEvent(v);
-            }
-
-            if (card.isDummy())
-            {
-                throw new NotImplementedException();
-            }
-
-            if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
-            {
-                handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
-            }
-            else
-            {
-                handleEvent(new MoveCardEvent(card, LocationPile.FIELD));
-            }
-
-            card.stackWrapper = null;
+            v.card.owner?.notifyObserver();
         }
         private void _movecard(GameEvent gevent)
         {
@@ -562,10 +540,17 @@ namespace stonekart
                 handleEvent(v);
             }
 
-            foreach (TriggeredAbility a in waitingTriggeredAbilities)
+            foreach (TriggeredAbility v in waitingTriggeredAbilities)
             {
-                
+                if (v.targetCount != 0)
+                {
+                    throw new NotImplementedException();
+                }
+                StackWrapper w = new StackWrapper(v.card.createDummy(), v, emptyTargetList);
+                handleEvent(new CastEvent(w));
             }
+
+            waitingTriggeredAbilities.Clear();
         }
 
         /// <summary>
@@ -869,12 +854,12 @@ namespace stonekart
                 handleEvent(e);
             }
 
-            if (card.isDummy())
+            if (card.isDummy)
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
+                stack.remove(card);
             }
-
-            if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+            else if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
             {
                 handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
             }
@@ -944,12 +929,8 @@ namespace stonekart
                 
                 if (ability.targetCount != 0) { throw new Exception("nopers2222"); }
                 
-                //raiseTriggeredAbility(ability);
-
-                foreach (var v in ability.resolve(ability.card, emptyTargetList))
-                {
-                    handleEvent(v);
-                }
+                raiseTriggeredAbility(ability);
+                
             }
         }
 

@@ -23,7 +23,8 @@ namespace stonekart
         
         public static bool operator ==(Location a, Location b)
         {
-            if (a == null || b == null) { return a == null && b == null; }
+            if (ReferenceEquals(a, b)) { return true; }
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) { return false; }
             return a.pile == b.pile && a.side == b.side;
         }
 

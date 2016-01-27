@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,16 @@ namespace stonekart
         {
             while (true)
             {
+                for (int i = 0; i < 10000; i++)
+                {
+                    Brush b = new SolidBrush(Color.Red);
+                    b.Dispose();
+                }
+                Console.ReadKey();
+            }
+            /*
+            while (true)
+            {
                 var h = _420(System.Console.ReadLine(), "0123456789");
                 foreach (var v in h) { System.Console.Write("{0:x2} ", v);}
             }
@@ -40,6 +51,7 @@ namespace stonekart
             System.Console.WriteLine("done");
             System.Console.ReadLine();
              
+            */
             Environment.Exit(0);
         }
 

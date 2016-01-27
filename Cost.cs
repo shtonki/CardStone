@@ -8,7 +8,7 @@ namespace stonekart
     public class Cost
     {
         //private ManaCoster manaCost;
-        private List<Coster> costs;
+        private List<SubCost> costs;
         /*
         public bool tryPay(Player p)
         {
@@ -41,19 +41,19 @@ namespace stonekart
             }
         }
 
-        public Cost(params Coster[] cs)
+        public Cost(params SubCost[] cs)
         {
-            costs = new List<Coster>(cs);
+            costs = new List<SubCost>(cs);
         }
 
-        public Cost(params Coster[][] cs)
+        public Cost(params SubCost[][] cs)
         {
             int c = 0;
             //foreach (Coster[] l in cs) { c += l.Length; }
-            costs = new List<Coster>(c);
-            foreach (Coster[] xs in cs)
+            costs = new List<SubCost>(c);
+            foreach (SubCost[] xs in cs)
             {
-                foreach (Coster t in xs)
+                foreach (SubCost t in xs)
                 {
                     costs.Add(t);
                 }
@@ -81,63 +81,50 @@ namespace stonekart
         }
     }
     */
-    public abstract class Coster
+    public abstract class SubCost
     {
         public abstract int[] check(Card c);
         abstract public void pay(Card c, int[] i);
     }
 
-    public class ManaCoster : Coster
+    public class ManaCost : SubCost
     {
         //todo(seba) reconsider how we store this information yet again
-        private List<ManaColour> cost;
+        public readonly int[] costs = new int[6];
+        public int CMC { get; private set; }
 
-        public ManaCoster(int white, int blue, int black, int red, int green)
+        public ManaCost(int white, int blue, int black, int red, int green, int grey)
         {
-            cost = new List<ManaColour>();
+            costs[(int)ManaColour.WHITE] = white;
+            costs[(int)ManaColour.BLUE] = blue;
+            costs[(int)ManaColour.BLACK] = black;
+            costs[(int)ManaColour.RED] = red;
+            costs[(int)ManaColour.GREEN] = green;
+            costs[(int)ManaColour.GREY] = grey;
 
-            cantIntoLambda(white, ManaColour.WHITE, ref cost);
-            cantIntoLambda(blue, ManaColour.BLUE, ref cost);
-            cantIntoLambda(black, ManaColour.BLACK, ref cost);
-            cantIntoLambda(red, ManaColour.RED, ref cost);
-            cantIntoLambda(green, ManaColour.GREEN, ref cost);
-        }
-
-        private void cantIntoLambda(int cnt, ManaColour clr, ref List<ManaColour> l)
-        {
-            while (cnt-- > 0)
-            {
-                l.Add(clr);
-            }
+            CMC = white + blue + black + red + green + grey;
         }
 
         public override int[] check(Card card)
         {
-            Player p = card.owner;
-
-            int[] cs = new int[5];
-
-            foreach (ManaColour b in cost)
-            {
-                cs[(int)b]++;
-            }
+            int[] r = new int[CMC];
+            int c = 0;
 
             for (int i = 0; i < 5; i++)
             {
-                if (p.getCurrentMana(i) < cs[i]) { return null; }
+                int t = costs[i];
+                while (t-- > 0)
+                {
+                    r[c++] = i;
+                }
             }
-            
-            return cost.Select(c => (int)c).ToArray();      //hack untested
+
+            return r;
         }
 
         public override void pay(Card card, int[] i)
         {
             card.owner.spendMana(i);
-        }
-
-        public int[] getColours()
-        {
-            return cost.Select(c => (int)c).ToArray();      //hack untested
         }
     }
 }

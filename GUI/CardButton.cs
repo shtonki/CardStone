@@ -161,9 +161,9 @@ namespace stonekart
                 pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
                 pevent.Graphics.DrawString(card.getAbilitiesString(), archTypeFont, b, flavorTextRectangle);
 
-                
-                
-                int[] mc = card.getManaCost().getColours();
+
+
+                int[] mc = card.getManaCost().costs;
 
 
                 Pen manaBallPen = new Pen(b, 4);

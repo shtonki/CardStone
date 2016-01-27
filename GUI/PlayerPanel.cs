@@ -248,6 +248,7 @@ namespace stonekart
         BLACK,
         RED,
         GREEN,
+        GREY,
     }
 
     public class PlayerButton : Button, GameUIElement
