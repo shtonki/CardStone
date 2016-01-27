@@ -32,7 +32,7 @@ namespace stonekart
         public void notifyObserver(Observable o)
         {
             Pile p = (Pile)o;
-            var cs = p.getCards();
+            var cs = p.cards;
             int i = 0;
 
             for (; i < cs.Count; i++)

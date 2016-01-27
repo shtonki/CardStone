@@ -31,9 +31,9 @@ namespace stonekart
             Pile p = (Pile)o;
 
             int i = 0;
-            for (; i < p.getCards().Count; i++)
+            for (; i < p.cards.Count; i++)
             {
-                p.getCards()[i].setObserver(buttons[i]);
+                p.cards[i].setObserver(buttons[i]);
                 buttons[i].setVisible(true);
                 buttons[i].Invalidate();
             }

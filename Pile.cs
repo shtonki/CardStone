@@ -11,7 +11,7 @@ namespace stonekart
     /// </summary>
     public class Pile : Observable
     {
-        private List<Card> cards;
+        //private List<Card> cards;
         public int Count { get { return cards.Count; }  }
 
         public Location location { get; private set; }
@@ -21,11 +21,8 @@ namespace stonekart
             location = l;
             cards = new List<Card>();
         }
-        
-        public List<Card> getCards()
-        {
-            return cards;
-        }
+
+        public List<Card> cards { get; private set; }
 
         public void add(Card c)
         {

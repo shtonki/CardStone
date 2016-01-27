@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
+    
     public class Card : Observable
     {
         private int id;
         private CardId cardId;
         public Location location { get; set; }
-        public Player owner { get; private set; }
-        public Player controller { get; private set; }
+        public Player owner { get; set; }
+        public Player controller { get; set; }
 
         private bool Attacking;
         private Card DefenderOf;
@@ -36,6 +37,7 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
+
         public StackWrapper stackWrapper;
 
         private int? basePower, baseToughness, CurrentPower, CurrentToughness;
@@ -75,10 +77,21 @@ namespace stonekart
             }
         }
 
-        private List<Ability> abilities;
+        //private List<Ability> abilities;
+        private readonly List<ActivatedAbility> baseActivatedAbilities;
+        private readonly List<TriggeredAbility> baseTriggeredAbilities;
         private ManaCoster castingCost;
-        private List<KeyAbility> keyAbilities; 
-        
+        private List<KeyAbility> keyAbilities;
+
+        public List<Ability> abilities => ((IEnumerable<Ability>)activatedAbilities).Concat(triggeredAbilities).ToList();
+        public List<ActivatedAbility> activatedAbilities => baseActivatedAbilities;
+        public List<TriggeredAbility> triggeredAbilities => baseTriggeredAbilities;
+
+        protected Card()
+        {
+            
+        }
+
         //todo(seba) move this entire constructor to a XML document
         public Card(CardId c)
         {
@@ -103,6 +116,8 @@ namespace stonekart
             }
 
             name = b.ToString();
+            baseActivatedAbilities = new List<ActivatedAbility>();
+            baseTriggeredAbilities = new List<TriggeredAbility>();
 
             switch (cardId)
             {
@@ -152,7 +167,7 @@ namespace stonekart
                 {
                     blueCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new OwnerDrawsSubEffect(2));
+                    fx.Add(new OwnerDraws(2));
                 } break;
 
                 case CardId.FrothingGoblin:
@@ -169,7 +184,9 @@ namespace stonekart
                     whiteCost = 1;
                     type = Type.Creature;
                     basePower = 1;
+                    baseToughness = 2;
                     EventFilter e = vanillaETB;
+                    baseTriggeredAbilities.Add(new TriggeredAbility(this, friendlyETB, friendlyETBDescription, LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
                 } break;
 
                 default:
@@ -184,7 +201,6 @@ namespace stonekart
                 CurrentToughness = baseToughness;
             }
 
-            abilities = new List<Ability>();
 
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCoster(whiteCost, blueCost, blackCost, redCost, greenCost);
@@ -192,7 +208,7 @@ namespace stonekart
             ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND);
             castAbility.setInstant(type == Type.Instant);
 
-            abilities.Add(castAbility);
+            baseActivatedAbilities.Add(castAbility);
 
             if ((basePower == null) != (baseToughness == null))
             {
@@ -200,20 +216,27 @@ namespace stonekart
             }
         }
 
+        #region commonEventFilters
 
         private bool vanillaETB(GameEvent e)
         {
             if (e.type != GameEventType.MOVECARD) { return false; }
             MoveCardEvent moveEvent = (MoveCardEvent)e;
 
-            return moveEvent.card == this && moveEvent.to.pile == LocationPile.FIELD;
+            return moveEvent.to.pile == LocationPile.FIELD;
         }
-        private EventFilter entersBattlefieldFilterLambda(params EventFilter[] fs)
+
+        private const string friendlyETBDescription =
+            "whenever a friendly creature enters the battlefield under your control";
+        private bool friendlyETB(GameEvent e)
         {
+            if (e.type != GameEventType.MOVECARD) { return false; }
+            MoveCardEvent moveEvent = (MoveCardEvent)e;
 
-
-            return null;
+            return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card.controller == this.controller;
         }
+
+        #endregion
 
         public int getId()
         {
@@ -234,18 +257,7 @@ namespace stonekart
         {
             return castingCost;
         }
-
-
-        public Player getController()
-        {
-            return owner;
-        }
         
-        public Ability getAbility(int i)
-        {
-            return abilities[i];
-        }
-
         public bool isDummy()
         {
             return false;
@@ -255,11 +267,7 @@ namespace stonekart
         {
             location = l;
         }
-
-        public void setOwner(Player p)
-        {
-            owner = p;
-        }
+        
 
 
 
@@ -268,8 +276,13 @@ namespace stonekart
             return type;
         }
 
-        public List<ActivatedAbility> getAvailableActivatedAbilities(bool canSorc)
+        public IList<ActivatedAbility> getAvailableActivatedAbilities(bool canSorc)
         {
+            return activatedAbilities.Where(@a =>
+                (canSorc || a.isInstant()) &&
+                a.castableFrom(location.pile)).ToList();
+
+            /*
             List<ActivatedAbility> r = new List<ActivatedAbility>();
 
             foreach (var v in abilities)
@@ -283,6 +296,7 @@ namespace stonekart
             }
 
             return r;
+            */
         }
 
         
@@ -332,14 +346,45 @@ namespace stonekart
             CurrentToughness = baseToughness;
         }
 
+        //hack assumes that abilities looks the same for both the players
+        //if this ever bugs that is most likely why
         public int getAbilityIndex(Ability a)
         {
-            return abilities.FindIndex(v => v == a);
+            int r = 0;
+            foreach (Ability v in abilities)
+            {
+                if (a == v)
+                {
+                    return r;
+                }
+                r++;
+            }
+
+            throw new ArgumentException();
         }
 
         public Ability getAbilityByIndex(int ix)
         {
-            return abilities[ix];
+            foreach (var a in abilities)
+            {
+                if (ix-- == 0)
+                {
+                    return a;
+                }
+            }
+
+            throw new TimeZoneNotFoundException();
+        }
+
+        public Card createDummy()
+        {
+            Card r = new Card();
+
+            r.name = name;
+            r.cardId = cardId;
+            r.castingCost = castingCost;
+
+            return r;
         }
 
         public Image getArt()
@@ -362,7 +407,11 @@ namespace stonekart
         public string getAbilitiesString()
         {
             StringBuilder b = new StringBuilder();
-            b.AppendLine(abilities[0].getExplanation());
+
+            foreach (Ability v in abilities)
+            {
+                b.AppendLine(v.explanation);
+            }
 
             foreach (var v in keyAbilities)
             {

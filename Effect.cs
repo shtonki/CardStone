@@ -29,7 +29,7 @@ namespace stonekart
                     targetRules[i++] = vv;
                 }
 
-                b.Append(v.getExplanation());
+                b.Append(v.explanation);
             }
 
             Explanation = b.ToString();
@@ -57,10 +57,8 @@ namespace stonekart
             return targetRules;
         }
 
-        public int targetCount
-        {
-            get { return subEffects.Sum(v => v.targetCount); }
-        }
+        public int targetCount => subEffects.Sum(v => v.targetCount);
+        
 
         public string explanation => Explanation;
     }
@@ -69,37 +67,33 @@ namespace stonekart
     {
         public TargetRule[] targetRules => targets;
         public int targetCount => targets.Length;
-        protected TargetRule[] targets; 
-
+        protected TargetRule[] targets;
+        public string explanation { get; protected set; }
 
         protected SubEffect()
         {
+            targets = new TargetRule[0];
         }
 
         abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts);
-
-        public abstract string getExplanation();
     }
 
-    public class OwnerDrawsSubEffect : SubEffect
+    public class OwnerDraws : SubEffect
     {
         private int i;
 
-        public OwnerDrawsSubEffect(int cards)
+        public OwnerDraws(int cards)
         {
             i = cards;
+            explanation = "draw " + i + " card(s)";
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> _)
         {
-            GameEvent e = new DrawEvent(c.getController(), i);
+            GameEvent e = new DrawEvent(c.controller, i);
             return new[] {e};
         }
-
-        public override string getExplanation()
-        {
-            return "Draw " + i + " cards.";
-        }
+        
     }
 
     public class PingN : SubEffect
@@ -115,6 +109,15 @@ namespace stonekart
                 this.targets[i] = new TargetRule(TargetRules.ZAPPABLE); 
             }
             d = damage;
+
+            if (targets == 1)
+            {
+                explanation = "deal " + d + " damage to target";
+            }
+            else
+            {
+                explanation = "deal " + d * targets + " damage split between up to " + targets + " targets";
+            }
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
@@ -139,17 +142,25 @@ namespace stonekart
 
             return r;
         }
+        
+    }
 
-        public override string getExplanation()
+    public class GainLife : SubEffect
+    {
+        private int life;
+
+        public GainLife(int n)
         {
-            if (targets.Length == 1)
-            {
-                return "Deal " + d + " damage to target.";
-            }
-            else
-            {
-                return "Deal " + d*targets.Length + " damage split between up to " + targets.Length + " targets.";
-            }
+            life = n;
+
+            explanation = "you gain " + life + " life";
         }
+
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        {
+            GameEvent[] l = {new GainLifeEvent(c.controller, life)};
+            return l;
+        }
+        
     }
 }

@@ -9,10 +9,12 @@ namespace stonekart
 {
     public class Player : Observable
     {
+        //todo(seba) move all these to props
         private int[] curMana, maxMana;
         private int health;
 
         private Pile hand, graveyard, exile, field, deck;
+        public IEnumerable<Card> cards { get; private set; } 
         private Pile[] piles;
 
         private LocationPlayer side;
@@ -85,9 +87,9 @@ namespace stonekart
         }
 
 
-        public void damage(int i)
+        public void setLifeRelative(int i)
         {
-            health -= i;
+            health += i;
             notifyObserver();
         }
 
@@ -120,7 +122,7 @@ namespace stonekart
         {
             resetMana();
 
-            foreach (Card c in field.getCards())
+            foreach (Card c in field.cards)
             {
                 c.topped = false;
                 c.summoningSick = false;
@@ -135,10 +137,13 @@ namespace stonekart
 
         public void loadDeck(List<Card> deckList)
         {
+            cards = deckList;
+
             Location l = new Location(LocationPile.DECK, side);
             foreach (Card c in deckList)
             {
-                c.setOwner(this);
+                c.owner = this;
+                c.controller = this;
                 deck.add(c);
                 c.setLocationRaw(l);
             }

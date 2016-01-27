@@ -45,20 +45,16 @@ namespace stonekart
     {
         private int cs;
 
-        public DrawEvent(Player p) : base(p, GameEventType.DRAW)
+        public DrawEvent(Player plr) : base(plr, GameEventType.DRAW)
         {
             cs = 1;
         }
 
-        public DrawEvent(Player p, int cards) : base(p, GameEventType.DRAW)
+        public DrawEvent(Player plr, int cards) : base(plr, GameEventType.DRAW)
         {
             cs = cards;
         }
-
-        public new Player getPlayer()
-        {
-            return p;
-        }
+        
 
         public int getCards()
         {
@@ -90,7 +86,7 @@ namespace stonekart
     {
         private int c;
 
-        public GainManaOrbEvent(Player player, int color) : base(player, GameEventType.GAINMANAORB)
+        public GainManaOrbEvent(Player plr, int color) : base(plr, GameEventType.GAINMANAORB)
         {
             c = color;
         }
@@ -124,7 +120,7 @@ namespace stonekart
 
     class UntopPlayerEvent : PlayerEvent
     {
-        public UntopPlayerEvent(Player player) : base(player, GameEventType.UNTOPPLAYER)
+        public UntopPlayerEvent(Player plr) : base(plr, GameEventType.UNTOPPLAYER)
         {
         }
     }
@@ -193,63 +189,44 @@ namespace stonekart
             return xdd;
         }
     }
+    
 
-    abstract class DamageFooEvent : GameEvent
+    class DamagePlayerEvent : PlayerEvent
     {
-        private Card s;
-        private int d;
+        public int damage { get; private set; }
+        public Card source { get; private set; }
 
-
-        public Card getSource()
+        public DamagePlayerEvent(Player plr, Card src, int dmg) : base(plr, GameEventType.DAMAGEPLAYER)
         {
-            return s;
+
+            damage = dmg;
         }
-
-        public int getDamage()
-        {
-            return d;
-        }
-
-        protected DamageFooEvent(Card source, int damage, GameEventType type) : base(type)
-        {
-            s = source;
-            d = damage;
-        }
-    }
-
-    class DamagePlayerEvent : DamageFooEvent
-    {
-        private Player p;
-
-        public DamagePlayerEvent(Player player, Card source, int damage) : base(source, damage, GameEventType.DAMAGEPLAYER)
-        {
-            p = player;
-        }
-
-        public Player getPlayer()
-        {
-            return p;
-        }
-    }
-
-    class GainLifeEvent
-    {
         
     }
 
-    class DamageCreatureEvent : DamageFooEvent
+    class GainLifeEvent : PlayerEvent
     {
-        private Card c;
+        public int life { get; private set; }
 
-        public DamageCreatureEvent(Card creature, Card source, int damage) : base(source, damage, GameEventType.DAMAGECREATURE)
+        public GainLifeEvent(Player p, int l) : base(p, GameEventType.GAINLIFE)
         {
-            c = creature;
+            life = l;
         }
+    }
 
-        public Card getCreature()
+    class DamageCreatureEvent : GameEvent
+    {
+        public Card creature { get; private set; }
+        public Card source { get; private set; }
+        public int damage { get; private set; }
+
+        public DamageCreatureEvent(Card crt, Card src, int dmg) : base(GameEventType.DAMAGECREATURE)
         {
-            return c;
+            creature = crt;
+            source = src;
+            damage = dmg;
         }
+        
     }
 
     class BuryCreature : CardEvent
@@ -262,17 +239,13 @@ namespace stonekart
 
     abstract class PlayerEvent : GameEvent
     {
-        protected Player p;
+        public Player player { get; private set; }
 
-        public PlayerEvent(Player player, GameEventType type) : base(type)
+        public PlayerEvent(Player plr, GameEventType type) : base(type)
         {
-            p = player;
+            player = plr;
         }
 
-        public Player getPlayer()
-        {
-            return p;
-        }
     }
 
     abstract class CardEvent : GameEvent

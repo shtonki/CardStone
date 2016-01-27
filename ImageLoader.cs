@@ -21,7 +21,7 @@ namespace stonekart
 
         public static void init()
         {
-            frame = Image.FromFile(framePath + "red2" + ".png");
+            frame = Image.FromFile(framePath + "white2" + ".png");
 
             imageMap = new Dictionary<CardId, Image>();
         }

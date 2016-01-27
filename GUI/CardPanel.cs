@@ -35,12 +35,12 @@ namespace stonekart
             Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh, actually entire function is a hack
             Pile p = (Pile)o;
 
-            int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.getCards().Count) ? CardButton.WIDTH : WIDTH/(1+p.getCards().Count));
+            int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.cards.Count) ? CardButton.WIDTH : WIDTH/(1+p.cards.Count));
 
             int i = 0;
-            for (; i < p.getCards().Count; i++)
+            for (; i < p.cards.Count; i++)
             {
-                p.getCards()[i].setObserver(cardButtons[i]); 
+                p.cards[i].setObserver(cardButtons[i]); 
                 cardButtons[i].Location = new Point(padding*i, 0);
                 cardButtons[i].setVisible(true);
                 cardButtons[i].Invalidate();
