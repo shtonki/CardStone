@@ -8,30 +8,19 @@ namespace stonekart
 {
     public abstract class Ability
     {
-        protected Effect effect;
-        protected Card card;
+        public Card card { get; protected set; }
+        
+        public Effect effect { get; protected set; }
 
-        public Card getCard()
+        public int targetCount => effect.targetCount;
+
+
+        public TargetRule[] targetRules => effect.getTargetRules();
+
+        public virtual string getExplanation()
         {
-            return card;
+            return effect.explanation;
         }
-
-        public Effect getEffect()
-        {
-            return effect;
-        }
-
-        public int countTargets()
-        {
-            return effect.countTargets();
-        }
-
-        public TargetRule[] getTargetRules()
-        {
-            return effect.getTargetRules();
-        }
-
-        public abstract string getExplanation();
     }
 
     public class ActivatedAbility : Ability
@@ -69,13 +58,21 @@ namespace stonekart
         {
             return instant;
         }
-
-
-        public override string getExplanation()
-        {
-            return effect.getExplanation();
-        }
+        
     }
 
-    
+    public class TriggeredAbility : Ability
+    {
+        public EventFilter filter { get; private set; }
+        public LocationPile pile { get; private set; }
+        public EventTiming timing { get; private set; }
+
+        public TriggeredAbility(EventFilter f, LocationPile p, EventTiming t, Effect e)
+        {
+            filter = f;
+            pile = p;
+            effect = e;
+            timing = t;
+        }
+    }
 }

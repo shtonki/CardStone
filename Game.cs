@@ -19,7 +19,6 @@ namespace stonekart
         private Pile stack;
 
         private Card[] attackers, defenders;
-        private List<CardButton> clearMe = new List<CardButton>(); //hack 
 
         private bool active;
         private int step;
@@ -29,7 +28,7 @@ namespace stonekart
         private GameConnection connection;
         private CardFactory cardFactory;
 
-        private EventHandler kappa;
+        private EventHandler[] baseEventHandlers = new EventHandler[Enum.GetNames(typeof(GameEventType)).Length];
 
         private Stack<StackWrapper> stackxd;
         
@@ -112,21 +111,25 @@ namespace stonekart
         #region eventHandlers
         private void setupEventHandlers()
         {
-            kappa = new EventHandler();
 
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.TOPCARD, _topcard));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.STEP, _step));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DRAW, _draw));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.CAST, _cast));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.MOVECARD, _moveCard));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.GAINMANAORB, _gainManaOrb));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.UNTOPPLAYER, _untopPlayer));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.RESOLVE, _resolve));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGEPLAYER, _damagePlayer));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.DAMAGECREATURE, _damageCreature));
-            kappa.addBaseHandler(new stonekart.EventHandler(GameEventType.BURYCREATURE, _buryCreature));
+            addBaseHandler(GameEventType.TOPCARD, _topcard);
+            addBaseHandler(GameEventType.STEP, _step);
+            addBaseHandler(GameEventType.DRAW, _draw);
+            addBaseHandler(GameEventType.CAST, _cast);
+            addBaseHandler(GameEventType.MOVECARD, _moveCard);
+            addBaseHandler(GameEventType.GAINMANAORB, _gainManaOrb);
+            addBaseHandler(GameEventType.UNTOPPLAYER, _untopPlayer);
+            addBaseHandler(GameEventType.RESOLVE, _resolve);
+            addBaseHandler(GameEventType.DAMAGEPLAYER, _damagePlayer);
+            addBaseHandler(GameEventType.DAMAGECREATURE, _damageCreature);
+            addBaseHandler(GameEventType.BURYCREATURE, _buryCreature);
         }
-        
+
+        private void addBaseHandler(GameEventType t, EventAction a)
+        {
+            baseEventHandlers[(int)t] = new EventHandler(t, a);
+        }
+
         private void _topcard(GameEvent gevent)
         {
             TopEvent e = (TopEvent)gevent;
@@ -165,11 +168,11 @@ namespace stonekart
             Ability a = x.ability;
             Card card = x.card;
 
-            List<GameEvent> es = a.getEffect().resolve(card, x.targets);
+            List<GameEvent> es = a.effect.resolve(card, x.targets);
 
             foreach (var v in es)
             {
-                kappa.handle(v);
+                handleEvent(v);
             }
 
             if (card.isDummy())
@@ -179,11 +182,11 @@ namespace stonekart
 
             if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
             {
-                raiseEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
+                handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
             }
             else
             {
-                raiseEvent(new MoveCardEvent(card, LocationPile.FIELD));
+                handleEvent(new MoveCardEvent(card, LocationPile.FIELD));
             }
 
             card.stackWrapper = null;
@@ -191,9 +194,9 @@ namespace stonekart
         private void _moveCard(GameEvent gevent)
         {
             MoveCardEvent e = (MoveCardEvent)gevent;
-            moveCardTo(e.getCard(), e.getLocation());
-            e.getCard().moveReset();
-            e.getCard().owner.notifyObserver();
+            moveCardTo(e.card, e.to);
+            e.card.moveReset();
+            e.card.owner.notifyObserver();
         }
         private void _gainManaOrb(GameEvent gevent)
         {
@@ -214,7 +217,7 @@ namespace stonekart
         private void _buryCreature(GameEvent gevent)
         {
             BuryCreature e = (BuryCreature)gevent;
-            raiseEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
+            handleEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
         }
         private void _damageCreature(GameEvent gevent)
         {
@@ -280,7 +283,7 @@ namespace stonekart
 
         private void untopStep()
         {
-            raiseEvent(new UntopPlayerEvent(activePlayer));
+            handleEvent(new UntopPlayerEvent(activePlayer));
 
             int s;
             if (active)
@@ -301,27 +304,27 @@ namespace stonekart
                 s = demandSelection();
             }
 
-            raiseEvent(new GainManaOrbEvent(activePlayer, s));
-            raiseEvent(new StepEvent(StepEvent.UNTOP));
+            handleEvent(new GainManaOrbEvent(activePlayer, s));
+            handleEvent(new StepEvent(StepEvent.UNTOP));
             givePriority(false);
         }
 
         private void drawStep()
         {
-            raiseEvent(new DrawEvent(activePlayer));
-            raiseEvent(new StepEvent(StepEvent.DRAW));
+            handleEvent(new DrawEvent(activePlayer));
+            handleEvent(new StepEvent(StepEvent.DRAW));
             givePriority(false);
         }
 
         private void mainStep(int i)
         {
-            raiseEvent(new StepEvent(i == 1 ?StepEvent.MAIN1 : StepEvent.MAIN2));
+            handleEvent(new StepEvent(i == 1 ?StepEvent.MAIN1 : StepEvent.MAIN2));
             givePriority(true);
         }
 
         private void startCombatStep()
         {
-            raiseEvent(new StepEvent(StepEvent.BEGINCOMBAT));
+            handleEvent(new StepEvent(StepEvent.BEGINCOMBAT));
             givePriority(false);
         }
 
@@ -363,7 +366,7 @@ namespace stonekart
 
             foreach (var a in attackers)
             {
-                raiseEvent(new TopEvent(a));
+                handleEvent(new TopEvent(a));
                 //todo attackers event
             }
             
@@ -406,12 +409,12 @@ namespace stonekart
                     if (attacker.defended)
                     {
                         Card defender = attacker.defendedBy;
-                        raiseEvent(new DamageCreatureEvent(defender, attacker, attacker.currentPower));
-                        raiseEvent(new DamageCreatureEvent(attacker, defender, defender.currentPower));
+                        handleEvent(new DamageCreatureEvent(defender, attacker, attacker.currentPower));
+                        handleEvent(new DamageCreatureEvent(attacker, defender, defender.currentPower));
                     }
                     else
                     {
-                        raiseEvent(new DamagePlayerEvent(inactivePlayer, attacker, attacker.currentPower));
+                        handleEvent(new DamagePlayerEvent(inactivePlayer, attacker, attacker.currentPower));
                     }
                 }
             }
@@ -438,13 +441,13 @@ namespace stonekart
                 attackers = defenders = null;
             }
 
-            raiseEvent(new StepEvent(StepEvent.ENDCOMBAT));
+            handleEvent(new StepEvent(StepEvent.ENDCOMBAT));
             givePriority(false);
         }
 
         private void endStep()
         {
-            raiseEvent(new StepEvent(StepEvent.END));
+            handleEvent(new StepEvent(StepEvent.END));
             givePriority(false);
         }
 
@@ -485,7 +488,7 @@ namespace stonekart
                     {
                         ((ActivatedAbility)a).getCost().pay(stackWrapper.card, action.getCosts());
                     }
-                    raiseEvent(new CastEvent(action.getStackWrapper()));
+                    handleEvent(new CastEvent(action.getStackWrapper()));
                 }
                 else //both passed
                 {
@@ -531,7 +534,7 @@ namespace stonekart
 
             foreach (GameEvent v in xd)
             {
-                raiseEvent(v);
+                handleEvent(v);
             }
         }
 
@@ -628,8 +631,8 @@ namespace stonekart
             gameInterface.setMessage("Select target(s)");
             gameInterface.setChoiceButtons(Choice.CANCEL);
 
-            Target[] targets = new Target[a.countTargets()];
-            TargetRule[] rules = a.getTargetRules();
+            Target[] targets = new Target[a.targetCount];
+            TargetRule[] rules = a.targetRules;
 
             int i = 0;
             while (i < targets.Length)
@@ -816,19 +819,54 @@ namespace stonekart
 
         private void resolveTop()
         {
-            raiseEvent(new ResolveEvent(stackxd.Peek()));
-            //c.ToOwners(Location.FIELD);
-            //raiseEvent(new ResolveCardEvent(c));
+            //handleEvent(new ResolveEvent(stackxd.Peek()));
+
+
+            StackWrapper x = stackxd.Peek();
+
+            if (!stackxd.Pop().Equals(x) || stack.peek() != x.card)
+            {
+                throw new CannotUnloadAppDomainException("we don't need to deal with the immigration \"problem\" that's not politically correct xddd");
+            }
+
+            Ability a = x.ability;
+            Card card = x.card;
+
+            List<GameEvent> es = a.effect.resolve(card, x.targets);
+
+            foreach (GameEvent e in es)
+            {
+                handleEvent(e);
+            }
+
+            if (card.isDummy())
+            {
+                throw new NotImplementedException();
+            }
+
+            if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+            {
+                handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
+            }
+            else
+            {
+                handleEvent(new MoveCardEvent(card, LocationPile.FIELD));
+            }
+
+            card.stackWrapper = null;
         }
 
         public Player getHero()
         {
             return hero;
         }
-
-        public void raiseEvent(GameEvent e)
+        
+        public void handleEvent(GameEvent e)
         {
-            kappa.handle(e);
+            int i = (int)e.type;
+
+            if (baseEventHandlers[i] == null) { return; }
+            baseEventHandlers[i].handle(e, EventTiming.Main);
         }
 
         private void raiseAction(GameAction a)
@@ -888,34 +926,6 @@ namespace stonekart
         */
         
 
-
-        private class EventHandler
-        {
-            private stonekart.EventHandler[] xds;
-
-            public EventHandler()
-            {
-                xds = new stonekart.EventHandler[100]; //1todo nope
-            }
-
-            public void addBaseHandler(stonekart.EventHandler e)
-            {
-                int i = (int)e.type;
-                if (xds[i] != null) { throw new Exception("event already handled"); }
-                xds[i] = e;
-            }
-
-            public void handle(GameEvent e)
-            {
-                if (xds[(int)e.getType()] == null)
-                {
-                    System.Console.WriteLine("No handler for " + e.GetType());
-                    return;
-                }
-
-                xds[(int)e.getType()].invoke(e);
-            }
-        }
 
         private class CardFactory
         {

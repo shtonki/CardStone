@@ -85,7 +85,7 @@ namespace stonekart
             cardId = c;
             location = null;
 
-            List<Effecter> fx = new List<Effecter>();
+            List<SubEffect> fx = new List<SubEffect>();
             
             keyAbilities = new List<KeyAbility>();
 
@@ -152,18 +152,30 @@ namespace stonekart
                 {
                     blueCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new OwnerDrawsEffecter(2));
+                    fx.Add(new OwnerDrawsSubEffect(2));
                 } break;
 
                 case CardId.FrothingGoblin:
                 {
                     redCost = 1;
                     type = Type.Creature;
-                    basePower = 1;
+                    basePower = 2;
                     baseToughness = 2;
                     keyAbilities.Add(KeyAbility.Fervor);
                 } break;
 
+                case CardId.TempleCleric:
+                {
+                    whiteCost = 1;
+                    type = Type.Creature;
+                    basePower = 1;
+                    EventFilter e = vanillaETB;
+                } break;
+
+                default:
+                {
+                    throw new Exception("pls no");
+                }
             }
 
             if (basePower != null)
@@ -187,8 +199,21 @@ namespace stonekart
                 throw new Exception("bad thing b0ss");
             }
         }
-        
-        
+
+
+        private bool vanillaETB(GameEvent e)
+        {
+            if (e.type != GameEventType.MOVECARD) { return false; }
+            MoveCardEvent moveEvent = (MoveCardEvent)e;
+
+            return moveEvent.card == this && moveEvent.to.pile == LocationPile.FIELD;
+        }
+        private EventFilter entersBattlefieldFilterLambda(params EventFilter[] fs)
+        {
+
+
+            return null;
+        }
 
         public int getId()
         {
@@ -358,6 +383,7 @@ namespace stonekart
         PropheticVision,
         ForkedLightning,
         FrothingGoblin,
+        TempleCleric,
     }
 
     public enum Type

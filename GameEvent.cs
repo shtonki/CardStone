@@ -24,6 +24,7 @@ namespace stonekart
         DAMAGEPLAYER,
         DAMAGECREATURE,
         BURYCREATURE,
+        GAINLIFE,
     }
 
     /// <summary>
@@ -31,17 +32,13 @@ namespace stonekart
     /// </summary>
     public abstract class GameEvent
     {
-        private GameEventType type;
+        public GameEventType type { get; private set; }
 
         public GameEvent(GameEventType type)
         {
             this.type = type;
         }
-
-        public GameEventType getType()
-        {
-            return type;
-        }
+        
     }
 
     class DrawEvent : PlayerEvent
@@ -134,13 +131,15 @@ namespace stonekart
 
     class MoveCardEvent : GameEvent
     {
-        private Card c;
-        private Location l;
+        public Card card { get; private set; }
+        public Location to { get; private set; }
+        public Location from { get; private set; }
 
         public MoveCardEvent(Card card, Location loc) : base(GameEventType.MOVECARD)
         {
-            c = card;
-            l = loc;
+            this.card = card;
+            to = loc;
+            from = card.location;
         }
 
         public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.owner.getSide()))
@@ -148,15 +147,8 @@ namespace stonekart
             
         }
 
-        public Card getCard()
-        {
-            return c;
-        }
+        
 
-        public Location getLocation()
-        {
-            return l;
-        }
     }
 
     class StepEvent : GameEvent
@@ -240,6 +232,11 @@ namespace stonekart
         }
     }
 
+    class GainLifeEvent
+    {
+        
+    }
+
     class DamageCreatureEvent : DamageFooEvent
     {
         private Card c;
@@ -315,25 +312,34 @@ namespace stonekart
 
     }
 
+    public delegate bool EventFilter(GameEvent e);
+    public delegate void EventAction(GameEvent e);
+    public enum EventTiming { Pre, Main, Post };
+
+
     public class EventHandler
     {
-        public delegate void eventHandler(GameEvent e);
 
-        public GameEventType type;
-        private eventHandler main, pre, post;
+        public readonly EventFilter filter;
+        public readonly EventAction action;
+        public readonly EventTiming timing;
 
-        public EventHandler(GameEventType t, eventHandler e)
+
+        public EventHandler(GameEventType t, EventAction e)
         {
-            type = t;
-            main = e;
+            //todo(seba) don't think these are interned the way you'd hope
+            filter = @v => v.type == t;
+            action = e;
+            timing = EventTiming.Main;
         }
 
-        public void invoke(GameEvent e)
+        public void handle(GameEvent e, EventTiming t)
         {
-            if (type == e.getType())
+            if (t == timing && filter(e))
             {
-                main(e);
+                action(e);
             }
         }
+        
     }
 }

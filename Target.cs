@@ -47,7 +47,7 @@ namespace stonekart
     {
         private List<Func<Target, bool>> checks; 
 
-        public TargetRule(TargetRulex r) : this(howDoIInlineFunctionsxd(r).ToArray())
+        public TargetRule(TargetRules r) : this(howDoIInlineFunctionsxd(r).ToArray())
         {
             
         }
@@ -62,23 +62,23 @@ namespace stonekart
             return checks.All(v => v(t));
         }
 
-        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetRulex r)
+        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetRules r)
         {
             List<Func<Target, bool>> rt = new List<Func<Target, bool>>();
 
             switch (r)
             {
-                case TargetRulex.ANY:
+                case TargetRules.ANY:
                 {
                     rt.Add(@t => true);
                 } break;
 
-                case TargetRulex.PLAYER:
+                case TargetRules.PLAYER:
                 {
                     rt.Add(@t => t.isPlayer());
                 } break;
 
-                case TargetRulex.ZAPPABLE:
+                case TargetRules.ZAPPABLE:
                 {
                     rt.Add(@t => t.isPlayer() ||
                                  t.getCard().location.pile == LocationPile.FIELD);
@@ -89,7 +89,7 @@ namespace stonekart
         }
     }
 
-    public enum TargetRulex
+    public enum TargetRules
     {
         ANY,
         PLAYER,

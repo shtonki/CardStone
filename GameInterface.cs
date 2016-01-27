@@ -94,7 +94,11 @@ namespace stonekart
         {
             gamePanel.setStep(s, a);
         }
-        
+
+        public void sendMessage(string s)
+        {
+            
+        }
 
         private WaitFor<GameElement> waitForGameElement = new WaitFor<GameElement>();
 

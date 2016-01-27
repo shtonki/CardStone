@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace stonekart
 {
     public class Effect
     {
-        private Effecter[] effecters;
+        private SubEffect[] subEffects;
         private TargetRule[] targetRules;
 
-        private string explanation;
+        private string Explanation;
 
-        public Effect(params Effecter[] es)
+        public Effect(params SubEffect[] es)
         {
-            effecters = es;
+            subEffects = es;
 
-            targetRules = new TargetRule[countTargets()];
+            targetRules = new TargetRule[targetCount];
 
             int i = 0;
             StringBuilder b = new StringBuilder();
 
             foreach (var v in es)
             {
-                foreach (var vv in v.getTargetRules())
+                foreach (var vv in v.targetRules)
                 {
                     targetRules[i++] = vv;
                 }
@@ -31,25 +32,23 @@ namespace stonekart
                 b.Append(v.getExplanation());
             }
 
-            explanation = b.ToString();
+            Explanation = b.ToString();
         }
 
         public List<GameEvent> resolve(Card c, Target[] ts)
         {
             List<GameEvent> r = new List<GameEvent>();
+            IEnumerator<Target> targetEnumerator = ((IEnumerable<Target>)ts).GetEnumerator();
+            targetEnumerator.MoveNext();
 
-            Effecter.hackEnumerator = ts.GetEnumerator();
-
-            foreach (Effecter e in effecters)
+            foreach (SubEffect e in subEffects)
             {
-                foreach (var v in e.resolve(c))
+                foreach (var v in e.resolve(c, targetEnumerator))
                 {
                     r.Add(v);
                 }
             }
-
-            Effecter.hackEnumerator = null;
-
+            
             return r;
         }
 
@@ -58,67 +57,40 @@ namespace stonekart
             return targetRules;
         }
 
-        public int countTargets()
+        public int targetCount
         {
-            int i = 0;
-
-            foreach (var v in effecters)
-            {
-                i += v.noOfTargets();
-            }
-
-            return i;
+            get { return subEffects.Sum(v => v.targetCount); }
         }
 
-        public string getExplanation()
-        {
-            return explanation;
-        }
+        public string explanation => Explanation;
     }
 
-    public abstract class Effecter
+    public abstract class SubEffect
     {
-        //todo hack me to the fucking moon i'm space bound baby this is ugly but jesus it feels good
-        public static IEnumerator hackEnumerator; 
+        public TargetRule[] targetRules => targets;
+        public int targetCount => targets.Length;
+        protected TargetRule[] targets; 
 
-        protected static Target nextTarget()
+
+        protected SubEffect()
         {
-            hackEnumerator.MoveNext();
-            return hackEnumerator.Current as Target;
         }
 
-        protected List<TargetRule> targets; 
-
-        abstract public GameEvent[] resolve(Card c);
-
-        protected Effecter()
-        {
-            targets = new List<TargetRule>();
-        }
-
-        public List<TargetRule> getTargetRules()
-        {
-            return targets;
-        }
-
-        public int noOfTargets()
-        {
-            return targets.Count;
-        }
+        abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts);
 
         public abstract string getExplanation();
     }
 
-    public class OwnerDrawsEffecter : Effecter
+    public class OwnerDrawsSubEffect : SubEffect
     {
         private int i;
 
-        public OwnerDrawsEffecter(int cards)
+        public OwnerDrawsSubEffect(int cards)
         {
             i = cards;
         }
 
-        public override GameEvent[] resolve(Card c)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> _)
         {
             GameEvent e = new DrawEvent(c.getController(), i);
             return new[] {e};
@@ -130,27 +102,30 @@ namespace stonekart
         }
     }
 
-    public class PingN : Effecter
+    public class PingN : SubEffect
     {
         private int d;
 
         public PingN(int targets, int damage)
         {
+            this.targets = new TargetRule[targets];
+
             for (int i = 0; i < targets; i++)
             {
-                this.targets.Add(new TargetRule(TargetRulex.ZAPPABLE));                
+                this.targets[i] = new TargetRule(TargetRules.ZAPPABLE); 
             }
             d = damage;
         }
 
-        public override GameEvent[] resolve(Card c)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
         {
 
-            GameEvent[] r = new GameEvent[targets.Count];
+            GameEvent[] r = new GameEvent[targets.Length];
 
             for (int i = 0; i < r.Length; i++)
             {
-                Target t = nextTarget();
+                Target t = ts.Current;
+                ts.MoveNext();
 
                 if (t.isPlayer())
                 {
@@ -167,13 +142,13 @@ namespace stonekart
 
         public override string getExplanation()
         {
-            if (targets.Count == 1)
+            if (targets.Length == 1)
             {
                 return "Deal " + d + " damage to target.";
             }
             else
             {
-                return "Deal " + d*targets.Count + " damage split between up to " + targets.Count + " targets.";
+                return "Deal " + d*targets.Length + " damage split between up to " + targets.Length + " targets.";
             }
         }
     }
