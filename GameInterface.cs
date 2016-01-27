@@ -113,14 +113,30 @@ namespace stonekart
             return r;
         }
 
+        //public Action resetFakeMana => gamePanel.heroPanel.resetFakeMana;
+        public void resetFakeMana()
+        {
+            gamePanel.heroPanel.resetFakeMana();
+        }
+
+        public void setFakeManas(int[] ms)
+        {
+            gamePanel.heroPanel.setFakeManas(ms);
+        }
+
+        public void decrementFakeMana(int c)
+        {
+            gamePanel.heroPanel.adjustFakeMana(c, -1);
+        }
+
         public ManaColour getManaColour()
         {
             while (true)
             {
                 GameElement g = getNextGameElementPress();
-                if (g.manaColor != null)
+                if (g.manaColour != null)
                 {
-                    return g.manaColor.Value;
+                    return g.manaColour.Value;
                 }
             }
         }

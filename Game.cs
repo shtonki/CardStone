@@ -93,18 +93,18 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
-                CardId.TempleCleric,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.Rapture,
+                CardId.Rapture,
+                CardId.Rapture,
+                CardId.Rapture,
+                CardId.Rapture,
+                CardId.Rapture,
             };
         }
 
@@ -333,7 +333,7 @@ namespace stonekart
 
         private bool chooseAttackersStep()
         {
-            if (active)
+            if (active && !autoPass)
             {
                 attackers = chooseMultiple("Choose attackers", c =>
                 {
@@ -546,7 +546,7 @@ namespace stonekart
                 {
                     throw new NotImplementedException();
                 }
-                StackWrapper w = new StackWrapper(v.card.createDummy(), v, emptyTargetList);
+                StackWrapper w = new StackWrapper(Card.createDummy(v), v, emptyTargetList);
                 handleEvent(new CastEvent(w));
             }
 
@@ -620,7 +620,7 @@ namespace stonekart
 
 
                         
-                        var v = a.getCost().check(c);
+                        var v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
                         Target[] targets = getTargets(a); 

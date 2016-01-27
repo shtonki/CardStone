@@ -11,6 +11,7 @@ namespace stonekart
     {
         //todo(seba) move all these to props
         private int[] curMana, maxMana;
+        public int totalMana => curMana.Sum(@v => v);
         private int health;
 
         private Pile hand, graveyard, exile, field, deck;

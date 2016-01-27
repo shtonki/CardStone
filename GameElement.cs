@@ -14,7 +14,7 @@ namespace stonekart
         public Card card => element as Card;
         public Choice? choice => element as Choice?;
         public Player player => element as Player;
-        public ManaColour? manaColor => element as ManaColour?;
+        public ManaColour? manaColour => element as ManaColour?;
 
         public GameElement(Card c)
         {

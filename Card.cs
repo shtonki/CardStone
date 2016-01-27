@@ -66,7 +66,6 @@ namespace stonekart
                 notifyObserver();
             }
         }
-
         public Card defendedBy
         {
             get { return DefendedBy; }
@@ -76,6 +75,9 @@ namespace stonekart
                 notifyObserver();
             }
         }
+
+        public bool isDummy => dummyFor != null;
+        public Ability dummyFor { get; private set; }
 
         //private List<Ability> abilities;
         private readonly List<ActivatedAbility> baseActivatedAbilities;
@@ -181,14 +183,22 @@ namespace stonekart
                     keyAbilities.Add(KeyAbility.Fervor);
                 } break;
 
-                case CardId.TempleCleric:
+                case CardId.TempleHealer:
                 {
-                    whiteCost = 1;
+                    whiteCost = 3;
+                    greyCost = 1;
                     type = Type.Creature;
-                    basePower = 1;
-                    baseToughness = 2;
+                    basePower = 4;
+                    baseToughness = 4;
                     EventFilter e = vanillaETB;
                     baseTriggeredAbilities.Add(new TriggeredAbility(this, friendlyETB, friendlyETBDescription, LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
+                } break;
+
+                case CardId.Rapture:
+                {
+                    whiteCost = 3;
+                    type = Type.Instant;
+                    fx.Add(new ExileTarget());
                 } break;
 
                 default:
@@ -260,7 +270,6 @@ namespace stonekart
             return castingCost;
         }
 
-        public bool isDummy { get; private set; }
 
         public void setLocationRaw(Location l)
         {
@@ -375,17 +384,18 @@ namespace stonekart
             throw new TimeZoneNotFoundException();
         }
 
-        public Card createDummy()
+        public static Card createDummy(Ability a)
         {
-
+            Card b = a.card;
             Card r = new Card();
 
-            r.name = name;
-            r.cardId = cardId;
-            r.castingCost = castingCost;
-            r.isDummy = true;
-            r.controller = controller;
-            r.owner = owner;
+            r.name = b.name;
+            r.cardId = b.cardId;
+            r.castingCost = b.castingCost;
+            r.dummyFor = a;
+            r.controller = b.controller;
+            r.owner = b.owner;
+            r.type = Type.Ability;
 
             return r;
         }
@@ -409,8 +419,12 @@ namespace stonekart
 
         public string getAbilitiesString()
         {
-
             StringBuilder b = new StringBuilder();
+
+            if (isDummy)
+            {
+                b.Append(dummyFor.explanation);
+            }
 
             foreach (Ability v in abilities)
             {
@@ -436,7 +450,8 @@ namespace stonekart
         PropheticVision,
         ForkedLightning,
         FrothingGoblin,
-        TempleCleric,
+        TempleHealer,
+        Rapture,
     }
 
     public enum Type
@@ -444,7 +459,9 @@ namespace stonekart
         Creature,
         Instant,
         Sorcery,
-        Relic
+        Relic,
+        Ability,
+        Token,
     }
 
     public enum Race
@@ -461,6 +478,7 @@ namespace stonekart
     {
         Warrior,
         Wizard,
+        Cleric,
     }
 
     public enum KeyAbility

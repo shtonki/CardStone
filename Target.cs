@@ -83,6 +83,10 @@ namespace stonekart
                     rt.Add(@t => t.isPlayer() ||
                                  t.getCard().location.pile == LocationPile.FIELD);
                 } break;
+                case TargetRules.CREATUREONFIELD:
+                {
+                    rt.Add(@t => t.isCard() && t.getCard().location.pile == LocationPile.FIELD);
+                } break;
             }
 
             return rt;
@@ -93,6 +97,7 @@ namespace stonekart
     {
         ANY,
         PLAYER,
-        ZAPPABLE
+        ZAPPABLE,
+        CREATUREONFIELD,
     }
 }

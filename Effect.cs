@@ -145,6 +145,25 @@ namespace stonekart
         
     }
 
+    public class ExileTarget : SubEffect
+    {
+        public ExileTarget()
+        {
+            targets = new TargetRule[1];
+            targets[0] = new TargetRule(TargetRules.CREATUREONFIELD);
+            explanation = "exile target creature";
+        }
+
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        {
+            GameEvent[] r = new GameEvent[1];
+            Target v = ts.Current;
+            ts.MoveNext();
+            r[0] = new MoveCardEvent(v.getCard(), LocationPile.EXILE);
+            return r;
+        }
+    }
+
     public class GainLife : SubEffect
     {
         private int life;

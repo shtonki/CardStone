@@ -5,3 +5,4 @@
 * the card size just isn't realistic quit daydreamin' kid
 * have the mana buttons be six actual buttons then an 'add button' to the right
 * pretty sure we're leaking memory through brushes
+* make the stack of displaypanel information in GameInterface an actual stack

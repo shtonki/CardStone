@@ -16,6 +16,8 @@ namespace stonekart
         public PlayerButton playerButton { get; private set; }
         private GameInterface game;
 
+        private int[] fakes = new int[5];
+
         private string
             hlt = "x",
             dck = "x",
@@ -108,6 +110,30 @@ namespace stonekart
             game.gameElementPressed(b.getElement());
         }
 
+        public void resetFakeMana()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                fakes[i] = 0;
+            }
+            updateManaDisplay();
+        }
+
+        public void setFakeManas(int[] ns)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                fakes[i] = ns[i];
+            }
+            updateManaDisplay();
+        }
+
+        public void adjustFakeMana(int c, int i)
+        {
+            fakes[c] -= i;
+            updateManaDisplay();
+        }
+
         public void showAddMana(bool y)
         {
             int q = y ? 1 : 0;
@@ -131,15 +157,12 @@ namespace stonekart
             }
         }
 
-        public void notifyObserver(Observable o)
+        private void updateManaDisplay()
         {
-            player = (Player)o;
-            playerButton.player = player;
-
             for (int c = 0; c < 5; c++)
             {
                 int i = 0;
-                for (; i < player.getCurrentMana(c); i++)
+                for (; i < player.getCurrentMana(c) - fakes[c]; i++)
                 {
                     manaButtons[c][i].setState(ManaButton.FILLED);
                 }
@@ -152,6 +175,14 @@ namespace stonekart
                     manaButtons[c][i].setState(ManaButton.HIDDEN);
                 }
             }
+        }
+
+        public void notifyObserver(Observable o)
+        {
+            player = (Player)o;
+            playerButton.player = player;
+
+            updateManaDisplay();
 
             hlt = player.getHealth().ToString();
             dck = player.getDeck().Count.ToString();

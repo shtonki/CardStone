@@ -20,12 +20,12 @@ namespace stonekart
             return false;
         }
         */
-        public int[][] check(Card card)
+        public int[][] check(Card card, GameInterface gi)
         {
             int[][] r = new int[costs.Count][];
             for (int i = 0; i < costs.Count; i++)
             {
-                int[] c = costs[i].check(card);
+                int[] c = costs[i].check(card, gi);
                 if (c == null) { return null; }
                 r[i] = c;
             }
@@ -83,43 +83,114 @@ namespace stonekart
     */
     public abstract class SubCost
     {
-        public abstract int[] check(Card c);
+        public abstract int[] check(Card c, GameInterface gi);
         abstract public void pay(Card c, int[] i);
     }
 
     public class ManaCost : SubCost
     {
         //todo(seba) reconsider how we store this information yet again
-        public readonly int[] costs = new int[6];
+        private readonly int[] Costs = new int[6];
+        public int[] costs => cloneLambda(Costs);
+
+        private int[] cloneLambda(int[] a)
+        {
+            int[] r = new int[a.Length];
+            for (int i = 0; i < r.Length; i++)
+            {
+                r[i] = a[i];
+            }
+            return r;
+        }
+
         public int CMC { get; private set; }
 
         public ManaCost(int white, int blue, int black, int red, int green, int grey)
         {
-            costs[(int)ManaColour.WHITE] = white;
-            costs[(int)ManaColour.BLUE] = blue;
-            costs[(int)ManaColour.BLACK] = black;
-            costs[(int)ManaColour.RED] = red;
-            costs[(int)ManaColour.GREEN] = green;
-            costs[(int)ManaColour.GREY] = grey;
+            Costs[(int)ManaColour.WHITE] = white;
+            Costs[(int)ManaColour.BLUE] = blue;
+            Costs[(int)ManaColour.BLACK] = black;
+            Costs[(int)ManaColour.RED] = red;
+            Costs[(int)ManaColour.GREEN] = green;
+            Costs[(int)ManaColour.GREY] = grey;
 
             CMC = white + blue + black + red + green + grey;
         }
 
-        public override int[] check(Card card)
+        public override int[] check(Card card, GameInterface gi)
         {
+            Player owner = card.owner;
+
+            if (CMC > owner.totalMana) { return null; }
+
             int[] r = new int[CMC];
+            int[] cz = costs;
             int c = 0;
 
             for (int i = 0; i < 5; i++)
             {
-                int t = costs[i];
-                while (t-- > 0)
+                if (cz[i] > owner.getCurrentMana(i))
+                {
+                    return null;
+                }
+                while (cz[i]-- > 0)
                 {
                     r[c++] = i;
                 }
             }
 
-            return r;
+            if (c == CMC) { return r; }
+
+            if (CMC == owner.totalMana)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    int v = owner.getCurrentMana(i) - Costs[i];
+                    while (v-- > 0)
+                    {
+                        r[c++] = i;
+                    }
+                }
+                return r;
+            }
+            else
+            {
+                var paid = costs;
+
+                gi.push();
+                gi.setFakeManas(Costs);
+                gi.setChoiceButtons(Choice.CANCEL);
+
+                while (c != CMC)
+                {
+                    gi.setMessage("Pay " + cz[5]);
+
+                    GameElement element = gi.getNextGameElementPress();
+
+                    if (element.choice != null && element.choice == Choice.CANCEL)
+                    {
+                        gi.resetFakeMana();
+                        gi.pop();
+                        return null;
+                    }
+
+                    else if (element.manaColour != null)
+                    {
+                        int v = (int)element.manaColour;
+
+                        if (owner.getCurrentMana(v) - paid[v] > 0)
+                        {
+                            r[c++] = v;
+                            gi.decrementFakeMana(v);
+                        }
+                    }
+                    
+                }
+
+                gi.resetFakeMana();
+                gi.pop();
+                return r;
+            }
         }
 
         public override void pay(Card card, int[] i)
