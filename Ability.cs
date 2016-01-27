@@ -21,7 +21,7 @@ namespace stonekart
 
         public TargetRule[] targetRules => effect.getTargetRules();
 
-        public virtual string explanation => effect.explanation;
+        public string description { get; protected set; }
 
 
         protected Ability(Card c)
@@ -36,13 +36,15 @@ namespace stonekart
         private LocationPile from;
         private bool instant;
         
-        public ActivatedAbility(Card ca, Cost c, Effect e, LocationPile pile) : base(ca)
+        public ActivatedAbility(Card ca, Cost c, Effect e, LocationPile pile, string desc) : base(ca)
         {
             from = pile;
 
             card = ca;
             cost = c;
             effect = e;
+
+            description = desc;
         }
 
 
@@ -73,21 +75,18 @@ namespace stonekart
         public EventFilter filter { get; private set; }
         public LocationPile pile { get; private set; }
         public EventTiming timing { get; private set; }
-        public override string explanation => Explanation;
-        private readonly string Explanation;
 
-        public TriggeredAbility(Card c, EventFilter f, string fd, LocationPile p, EventTiming t, Effect e) : base(c)
+        public TriggeredAbility(Card c, EventFilter f, string desc, LocationPile p, EventTiming t, Effect e) : base(c)
         {
             filter = f;
             pile = p;
             effect = e;
             timing = t;
-
-            Explanation = fd + e.explanation;
+            description = desc;
         }
 
-        public TriggeredAbility(Card c, EventFilter f, string fd, LocationPile p, EventTiming t, params SubEffect[] es) 
-            :this(c, f, fd, p, t, new Effect(es))
+        public TriggeredAbility(Card c, EventFilter f, string desc, LocationPile p, EventTiming t, params SubEffect[] es) 
+            :this(c, f, desc, p, t, new Effect(es))
         {
             
         }

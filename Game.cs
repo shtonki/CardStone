@@ -103,8 +103,6 @@ namespace stonekart
                 CardId.Rapture,
                 CardId.Rapture,
                 CardId.Rapture,
-                CardId.Rapture,
-                CardId.Rapture,
             };
         }
 

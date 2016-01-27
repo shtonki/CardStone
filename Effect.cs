@@ -18,21 +18,7 @@ namespace stonekart
             subEffects = es;
 
             targetRules = new TargetRule[targetCount];
-
-            int i = 0;
-            StringBuilder b = new StringBuilder();
-
-            foreach (var v in es)
-            {
-                foreach (var vv in v.targetRules)
-                {
-                    targetRules[i++] = vv;
-                }
-
-                b.Append(v.explanation);
-            }
-
-            Explanation = b.ToString();
+            
         }
 
         public List<GameEvent> resolve(Card c, Target[] ts)
@@ -68,7 +54,6 @@ namespace stonekart
         public TargetRule[] targetRules => targets;
         public int targetCount => targets.Length;
         protected TargetRule[] targets;
-        public string explanation { get; protected set; }
 
         protected SubEffect()
         {
@@ -85,7 +70,6 @@ namespace stonekart
         public OwnerDraws(int cards)
         {
             i = cards;
-            explanation = "draw " + i + " card(s)";
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> _)
@@ -109,15 +93,6 @@ namespace stonekart
                 this.targets[i] = new TargetRule(TargetRules.ZAPPABLE); 
             }
             d = damage;
-
-            if (targets == 1)
-            {
-                explanation = "deal " + d + " damage to target";
-            }
-            else
-            {
-                explanation = "deal " + d * targets + " damage split between up to " + targets + " targets";
-            }
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
@@ -151,7 +126,6 @@ namespace stonekart
         {
             targets = new TargetRule[1];
             targets[0] = new TargetRule(TargetRules.CREATUREONFIELD);
-            explanation = "exile target creature";
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
@@ -171,8 +145,6 @@ namespace stonekart
         public GainLife(int n)
         {
             life = n;
-
-            explanation = "you gain " + life + " life";
         }
 
         public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)

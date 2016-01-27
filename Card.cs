@@ -105,7 +105,7 @@ namespace stonekart
             List<SubEffect> fx = new List<SubEffect>();
             
             keyAbilities = new List<KeyAbility>();
-
+            string castDescription = "";
             int redCost = 0, greenCost = 0, whiteCost = 0, blackCost = 0, blueCost = 0, greyCost = 0;
 
             string s = cardId.ToString();
@@ -149,6 +149,7 @@ namespace stonekart
                     redCost = 1;
                     type = Type.Instant;
                     fx.Add(new PingN(1,3));
+                    castDescription = "Deal 3 damage to target player or creature.";
                 } break;
 
                 case CardId.ForkedLightning:
@@ -156,6 +157,7 @@ namespace stonekart
                     redCost = 1;
                     type = Type.Sorcery;
                     fx.Add(new PingN(2, 1));
+                    castDescription = "Deal 2 damage to 2 target players or creatures.";
                 } break;
 
                 case CardId.SolemnAberration:
@@ -172,6 +174,7 @@ namespace stonekart
                     blueCost = 1;
                     type = Type.Sorcery;
                     fx.Add(new OwnerDraws(2));
+                    castDescription = "Draw 2 cards";
                 } break;
 
                 case CardId.FrothingGoblin:
@@ -191,7 +194,7 @@ namespace stonekart
                     basePower = 4;
                     baseToughness = 4;
                     EventFilter e = vanillaETB;
-                    baseTriggeredAbilities.Add(new TriggeredAbility(this, friendlyETB, friendlyETBDescription, LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
+                    baseTriggeredAbilities.Add(new TriggeredAbility(this, friendlyETB, underYourControlETBDescription + "gain 1 life.", LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
                 } break;
 
                 case CardId.Rapture:
@@ -199,6 +202,7 @@ namespace stonekart
                     whiteCost = 3;
                     type = Type.Instant;
                     fx.Add(new ExileTarget());
+                    castDescription = "Exile target creature";
                 } break;
 
                 default:
@@ -217,7 +221,7 @@ namespace stonekart
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
             Cost cc = new Cost(castingCost);
-            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND);
+            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND, castDescription);
             castAbility.setInstant(type == Type.Instant);
 
             baseActivatedAbilities.Add(castAbility);
@@ -238,8 +242,8 @@ namespace stonekart
             return moveEvent.to.pile == LocationPile.FIELD;
         }
 
-        private const string friendlyETBDescription =
-            "whenever a friendly creature enters the battlefield under your control";
+        private const string underYourControlETBDescription =
+            "Whenever a creature enters the battlefield under your control ";
         private bool friendlyETB(GameEvent e)
         {
             if (e.type != GameEventType.MOVECARD) { return false; }
@@ -423,12 +427,12 @@ namespace stonekart
 
             if (isDummy)
             {
-                b.Append(dummyFor.explanation);
+                b.Append(dummyFor.description);
             }
 
             foreach (Ability v in abilities)
             {
-                b.AppendLine(v.explanation);
+                if (v.description.Length != 0) { b.AppendLine(v.description); }
             }
 
             foreach (var v in keyAbilities)
