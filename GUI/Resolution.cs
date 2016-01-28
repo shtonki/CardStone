@@ -32,6 +32,11 @@ namespace stonekart
         {
             return currentResolution.get(d);
         }
+
+        public static int getHack(int i)
+        {
+            return get((ElementDimensions)i);
+        }
         
 
         public static void set(string k, int v)
@@ -151,7 +156,7 @@ namespace stonekart
             }
         }
     }
-
+    
     public enum ElementDimensions
     {
         FrameHeight,
@@ -184,18 +189,58 @@ namespace stonekart
         CardButtonPTTextLocationY,
         CardButtonPTTextLocationT,
 
-        HandPanelHeight,
-        HandPanelWidth,
         HandPanelLocationX,
         HandPanelLocationY,
+        HandPanelWidth,
+        HandPanelHeight,
+        HandPanelPaddingX,
+        HandPanelPaddingY,
+        HandPanelPaddingLeft,
+        HandPanelPaddingTop,
+
+        HeroFieldPanelLocationX,
+        HeroFieldPanelLocationY,
+        HeroFieldPanelWidth,
+        HeroFieldPanelHeight,
+        HeroFieldPanelPaddingX,
+        HeroFieldPanelPaddingY,
+        HeroFieldPanelPaddingLeft,
+        HeroFieldPanelPaddingTop,
 
 
-        ChoicePanelHeight,
-        ChoicePanelWidth,
+        StackPanelLocationX,
+        StackPanelLocationY,
+        StackPanelWidth,
+        StackPanelHeight,
+        StackPanelPaddingX,
+        StackPanelPaddingY,
+        StackPanelPaddingLeft,
+        StackPanelPaddingTop,
+
+        VillainFieldPanelLocationX,
+        VillainFieldPanelLocationY,
+        VillainFieldPanelWidth,
+        VillainFieldPanelHeight,
+        VillainFieldPanelPaddingX,
+        VillainFieldPanelPaddingY,
+        VillainFieldPanelPaddingLeft,
+        VillainFieldPanelPaddingTop,
+
+        /*
         ChoicePanelLocationX,
         ChoicePanelLocationY,
+        ChoicePanelWidth,
+        ChoicePanelHeight,
 
+        HeroPanelLocationX,
+        HeroPanelLocationY,
+        HeroPanelWidth,
+        HeroPanelHeight,
 
+        
+
+        
+        */
     }
 
     public enum Resolutions

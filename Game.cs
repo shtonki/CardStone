@@ -430,13 +430,14 @@ namespace stonekart
 
                 foreach (Card c in attackers)
                 {
-                    gameInterface.getCardButton(c).setBorder(null);
+                    //gameInterface.getCardButton(c).setBorder(null);
+                    c.attacking = false;
                     c.defendedBy = null;
                 }
 
                 foreach (Card c in defenders)
                 {
-                    gameInterface.getCardButton(c).setBorder(null);
+                    //gameInterface.getCardButton(c).setBorder(null);
                     c.defenderOf = null;
                 }
                 attackers = defenders = null;

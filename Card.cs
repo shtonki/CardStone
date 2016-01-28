@@ -188,8 +188,8 @@ namespace stonekart
 
                 case CardId.TempleHealer:
                 {
-                    whiteCost = 3;
-                    greyCost = 1;
+                    whiteCost = 1;
+                    greyCost = 0;
                     type = Type.Creature;
                     race = Race.Human;
                     subType = SubType.Cleric;
@@ -358,6 +358,7 @@ namespace stonekart
         {
             CurrentPower = basePower;
             CurrentToughness = baseToughness;
+            summoningSick = true;
         }
 
         //hack assumes that abilities looks the same for both the players

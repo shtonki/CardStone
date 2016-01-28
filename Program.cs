@@ -29,22 +29,6 @@ namespace stonekart
                 string[] ss = s.Split(' ').Select(l => l.Trim()).ToArray();
                 if (ss[0] == "res")
                 {
-                    if (ss[1] == "du")
-                    {
-                        Dictionary<string, bool> d = new Dictionary<string, bool>();
-
-                        foreach (Control v in GUI.getAll())
-                        {
-                            string[] xx = v.GetType().ToString().Split('.');
-                            string x = xx[xx.Length - 1];
-                            if (!d.ContainsKey(x)) { d[x] = v is Resolutionable; }
-                        }
-
-                        foreach (KeyValuePair<string, bool> v in d)
-                        {
-                            Console.WriteLine(v.Key.PadRight(30) + v.Value);
-                        }
-                    }
 
                     if (ss[1] == "s")
                     {

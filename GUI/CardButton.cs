@@ -104,6 +104,7 @@ namespace stonekart
             {
                 borderPen.Dispose();
             }
+
             borderPen = c == null ? null : new Pen(c.Value, 8);
             //borderPen = c == null ? null : borderPen == null ? new Pen(c.Value, 8) : null;
             Invalidate();

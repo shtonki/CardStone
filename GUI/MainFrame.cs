@@ -359,9 +359,9 @@ namespace stonekart
         public CardPanel handPanel;
         public PlayerPanel heroPanel, villainPanel;
         private ChoicePanel choicePanel;
-        public CardBox stackPanel;
-        public FieldPanel heroFieldPanel;
-        public FieldPanel villainFieldPanel;
+        public CardPanel stackPanel;
+        public CardPanel heroFieldPanel;
+        public CardPanel villainFieldPanel;
         private TurnPanel turnPanel;
         private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
 
@@ -400,8 +400,9 @@ namespace stonekart
             textPanel.Controls.Add(inputBox);
             */
             
-            handPanel = new CardPanel(20, ()=>new CardButton(g));
-            //handPanel.Location = new Point(400, 660);
+            
+            handPanel = new CardPanel(20, ()=>new CardButton(g), new LayoutArgs(0, 1, false, false));
+            handPanel.Location = new Point(400, 660);
 
 
             choicePanel = new ChoicePanel(g);
@@ -412,19 +413,21 @@ namespace stonekart
 
             villainPanel = new PlayerPanel(g);
             villainPanel.Location = new Point(20, 10);
-
-            stackPanel = new CardBox(g, 190, 500);
-            stackPanel.Location = new Point(400, 20);
-
-            heroFieldPanel = new FieldPanel(g, true);
-            //heroFieldPanel = new CardPanel(20, () => new SnapCardButton(g, -40));
-            heroFieldPanel.Location = new Point(600, 330);
-
-            villainFieldPanel = new FieldPanel(g ,false);
-            villainFieldPanel.Location = new Point(600, 10);
             
+            //stackPanel = new CardBox(g, 190, 500);
+            stackPanel = new CardPanel(20, () => new CardButton(g), new LayoutArgs(1, 0, true, false));
+            //stackPanel.Location = new Point(400, 20);
+            //stackPanel.Size = new Size(190, 500);
+
+            //heroFieldPanel = new FieldPanel(g, true);
+            heroFieldPanel = new CardPanel(20, () => new SnapCardButton(g, -40), new LayoutArgs(0, 1, false, false));
+            heroFieldPanel.BackColor = Color.MediumSeaGreen;
+            //heroFieldPanel.Location = new Point(600, 330);
             
-            
+            villainFieldPanel = new CardPanel(20, () => new SnapCardButton(g, 40), new LayoutArgs(0, 1, false, false));
+            villainFieldPanel.BackColor = Color.Maroon;
+
+
 
             turnPanel = new TurnPanel();
             turnPanel.Location = new Point(325, 200);
@@ -450,17 +453,42 @@ namespace stonekart
             Size = new Size(
                 Resolution.get(ElementDimensions.FrameWidth),
                 Resolution.get(ElementDimensions.FrameHeight));
-
-            CardPanelArgs handArgs = new CardPanelArgs();
             
-            handArgs.width = Resolution.get(ElementDimensions.HandPanelWidth);
-            handArgs.height = Resolution.get(ElementDimensions.HandPanelHeight);
+            stillRetardedLambda(handPanel, ElementDimensions.HandPanelPaddingX);
+            stillRetardedLambda(heroFieldPanel, ElementDimensions.HeroFieldPanelPaddingX);
+            stillRetardedLambda(villainFieldPanel, ElementDimensions.VillainFieldPanelPaddingX);
+            stillRetardedLambda(stackPanel, ElementDimensions.StackPanelPaddingX);
 
-            handPanel.Location = new Point(
-                Resolution.get(ElementDimensions.HandPanelLocationX),
-                Resolution.get(ElementDimensions.HandPanelLocationY));
-            handPanel.layoutButtons(handArgs);
+            imRetardedLambda(handPanel, ElementDimensions.HandPanelLocationX);
+            imRetardedLambda(heroFieldPanel, ElementDimensions.HeroFieldPanelLocationX);
+            imRetardedLambda(villainFieldPanel, ElementDimensions.VillainFieldPanelLocationX);
+            imRetardedLambda(stackPanel, ElementDimensions.StackPanelLocationX);
+
         }
+
+        private void imRetardedLambda(Control c, ElementDimensions d)
+        {
+            int b = (int)d;
+            int lx = Resolution.getHack(b++);
+            int ly = Resolution.getHack(b++);
+            int sx = Resolution.getHack(b++);
+            int sy = Resolution.getHack(b++);
+            
+            c.Location = new Point(lx, ly);
+            c.Size = new Size(sx, sy);
+        }
+
+        private void stillRetardedLambda(CardPanel c, ElementDimensions d)
+        {
+            int b = (int)d;
+            int px = Resolution.getHack(b++);
+            int py = Resolution.getHack(b++);
+            int pl = Resolution.getHack(b++);
+            int pt = Resolution.getHack(b++);
+            
+            c.placeButtons(new PlacementArgs(px, py, pl, pt));
+        }
+
 
         public void setObservers(Player hero, Player villain, Pile stack)
         {
