@@ -45,8 +45,15 @@ namespace stonekart
 
             int width = Resolution.get(ElementDimensions.CardButtonArtWidth);
             int height = Resolution.get(ElementDimensions.CardButtonArtHeight);
-
-            Image i = Image.FromFile(cardArtPath + id + ".png");
+            Image i;
+            try
+            {
+                i = Image.FromFile(cardArtPath + id + ".png");
+            }
+            catch (Exception)
+            {
+                i = Image.FromFile(cardArtPath + "NOTHING.png");
+            }
             Image rz = resizeImage(i, width, height);
             imageMap.Add(id, rz);
             //rz.Save(id.ToString() + ".jpg");

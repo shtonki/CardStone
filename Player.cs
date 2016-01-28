@@ -14,7 +14,7 @@ namespace stonekart
         public int totalMana => curMana.Sum(@v => v);
         private int health;
 
-        private Pile hand, graveyard, exile, field, deck;
+        //private Pile hand, graveyard, exile, field, deck;
         public IEnumerable<Card> cards { get; private set; } 
         private Pile[] piles;
 
@@ -150,30 +150,15 @@ namespace stonekart
             }
         }
 
-        public Pile getHand()
-        {
-            return hand;
-        }
+        public Pile hand { get; }
 
-        public Pile getGraveyard()
-        {
-            return graveyard;
-        }
+        public Pile graveyard { get; }
 
-        public Pile getExile()
-        {
-            return exile;
-        }
+        public Pile exile { get; }
 
-        public Pile getField()
-        {
-            return field;
-        }
+        public Pile field { get; }
 
-        public Pile getDeck()
-        {
-            return deck;
-        }
+        public Pile deck { get; }
 
         public Pile getPile(LocationPile p)
         {

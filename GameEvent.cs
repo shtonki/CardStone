@@ -25,6 +25,7 @@ namespace stonekart
         DAMAGECREATURE,
         BURYCREATURE,
         GAINLIFE,
+        SUMMONTOKEN,
     }
 
     /// <summary>
@@ -189,7 +190,17 @@ namespace stonekart
             return xdd;
         }
     }
-    
+
+    class SummonTokenEvent : GameEvent
+    {
+        public CardId id {get; private set; }
+        public Player player { get; private set; }
+        public SummonTokenEvent(Player p, CardId id) : base(GameEventType.SUMMONTOKEN)
+        {
+            this.id = id;
+            player = p;
+        }
+    }
 
     class DamagePlayerEvent : PlayerEvent
     {

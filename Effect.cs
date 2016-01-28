@@ -154,4 +154,28 @@ namespace stonekart
         }
         
     }
+
+    public class SummonNTokens : SubEffect
+    {
+        public int count { get; private set; }
+        public CardId card { get; private set; }
+        public SummonNTokens(int n, CardId c)
+        {
+            count = n;
+            card = c;
+            
+        }
+
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        {
+            GameEvent[] r = new GameEvent[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                r[i] = new SummonTokenEvent(c.controller, card);
+            }
+
+            return r;
+        }
+    }
 }

@@ -185,9 +185,9 @@ namespace stonekart
             updateManaDisplay();
 
             hlt = player.getHealth().ToString();
-            dck = player.getDeck().Count.ToString();
-            hnd = player.getHand().Count.ToString();
-            yrd = player.getGraveyard().Count.ToString();
+            dck = player.deck.Count.ToString();
+            hnd = player.hand.Count.ToString();
+            yrd = player.graveyard.Count.ToString();
 
 
             Invalidate();

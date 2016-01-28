@@ -188,15 +188,18 @@ namespace stonekart
 
                 case CardId.TempleHealer:
                 {
-                    whiteCost = 1;
-                    greyCost = 0;
+                    whiteCost = 3;
+                    greyCost = 1;
                     type = Type.Creature;
                     race = Race.Human;
                     subType = SubType.Cleric;
                     basePower = 4;
                     baseToughness = 4;
                     EventFilter e = vanillaETB;
-                    baseTriggeredAbilities.Add(new TriggeredAbility(this, friendlyETB, underYourControlETBDescription + "gain 1 life.", LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
+                    baseTriggeredAbilities.Add(new TriggeredAbility(this, 
+                        friendlyETB, 
+                        underYourControlETBDescription + "gain 1 life.", 
+                        LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
                 } break;
 
                 case CardId.Rapture:
@@ -205,6 +208,22 @@ namespace stonekart
                     type = Type.Instant;
                     fx.Add(new ExileTarget());
                     castDescription = "Exile target creature";
+                } break;
+
+                case CardId.CallToArms:
+                {
+                    whiteCost = 1;
+                    type = Type.Sorcery;
+                    fx.Add(new SummonNTokens(2, CardId.Squire));
+                    castDescription = "Summon two Squires.";
+                } break;
+
+                case CardId.Squire:
+                {
+                    type = Type.Token;
+                    race = Race.Human;
+                    baseToughness = 1;
+                    basePower = 1;
                 } break;
 
                 default:
@@ -449,6 +468,8 @@ namespace stonekart
         FrothingGoblin,
         TempleHealer,
         Rapture,
+        Squire,
+        CallToArms,
     }
 
     public enum Type

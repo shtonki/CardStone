@@ -93,16 +93,14 @@ namespace stonekart
         {
             return new[]
             {
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
                 CardId.TempleHealer,
                 CardId.TempleHealer,
                 CardId.TempleHealer,
                 CardId.TempleHealer,
-                CardId.TempleHealer,
-                CardId.TempleHealer,
-                CardId.Rapture,
-                CardId.Rapture,
-                CardId.Rapture,
-                CardId.Rapture,
             };
         }
 
@@ -128,6 +126,7 @@ namespace stonekart
             addBaseHandler(GameEventType.DAMAGECREATURE, _damagecreature);
             addBaseHandler(GameEventType.BURYCREATURE, _burycreature);
             addBaseHandler(GameEventType.GAINLIFE, _gainlife);
+            addBaseHandler(GameEventType.SUMMONTOKEN, _summontoken);
         }
 
         private void addBaseHandler(GameEventType t, EventAction a)
@@ -135,6 +134,12 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _summontoken(GameEvent gevent)
+        {
+            SummonTokenEvent e = (SummonTokenEvent)gevent;
+            Card card = cardFactory.makeCard(e.player, e.id);
+            handleEvent(new MoveCardEvent(card, LocationPile.FIELD));
+        }
         private void _gainlife(GameEvent gevent)
         {
             GainLifeEvent e = (GainLifeEvent)gevent;
@@ -160,7 +165,7 @@ namespace stonekart
                 int i = 0;
                 while (i++ < e.getCards())
                 {
-                    handleEvent(new MoveCardEvent(e.player.getDeck().peek(), e.player.getHand().location));
+                    handleEvent(new MoveCardEvent(e.player.deck.peek(), e.player.hand.location));
                 }
 
                 //e.player.draw(e.getCards());
@@ -175,18 +180,10 @@ namespace stonekart
             StackWrapper v = e.getStackWrapper();
             //v.card = v.card.createDummy();
             Card card = v.card;
-            
-            
-            if (card.location != null)
-            {
-                pileFromLocation(card.location).remove(card);
-            }
 
             
-            stack.add(card);
-            card.location = stack.location;
 
-            //moveCardTo(v.card.createDummy(), stack); 
+            moveCardTo(card, stack); 
             stackxd.Push(v);
             v.card.stackWrapper = v;
 
@@ -403,7 +400,7 @@ namespace stonekart
 
         private void combatDamageStep()
         {
-            foreach (var attacker in activePlayer.getField().cards)
+            foreach (var attacker in activePlayer.field.cards)
             {
                 if (attacker.attacking)
                 {
@@ -518,7 +515,7 @@ namespace stonekart
         {
             List<GameEvent> xd = new List<GameEvent>();
 
-            foreach (var v in hero.getField().cards)
+            foreach (var v in hero.field.cards)
             {
                 if (v.currentToughness <= 0)
                 {
@@ -526,7 +523,7 @@ namespace stonekart
                 }
             }
 
-            foreach (var v in villain.getField().cards)
+            foreach (var v in villain.field.cards)
             {
                 if (v.currentToughness <= 0)
                 {
@@ -938,12 +935,16 @@ namespace stonekart
             connection.sendGameAction(a);
         }
 
-        public void moveCardTo(Card c, Pile to)
+        public void moveCardTo(Card card, Pile to)
         {
-            Pile from = pileFromLocation(c.location);
-            from.remove(c);
-            to.add(c);
-            c.location = to.location;
+            if (card.location != null)
+            {
+                pileFromLocation(card.location).remove(card);
+            }
+
+
+            to.add(card);
+            card.location = to.location;
         }
 
         public void moveCardTo(Card c, Location l)
@@ -1002,6 +1003,7 @@ namespace stonekart
                 Card c = new Card(id);
                 c.setId(i);
                 c.owner = owner;
+                c.controller = owner;
                 cards.Add(i, c);
                 return c;
             }

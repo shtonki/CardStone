@@ -495,12 +495,12 @@ namespace stonekart
             hero.setObserver(heroPanel);
             villain.setObserver(villainPanel);
 
-            hero.getHand().setObserver(handPanel);
+            hero.hand.setObserver(handPanel);
 
             stack.setObserver(stackPanel);
 
-            hero.getField().setObserver(heroFieldPanel);
-            villain.getField().setObserver(villainFieldPanel);
+            hero.field.setObserver(heroFieldPanel);
+            villain.field.setObserver(villainFieldPanel);
         }
 
         public void setStep(int s, bool a)
