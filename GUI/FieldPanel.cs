@@ -6,7 +6,7 @@ namespace stonekart
 {
     public class FieldPanel : Panel, Observer
     {
-        private SnapCardButton[] buttons;
+        private CardButton[] buttons;
         private const int BUTTONS = 10;
 
         public FieldPanel(GameInterface g, bool asHero)
@@ -14,12 +14,13 @@ namespace stonekart
             Size = new Size(900, 320);
             BackColor = Color.DarkKhaki;
 
-            buttons = new SnapCardButton[BUTTONS];
+            buttons = new CardButton[BUTTONS];
 
             for (int i = 0; i < BUTTONS; i++)
             {
-                buttons[i] = new SnapCardButton(g, asHero);
-                buttons[i].setLocation(5 + 183 * i, asHero ? 38 : 0);
+                SnapCardButton b = new SnapCardButton(g, asHero ? 40 : -40);
+                b.Location = new Point(5 + 183 * i, asHero ? 38 : 0);
+                buttons[i] = b;
                 Controls.Add(buttons[i]);
                 buttons[i].setVisible(false);
             }
@@ -44,17 +45,19 @@ namespace stonekart
             }
         }
     }
-
-    //todo seba move this to where it should be
+    
     class SnapCardButton : CardButton, Observer
     {
         private Point def, att;
 
         private int xdd;
 
-        public SnapCardButton(GameInterface g, bool b) : base(g)
+        private bool dirty;
+
+        public SnapCardButton(GameInterface g, int i) : base(g)
         {
-            xdd = b ? -40 : 40;
+            LocationChanged += (sender, args) => setLocation();
+            xdd = i;
         }
 
         public new void notifyObserver(Observable o)
@@ -62,14 +65,22 @@ namespace stonekart
             base.notifyObserver(o);
 
             Card c = (Card)o;
-            Invoke(new Action(() => { Location = c.topped ? att : def; }));
+            Invoke(new Action(() => { dirty = true; Location = c.topped ? att : def; }));
         }
+        
 
-        public void setLocation(int x, int y)
+        private void setLocation()
         {
+            if (dirty)
+            {
+                dirty = false;
+                return;
+            }
+
+            int x = Location.X;
+            int y = Location.Y;
             def = new Point(x, y);
             att = new Point(x, y + xdd);
-            Location = def;
         }
     }
 }

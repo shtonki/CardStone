@@ -360,7 +360,7 @@ namespace stonekart
         public PlayerPanel heroPanel, villainPanel;
         private ChoicePanel choicePanel;
         public CardBox stackPanel;
-        public FieldPanel heroFieldPanel;
+        public CardPanel heroFieldPanel;
         public FieldPanel villainFieldPanel;
         private TurnPanel turnPanel;
         private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
@@ -399,7 +399,7 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
 
-            handPanel = new CardPanel(g);
+            handPanel = new CardPanel(0, new CardPanelArgs(), ()=>new CardButton(g));
             handPanel.Location = new Point(400, 660);
 
 
@@ -415,7 +415,8 @@ namespace stonekart
             stackPanel = new CardBox(g, 190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            heroFieldPanel = new FieldPanel(g, true);
+            //heroFieldPanel = new FieldPanel(g, true);
+            heroFieldPanel = new CardPanel(0, new CardPanelArgs(), () => new SnapCardButton(g, -40));
             heroFieldPanel.Location = new Point(600, 330);
 
             villainFieldPanel = new FieldPanel(g ,false);
