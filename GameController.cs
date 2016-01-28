@@ -20,7 +20,6 @@ namespace stonekart
         {
             Settings.loadSettings();
 
-            ImageLoader.init();
             FontLoader.init();
 
             GUI.createFrame();

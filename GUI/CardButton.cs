@@ -7,37 +7,23 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    public class CardButton : Button, GameUIElement, Observer
+    public class CardButton : Button, GameUIElement, Observer, Resolutionable
     {
-        public static int WIDTH = 180, HEIGHT = 280;
-        private readonly Size size = new Size(WIDTH, HEIGHT);
 
-        private static FontFamily fontFamilyA;
+        //private static FontFamily fontFamilyA;
 
         private GameInterface gameInterface;
         private Card card;
 
         private Pen borderPen;
-
-        static CardButton()
-        {
-            //todo(seba) actually use the FontLoader class
-            var a = new PrivateFontCollection();
-
-            try
-            {
-                //privet.AddFontFile(@"res/FONT/mangalb.ttf");
-                a.AddFontFile(@"res/FONT/MatrixBold.ttf");
-            }
-            catch (Exception e)
-            {
-                System.Console.WriteLine(e.Message);
-            }
-            fontFamilyA = a.Families[0];
-        }
+        private Brush[] brushes = new Brush[6];
+        private Font cardNameFont, textFont, PTFont;
+        
 
         public CardButton(GameInterface g)
         {
+            updateResolution();
+
             brushes[(int)ManaColour.WHITE] = new SolidBrush(Color.White);
             brushes[(int)ManaColour.RED] = new SolidBrush(Color.Red);
             brushes[(int)ManaColour.BLACK] = new SolidBrush(Color.Black);
@@ -47,7 +33,6 @@ namespace stonekart
 
             gameInterface = g;
             Visible = true;
-            Size = size;
             
             MouseEnter += (sender, args) =>
             {
@@ -120,49 +105,54 @@ namespace stonekart
             Invalidate();
         }
 
-        private const int w = 33;
 
         private static Rectangle flavorTextRectangle = new Rectangle(13, 183, 160, 70);
 
-        private Brush[] brushes = new Brush[6];
 
         protected override void OnPaint(PaintEventArgs pevent)
         {
             //base.OnPaint(pevent);
             if (card != null)
             {
-                Brush b = new SolidBrush(Color.Black);
-                Font cardNameFont = new Font(fontFamilyA,
-                16,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel),
+                
+                int width = Size.Width,
+                    height = Size.Height;
 
-                archTypeFont = new Font(fontFamilyA,
-                13,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel),
-
-                PTFont = new Font(fontFamilyA,
-                30,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel);
-
+                Brush b = brushes[(int)ManaColour.BLACK];
+                
+                
                 pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                pevent.Graphics.DrawImage(card.getFrame(), new Point(0, 0));
-                pevent.Graphics.DrawImage(card.getArt(), new Point(15, 25));
+
+                pevent.Graphics.DrawImage(ImageLoader.getFrame(), new Point(0, 0));
+
+                pevent.Graphics.DrawImage(ImageLoader.getCardArt(card.cardId), 
+                    Resolution.get(ElementDimensions.CardButtonArtLocationX), 
+                    Resolution.get(ElementDimensions.CardButtonArtLocationY));
+                
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-                //Brush b = (Brush)blackBrush.Clone();
-                pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 4, 5);
-                pevent.Graphics.DrawString(card.getArchtypeString(), archTypeFont, b, 15, 165);
-                pevent.Graphics.DrawString(card.getAbilitiesString(), archTypeFont, b, flavorTextRectangle);
+                pevent.Graphics.DrawString(card.getName(), cardNameFont, b, 
+                    Resolution.get(ElementDimensions.CardButtonNameLocationX), 
+                    Resolution.get(ElementDimensions.CardButtonNameLocationY));
 
+                pevent.Graphics.DrawString(card.getArchtypeString(), textFont, b, 
+                    Resolution.get(ElementDimensions.CardButtonTypeTextLocationX),
+                    Resolution.get(ElementDimensions.CardButtonTypeTextLocationY));
+
+                pevent.Graphics.DrawString(card.getAbilitiesString(), textFont, b, 
+                    new Rectangle(
+                            Resolution.get(ElementDimensions.CardButtonTextLocationX),
+                            Resolution.get(ElementDimensions.CardButtonTextLocationY),
+                            Resolution.get(ElementDimensions.CardButtonTextWidth),
+                            Resolution.get(ElementDimensions.CardButtonTextHeight)
+                        ));
+                
 
 
                 int[] mc = card.getManaCost().costs;
 
 
-                Pen manaBallPen = new Pen(b, 4);
+                Pen manaBallPen = new Pen(b, 2);
 
 
                 int c = 0;
@@ -172,18 +162,35 @@ namespace stonekart
                     while (mc[i]-- > 0)
                     {
 
-                        pevent.Graphics.DrawEllipse(manaBallPen, 159 - c * 15, 7, 10, 10);
-                        pevent.Graphics.FillEllipse(b, 159 - c * 15, 7, 10, 10);
+                        pevent.Graphics.DrawEllipse(manaBallPen, 
+                            Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding),
+                            Resolution.get(ElementDimensions.CardButtonManaOrbLocationY), 
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize),
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize));
+
+                        pevent.Graphics.FillEllipse(b, 
+                            Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding),
+                            Resolution.get(ElementDimensions.CardButtonManaOrbLocationY),
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize),
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize));
+
                         c++;
                     }
                 }
-
+                
                 if (mc[(int)ManaColour.GREY] != 0)
                 {
                     b = brushes[(int)ManaColour.GREY];
-                    pevent.Graphics.FillEllipse(b, 156 - c * 15, 5, 14, 14);
+                    pevent.Graphics.FillEllipse(b, 
+                        Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding) - 1,
+                            Resolution.get(ElementDimensions.CardButtonManaOrbLocationY) - 1,
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize) + 2,
+                            Resolution.get(ElementDimensions.CardButtonManaOrbSize) + 2);
                     b = brushes[(int)ManaColour.BLACK];
-                    pevent.Graphics.DrawString(mc[(int)ManaColour.GREY].ToString(), cardNameFont, b, 158 - c * 15, 4);
+                    pevent.Graphics.DrawString(mc[(int)ManaColour.GREY].ToString(), cardNameFont, b,
+                        Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding) + 1,
+                        Resolution.get(ElementDimensions.CardButtonManaOrbNumberLocationY));
+                        
                 }
                 
                 if (card.hasPT())
@@ -192,22 +199,27 @@ namespace stonekart
                     Brush pt = new SolidBrush(Color.Black);
                     Brush damaged = new SolidBrush(Color.DarkRed);
 
-                    pevent.Graphics.FillEllipse(p, -w, 280 - w, 2 * w, 2 * w);
-                    pevent.Graphics.FillEllipse(p, 180 - w, 280 - w, 2 * w, 2 * w);
-                    pevent.Graphics.DrawString(card.currentPower.ToString(), PTFont, pt, 4, 250);
-                    pevent.Graphics.DrawString(card.currentToughness.ToString(), PTFont, card.isDamaged() ? damaged : pt, 154, 250);
+                    int w = Resolution.get(ElementDimensions.CardButtonPTAreaSize);
+
+                    pevent.Graphics.FillEllipse(p, -w, height - w, 2 * w, 2 * w);
+                    pevent.Graphics.FillEllipse(p , width - w, height - w, 2 * w, 2 * w);
+
+                    pevent.Graphics.DrawString(card.currentPower.ToString(), PTFont, pt, 
+                        Resolution.get(ElementDimensions.CardButtonPTTextLocationP),
+                        Resolution.get(ElementDimensions.CardButtonPTTextLocationY));
+
+                    pevent.Graphics.DrawString(card.currentToughness.ToString(), PTFont, card.isDamaged() ? damaged : pt,
+                        Resolution.get(ElementDimensions.CardButtonPTTextLocationT),
+                        Resolution.get(ElementDimensions.CardButtonPTTextLocationY));
                 }
 
                 if (borderPen != null)
                 {
-                    pevent.Graphics.DrawRectangle(borderPen, 0, 0, WIDTH, HEIGHT);                    
+                    pevent.Graphics.DrawRectangle(borderPen, 0, 0, width, height);                    
                 }
 
-                /*
-                pevent.Graphics.FillEllipse(new SolidBrush(Color.LightSlateGray), 158 - i * 15, 5, 14, 14);
-                Font gcFont = new Font(fontFamilyA, 18, FontStyle.Regular, GraphicsUnit.Pixel);
-                pevent.Graphics.DrawString("2", gcFont, new SolidBrush(Color.Black), 159 - i * 15, 2);
-                 */
+                manaBallPen.Dispose();
+                
             }
         }
 
@@ -236,6 +248,26 @@ namespace stonekart
             {
                 Visible = card != null;       
             }
+            Invalidate();
+        }
+
+        public void updateResolution()
+        {
+            if (cardNameFont != null)
+            {
+                cardNameFont.Dispose();
+                textFont.Dispose();
+                PTFont.Dispose();
+            }
+
+            cardNameFont = FontLoader.getFont(FontLoader.MANGALB, Resolution.get(ElementDimensions.CardButtonNameFontSize));
+            textFont = FontLoader.getFont(FontLoader.MANGALB, Resolution.get(ElementDimensions.CardButtonTextFontSize));
+            PTFont = FontLoader.getFont(FontLoader.MANGALB, Resolution.get(ElementDimensions.CardButtonPTFontSize));
+            
+            int height = Resolution.get(ElementDimensions.CardButtonHeight),
+                width =  Resolution.get(ElementDimensions.CardButtonWidth);
+            Size = new Size(width, height);
+
             Invalidate();
         }
     }

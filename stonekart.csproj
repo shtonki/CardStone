@@ -83,6 +83,7 @@
     <Compile Include="GameAction.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="GameInterface.cs" />
+    <Compile Include="GUI\Resolution.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="GUI\GameUIElement.cs" />

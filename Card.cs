@@ -13,7 +13,7 @@ namespace stonekart
     public class Card : Observable
     {
         private int id;
-        private CardId cardId;
+        public CardId cardId { get; private set; }
         public Location location { get; set; }
         public Player owner { get; set; }
         public Player controller { get; set; }
@@ -191,6 +191,8 @@ namespace stonekart
                     whiteCost = 3;
                     greyCost = 1;
                     type = Type.Creature;
+                    race = Race.Human;
+                    subType = SubType.Cleric;
                     basePower = 4;
                     baseToughness = 4;
                     EventFilter e = vanillaETB;
@@ -403,17 +405,7 @@ namespace stonekart
 
             return r;
         }
-
-        public Image getArt()
-        {
-            return ImageLoader.getCardArt(cardId);
-        }
-
-        public Image getFrame()
-        {
-            return ImageLoader.getFrame();
-        }
-
+        
         public string getArchtypeString()
         {
             return type.ToString() +

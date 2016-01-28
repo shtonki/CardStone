@@ -26,7 +26,7 @@ namespace stonekart
             var a = new PrivateFontCollection();
             
             a.AddFontFile(@"res/FONT/mplantin.ttf");
-            a.AddFontFile(@"res/FONT/mangalb.ttf");
+            a.AddFontFile(@"res/FONT/MatrixBold.ttf");
             a.AddFontFile(@"res/FONT/Maiandra GD.ttf");
 
             fontFamilies[MPLATIN] = a.Families[0];

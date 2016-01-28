@@ -159,8 +159,10 @@ namespace stonekart
             return labelx.Focused;
         }
 
-        
-        
+        public void updateResolution()
+        {
+            
+        }
     }
 
     public class MainMenuPanel : DisplayPanel

@@ -169,7 +169,11 @@ namespace stonekart
                 frame.handleGlobalKeyDown(Keys.Escape);
             }
         }
-        
+
+        public static void setResolution(Resolution r)
+        {
+            frame.updateResolution();
+        }
 
         /*
         public const int
@@ -180,7 +184,43 @@ namespace stonekart
         //todo(notme) sholdn't be const fam
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
 
-        
+        public static void updateAll()
+        {
+            foreach (Control v in getAll())
+            {
+                if (v is Resolutionable)
+                {
+                    Resolutionable vr = v as Resolutionable;
+                    if (v.InvokeRequired)
+                    {
+                        v.Invoke(new Action(() =>
+                        {
+                            vr.updateResolution();
+                            //v.Invalidate();
+                        }));
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
+
+            //frame.Invoke(new Action(frame.Invalidate));
+        }
+
+        public static IEnumerable<Control> getAll()
+        {
+            return getAll(frame);
+        } 
+
+        private static IEnumerable<Control> getAll(Control control)
+        {
+            var controls = control.Controls.Cast<Control>();
+
+            return controls.SelectMany(ctrl => getAll(ctrl))
+                                      .Concat(controls);
+        }
     }
 
     public class ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense

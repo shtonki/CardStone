@@ -35,7 +35,10 @@ namespace stonekart
             Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh, actually entire function is a hack
             Pile p = (Pile)o;
 
-            int padding = 5 + (CardButton.WIDTH < WIDTH/(1 + p.cards.Count) ? CardButton.WIDTH : WIDTH/(1+p.cards.Count));
+            int height = Size.Height,
+                width = Size.Width;
+
+            int padding = 5 + (width < WIDTH/(1 + p.cards.Count) ? width : WIDTH/(1+p.cards.Count));
 
             int i = 0;
             for (; i < p.cards.Count; i++)
