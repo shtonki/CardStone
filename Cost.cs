@@ -89,9 +89,11 @@ namespace stonekart
 
     public class ManaCost : SubCost
     {
-        //todo(seba) reconsider how we store this information yet again
+        //todo(seba) reconsider how we store this information yet again, no it's fine xd
         private readonly int[] Costs = new int[6];
         public int[] costs => cloneLambda(Costs);
+
+        public IEnumerable<int> costsEnumerable => Costs;
 
         private int[] cloneLambda(int[] a)
         {

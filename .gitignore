@@ -1,5 +1,6 @@
 /bin/Debug/*
 !cardstone.zip
+!/bin/Debug/res
 /obj/Debug/*
 /obj/Debug/*.cs
 settings

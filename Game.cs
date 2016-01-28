@@ -101,6 +101,10 @@ namespace stonekart
                 CardId.TempleHealer,
                 CardId.TempleHealer,
                 CardId.TempleHealer,
+                CardId.ShimmeringKoi,
+                CardId.ShimmeringKoi,
+                CardId.ShimmeringKoi,
+                CardId.ShimmeringKoi,
             };
         }
 

@@ -37,7 +37,7 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
-
+        public readonly ManaColour colour;
         public StackWrapper stackWrapper;
 
         private int? basePower, baseToughness, CurrentPower, CurrentToughness;
@@ -82,7 +82,7 @@ namespace stonekart
         //private List<Ability> abilities;
         private readonly List<ActivatedAbility> baseActivatedAbilities;
         private readonly List<TriggeredAbility> baseTriggeredAbilities;
-        private ManaCost castingCost;
+        public ManaCost castingCost { get; private set; }
         private List<KeyAbility> keyAbilities;
 
         public List<Ability> abilities => ((IEnumerable<Ability>)activatedAbilities).Concat(triggeredAbilities).ToList();
@@ -122,6 +122,8 @@ namespace stonekart
             name = b.ToString();
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
+
+            ManaColour? forceColour = null;
 
             switch (cardId)
             {
@@ -224,6 +226,23 @@ namespace stonekart
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
+                    forceColour = ManaColour.WHITE;
+                } break;
+
+                case CardId.ShimmeringKoi:
+                {
+                    blueCost = 2;
+                    greyCost = 2;
+                    type = Type.Creature;
+                    race = Race.Fish;
+                    basePower = 2;
+                    baseToughness = 3;
+                        baseTriggeredAbilities.Add(new TriggeredAbility(this,
+                            thisETB(this),
+                            thisETBDescription + "draw a card.",
+                            LocationPile.FIELD, EventTiming.Post,
+                            new OwnerDraws(1)
+                            ));
                 } break;
 
                 default:
@@ -251,6 +270,21 @@ namespace stonekart
             {
                 throw new Exception("bad thing b0ss");
             }
+
+            var vs = castingCost.costsEnumerable;
+            int n = vs.TakeWhile(v => v == 0).Count();  //spooky LINQ that probably breaks at some point 
+            if (n == 6)
+            {
+                if (!forceColour.HasValue)
+                {
+                    throw new Exception();
+                }
+                colour = forceColour.Value;
+            }
+            else
+            {
+                colour = (ManaColour)n;
+            }
         }
 
         #region commonEventFilters
@@ -271,6 +305,18 @@ namespace stonekart
             MoveCardEvent moveEvent = (MoveCardEvent)e;
 
             return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card.controller == this.controller;
+        }
+
+        private string thisETBDescription = "Whenever this card enters the battlefield, ";
+        private EventFilter thisETB(Card c)
+        {
+            return new EventFilter(@e =>
+            {
+                if (e.type != GameEventType.MOVECARD) { return false; }
+                MoveCardEvent moveEvent = (MoveCardEvent)e;
+
+                return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card == c;
+            });
         }
 
         #endregion
@@ -425,7 +471,9 @@ namespace stonekart
 
             return r;
         }
+
         
+
         public string getArchtypeString()
         {
             return type.ToString() +
@@ -470,6 +518,8 @@ namespace stonekart
         Rapture,
         Squire,
         CallToArms,
+        Ragnarok,
+        ShimmeringKoi,
     }
 
     public enum Type

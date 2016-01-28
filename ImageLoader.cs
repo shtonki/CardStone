@@ -16,10 +16,11 @@ namespace stonekart
     {
         private const string cardArtPath = @"res/IMG/card/";
         private const string framePath = @"res/IMG/frame/";
+        private const string postFrame = @"3.png";
 
         private static Dictionary<CardId, Image> imageMap;
 
-        private static Image frame;
+        private static Image[] frames = new Image[6];
 
         static ImageLoader()
         {
@@ -31,7 +32,13 @@ namespace stonekart
             int width = Resolution.get(ElementDimensions.CardButtonWidth);
             int height = Resolution.get(ElementDimensions.CardButtonHeight);
 
-            frame = resizeImage(Image.FromFile(framePath + "white2" + ".png"), width, height);
+            //todo(seba) this is probably where we dispose of the things
+
+            frames[(int)ManaColour.WHITE] = resizeImage(Image.FromFile(framePath + "white" + postFrame), width, height);
+            frames[(int)ManaColour.BLUE] = resizeImage(Image.FromFile(framePath + "blue" + postFrame), width, height);
+            frames[(int)ManaColour.BLACK] = resizeImage(Image.FromFile(framePath + "black" + postFrame), width, height);
+            frames[(int)ManaColour.RED] = resizeImage(Image.FromFile(framePath + "red" + postFrame), width, height);
+            frames[(int)ManaColour.GREEN] = resizeImage(Image.FromFile(framePath + "green" + postFrame), width, height);
 
             imageMap = new Dictionary<CardId, Image>();
         }
@@ -60,9 +67,9 @@ namespace stonekart
             return i;
         }
 
-        public static Image getFrame()
+        public static Image getFrame(Card c)
         {
-            return frame;
+            return frames[(int)c.colour];
         }
 
         private static Image resizeImage(Image image, int width, int height)

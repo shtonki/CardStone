@@ -63,7 +63,7 @@ namespace stonekart
             return r;
         }
 
-
+        /*
         public static WindowedPanel showWindow(Control p, string barTitle, bool closeable, Action closeCallback)
         {
             WindowedPanel v = null;
@@ -99,9 +99,15 @@ namespace stonekart
             return v;
         }
 
-        public static WindowedPanel showWindow(Control p)
+        public static WindowedPanel showWindow(Panel p)
         {
             return showWindow(p, "", false, null);
+        }
+        */
+
+        public static WindowedPanel showWindow(Panel p)
+        {
+            return null;
         }
 
         public static void showTell(string f, string m)

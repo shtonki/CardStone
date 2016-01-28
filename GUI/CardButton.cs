@@ -128,7 +128,7 @@ namespace stonekart
                 
                 pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                pevent.Graphics.DrawImage(ImageLoader.getFrame(), new Point(0, 0));
+                pevent.Graphics.DrawImage(ImageLoader.getFrame(card), new Point(0, 0));
 
                 pevent.Graphics.DrawImage(ImageLoader.getCardArt(card.cardId), 
                     Resolution.get(ElementDimensions.CardButtonArtLocationX), 
