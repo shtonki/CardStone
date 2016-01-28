@@ -184,7 +184,16 @@ namespace stonekart
         CardButtonPTTextLocationY,
         CardButtonPTTextLocationT,
 
+        HandPanelHeight,
+        HandPanelWidth,
+        HandPanelLocationX,
+        HandPanelLocationY,
 
+
+        ChoicePanelHeight,
+        ChoicePanelWidth,
+        ChoicePanelLocationX,
+        ChoicePanelLocationY,
 
 
     }

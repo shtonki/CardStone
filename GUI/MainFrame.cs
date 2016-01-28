@@ -352,7 +352,7 @@ namespace stonekart
         }
     }
 
-    public class GamePanel : DisplayPanel
+    public class GamePanel : DisplayPanel, Resolutionable
     {
         private GameInterface gameInterface;
         private TextBox inputBox, outputBox;
@@ -360,7 +360,7 @@ namespace stonekart
         public PlayerPanel heroPanel, villainPanel;
         private ChoicePanel choicePanel;
         public CardBox stackPanel;
-        public CardPanel heroFieldPanel;
+        public FieldPanel heroFieldPanel;
         public FieldPanel villainFieldPanel;
         private TurnPanel turnPanel;
         private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
@@ -371,8 +371,8 @@ namespace stonekart
         {
             gameInterface = g;
             BackColor = Color.Silver;
-            Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
-
+            //Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
+            /*
             inputBox = new TextBox();
             inputBox.KeyDown += (sender, args) =>
             {
@@ -398,9 +398,10 @@ namespace stonekart
 
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
-
-            handPanel = new CardPanel(0, new CardPanelArgs(), ()=>new CardButton(g));
-            handPanel.Location = new Point(400, 660);
+            */
+            
+            handPanel = new CardPanel(20, ()=>new CardButton(g));
+            //handPanel.Location = new Point(400, 660);
 
 
             choicePanel = new ChoicePanel(g);
@@ -415,8 +416,8 @@ namespace stonekart
             stackPanel = new CardBox(g, 190, 500);
             stackPanel.Location = new Point(400, 20);
 
-            //heroFieldPanel = new FieldPanel(g, true);
-            heroFieldPanel = new CardPanel(0, new CardPanelArgs(), () => new SnapCardButton(g, -40));
+            heroFieldPanel = new FieldPanel(g, true);
+            //heroFieldPanel = new CardPanel(20, () => new SnapCardButton(g, -40));
             heroFieldPanel.Location = new Point(600, 330);
 
             villainFieldPanel = new FieldPanel(g ,false);
@@ -432,13 +433,33 @@ namespace stonekart
             Controls.Add(choicePanel);
             Controls.Add(heroPanel);
             Controls.Add(handPanel);
-            Controls.Add(textPanel);
+            //Controls.Add(textPanel);
             Controls.Add(stackPanel);
             Controls.Add(heroFieldPanel);
             Controls.Add(villainFieldPanel);
             Controls.Add(turnPanel);
             Controls.Add(villainPanel);
             Visible = false;
+
+            updateResolution();
+        }
+
+
+        public void updateResolution()
+        {
+            Size = new Size(
+                Resolution.get(ElementDimensions.FrameWidth),
+                Resolution.get(ElementDimensions.FrameHeight));
+
+            CardPanelArgs handArgs = new CardPanelArgs();
+            
+            handArgs.width = Resolution.get(ElementDimensions.HandPanelWidth);
+            handArgs.height = Resolution.get(ElementDimensions.HandPanelHeight);
+
+            handPanel.Location = new Point(
+                Resolution.get(ElementDimensions.HandPanelLocationX),
+                Resolution.get(ElementDimensions.HandPanelLocationY));
+            handPanel.layoutButtons(handArgs);
         }
 
         public void setObservers(Player hero, Player villain, Pile stack)
@@ -504,7 +525,7 @@ namespace stonekart
             arrows.Clear();
         }
 
-        
+
     }
 
 
