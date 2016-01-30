@@ -1,0 +1,246 @@
+<resolution>
+  <dim name="FrameHeight">
+    <val>1000</val>
+  </dim>
+
+  <dim name="FrameWidth">
+    <val>1800</val>
+  </dim>
+
+  <dim name="CardButtonHeight">
+    <val>280</val>
+  </dim>
+
+  <dim name="CardButtonWidth">
+    <val>180</val>
+  </dim>
+
+  <dim name="CardButtonArtHeight">
+    <val>131</val>
+  </dim>
+
+  <dim name="CardButtonArtWidth">
+    <val>142</val>
+  </dim>
+
+  <dim name="CardButtonArtLocationX">
+    <val>19</val>
+  </dim>
+
+  <dim name="CardButtonArtLocationY">
+    <val>30</val>
+  </dim>
+
+  <dim name="CardButtonNameLocationX">
+    <val>9</val>
+  </dim>
+
+  <dim name="CardButtonNameLocationY">
+    <val>7</val>
+  </dim>
+
+  <dim name="CardButtonNameFontSize">
+    <val>14</val>
+  </dim>
+
+  <dim name="CardButtonTextFontSize">
+    <val>10</val>
+  </dim>
+
+  <dim name="CardButtonPTFontSize">
+    <val>1</val>
+  </dim>
+
+  <dim name="CardButtonTypeTextLocationX">
+    <val>17</val>
+  </dim>
+
+  <dim name="CardButtonTypeTextLocationY">
+    <val>168</val>
+  </dim>
+
+  <dim name="CardButtonTextLocationX">
+    <val>21</val>
+  </dim>
+
+  <dim name="CardButtonTextLocationY">
+    <val>181</val>
+  </dim>
+
+  <dim name="CardButtonTextWidth">
+    <val>130</val>
+  </dim>
+
+  <dim name="CardButtonTextHeight">
+    <val>37</val>
+  </dim>
+
+  <dim name="CardButtonManaOrbLocationX">
+    <val>154</val>
+  </dim>
+
+  <dim name="CardButtonManaOrbLocationY">
+    <val>7</val>
+  </dim>
+
+  <dim name="CardButtonManaOrbSize">
+    <val>11</val>
+  </dim>
+
+  <dim name="CardButtonManaOrbPadding">
+    <val>13</val>
+  </dim>
+
+  <dim name="CardButtonGreyCostLocationX">
+    <val>1</val>
+  </dim>
+
+  <dim name="CardButtonGreyCostLocationY">
+    <val>-1</val>
+  </dim>
+
+  <dim name="CardButtonPTAreaSize">
+    <val>1</val>
+  </dim>
+
+  <dim name="CardButtonPTTextLocationP">
+    <val>1</val>
+  </dim>
+
+  <dim name="CardButtonPTTextLocationY">
+    <val>1</val>
+  </dim>
+
+  <dim name="CardButtonPTTextLocationT">
+    <val>1</val>
+  </dim>
+
+  <dim name="HandPanelLocationX">
+    <val>1</val>
+  </dim>
+
+  <dim name="HandPanelLocationY">
+    <val>1</val>
+  </dim>
+
+  <dim name="HandPanelWidth">
+    <val>700</val>
+  </dim>
+
+  <dim name="HandPanelHeight">
+    <val>300</val>
+  </dim>
+
+  <dim name="HandPanelPaddingX">
+    <val>50</val>
+  </dim>
+
+  <dim name="HandPanelPaddingY">
+    <val>1</val>
+  </dim>
+
+  <dim name="HandPanelPaddingLeft">
+    <val>1</val>
+  </dim>
+
+  <dim name="HandPanelPaddingTop">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelLocationX">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelLocationY">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelWidth">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelHeight">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelPaddingX">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelPaddingY">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelPaddingLeft">
+    <val>1</val>
+  </dim>
+
+  <dim name="HeroFieldPanelPaddingTop">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelLocationX">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelLocationY">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelWidth">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelHeight">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelPaddingX">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelPaddingY">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelPaddingLeft">
+    <val>1</val>
+  </dim>
+
+  <dim name="StackPanelPaddingTop">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelLocationX">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelLocationY">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelWidth">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelHeight">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelPaddingX">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelPaddingY">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelPaddingLeft">
+    <val>1</val>
+  </dim>
+
+  <dim name="VillainFieldPanelPaddingTop">
+    <val>1</val>
+  </dim>
+
+</resolution>

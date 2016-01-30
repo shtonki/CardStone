@@ -193,8 +193,8 @@ namespace stonekart
                             Resolution.get(ElementDimensions.CardButtonManaOrbSize) + 2);
                     b = brushes[(int)ManaColour.BLACK];
                     pevent.Graphics.DrawString(mc[(int)ManaColour.GREY].ToString(), cardNameFont, b,
-                        Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding) + 1,
-                        Resolution.get(ElementDimensions.CardButtonManaOrbNumberLocationY));
+                        Resolution.get(ElementDimensions.CardButtonGreyCostLocationX) + Resolution.get(ElementDimensions.CardButtonManaOrbLocationX) - c * Resolution.get(ElementDimensions.CardButtonManaOrbPadding) + 1,
+                        Resolution.get(ElementDimensions.CardButtonGreyCostLocationY) + Resolution.get(ElementDimensions.CardButtonManaOrbLocationY));
                         
                 }
                 

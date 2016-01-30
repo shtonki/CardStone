@@ -54,6 +54,11 @@ namespace stonekart
             currentResolution.set(d, v);
         }
 
+        public static void setRelative(ElementDimensions d, int v)
+        {
+            currentResolution.set(d, currentResolution.get(d) + v);
+        }
+
         public static IEnumerable<Tuple<ElementDimensions, int>> getAllPairs()
         {
             return currentResolution.getAllPairs();
@@ -113,6 +118,8 @@ namespace stonekart
                 }
                 f.Close();
                 f.Dispose();
+
+                //scale(1, 1);
             }
 
         }
@@ -183,7 +190,8 @@ namespace stonekart
         CardButtonManaOrbLocationY,
         CardButtonManaOrbSize,
         CardButtonManaOrbPadding,
-        CardButtonManaOrbNumberLocationY,
+        CardButtonGreyCostLocationX,
+        CardButtonGreyCostLocationY,
         CardButtonPTAreaSize,
         CardButtonPTTextLocationP,
         CardButtonPTTextLocationY,
@@ -252,6 +260,5 @@ namespace stonekart
     public interface Resolutionable
     {
         void updateResolution();
-        
     }
 }

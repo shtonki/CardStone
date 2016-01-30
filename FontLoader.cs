@@ -36,6 +36,7 @@ namespace stonekart
 
         public static Font getFont(int baseFont, int size)
         {
+            size = size < 1 ? 1 : size;
             Font f = new Font(fontFamilies[baseFont],
                               size,
                               FontStyle.Regular,

@@ -20,9 +20,11 @@ namespace stonekart
         static void Main(string[] args)
         {
             CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
-            
+            ResHacker.open();
             GameController.startGame();
 
+
+            /*
             while (true)
             {
                 string s = Console.ReadLine();
@@ -81,10 +83,12 @@ namespace stonekart
                         GUI.updateAll();
                     }
                 }
+               
             }
+             */
         }
 
-        
+
 
         private static void xd()
         {
