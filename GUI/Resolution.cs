@@ -88,13 +88,14 @@ namespace stonekart
 
         public Resolutions resolution { get; private set; }
         
+
         public Res(Resolutions s)
         {
             resolution = s;
 
             values = new int[Enum.GetNames(typeof(ElementDimensions)).Length];
 
-            FileStream f = File.Open(resolution + ".xml",FileMode.Open);
+            FileStream f = File.Open("./res/RESOLUTION/" + resolution + ".xml",FileMode.Open);
             using (XmlReader reader = XmlReader.Create(new StreamReader(f)))
             {
                 while (true)
