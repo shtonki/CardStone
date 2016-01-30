@@ -1,0 +1,1 @@
+csc *.cs GUI/*.cs /r:System.Numerics.dll /r:Connection.dll 
