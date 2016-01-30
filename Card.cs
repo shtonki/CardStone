@@ -307,7 +307,7 @@ namespace stonekart
             return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card.controller == this.controller;
         }
 
-        private string thisETBDescription = "Whenever this card enters the battlefield, ";
+        private const string thisETBDescription = "Whenever this card enters the battlefield, ";
         private EventFilter thisETB(Card c)
         {
             return new EventFilter(@e =>
