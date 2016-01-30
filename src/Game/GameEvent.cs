@@ -26,6 +26,7 @@ namespace stonekart
         BURYCREATURE,
         GAINLIFE,
         SUMMONTOKEN,
+        MODIFYCARD,
     }
 
     /// <summary>
@@ -240,13 +241,28 @@ namespace stonekart
         
     }
 
-    class BuryCreature : CardEvent
+    class BuryCreatureEvent : CardEvent
     {
-        public BuryCreature(Card card) : base(card, GameEventType.BURYCREATURE)
+        public BuryCreatureEvent(Card card) : base(card, GameEventType.BURYCREATURE)
         {
         }
     }
 
+    class ModifyCardEvent : GameEvent
+    {
+        public readonly Card card;
+        public readonly Modifiable modifiable;
+        public readonly int value;
+        public readonly Clojurex clojure;
+
+        public ModifyCardEvent(Card card, Modifiable m, Clojurex c, int value) : base(GameEventType.MODIFYCARD)
+        {
+            this.card = card;
+            modifiable = m;
+            this.value = value;
+            clojure = c;
+        }
+    }
 
     abstract class PlayerEvent : GameEvent
     {

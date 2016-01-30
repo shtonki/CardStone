@@ -17,10 +17,10 @@ namespace stonekart
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            //CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
-            ResHacker.open();
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
+            //ResHacker.open();
             GameController.startGame();
 
 

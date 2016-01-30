@@ -1,12 +1,8 @@
 * allow resizing of the game window
-* colorless mana costs
-* display targeting and defending
-* call ClearFocus after transitioning to another DisplayPanel without crashing
-* the card size just isn't realistic quit daydreamin' kid
 * have the mana buttons be six actual buttons then an 'add button' to the right
 * pretty sure we're leaking memory through brushes
 * make the stack of displaypanel information in GameInterface an actual stack
-* make CardPanel actually display the cards ontop of each other in the way god intended
 * fix Observer/Observable and all the classes that implement them
 * implement showWindow in GUI
 * implement showCards in GameInterface
+* stop being OOgodx in GameEvent

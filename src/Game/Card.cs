@@ -40,9 +40,22 @@ namespace stonekart
         public readonly ManaColour colour;
         public StackWrapper stackWrapper;
 
-        private int? basePower, baseToughness, CurrentPower, CurrentToughness;
-        public int currentPower => CurrentPower.GetValueOrDefault();
-        public int currentToughness => CurrentToughness.GetValueOrDefault();
+        private Modifiable<int>[] mods = new Modifiable<int>[Enum.GetNames(typeof(Modifiable)).Count()];
+
+        private Modifiable<int> power
+        {
+            get { return mods[(int)Modifiable.Power]; }
+            set { mods[(int)Modifiable.Power] = value; }
+        }
+
+        private Modifiable<int> toughness
+        {
+            get { return mods[(int)Modifiable.Toughness]; }
+            set { mods[(int)Modifiable.Toughness] = value; }
+        }
+        //private Modifiable<int> power, toughness;
+        public int currentPower => power.getValue();
+        public int currentToughness => toughness.getValue();
         public bool summoningSick { get; set; }
         public bool attacking
         {
@@ -89,6 +102,10 @@ namespace stonekart
         public List<ActivatedAbility> activatedAbilities => baseActivatedAbilities;
         public List<TriggeredAbility> triggeredAbilities => baseTriggeredAbilities;
 
+        private int moveHackInt = 0;
+
+        public List<Aura> auras { get; private set; }
+
         protected Card()
         {
             baseActivatedAbilities = new List<ActivatedAbility>();
@@ -118,12 +135,13 @@ namespace stonekart
 
                 b.Append(ch);
             }
-
+            auras = new List<Aura>();
             name = b.ToString();
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
 
             ManaColour? forceColour = null;
+            int? basePower = null, baseToughness = null;
 
             switch (cardId)
             {
@@ -227,7 +245,8 @@ namespace stonekart
                     baseToughness = 1;
                     basePower = 1;
                     forceColour = ManaColour.WHITE;
-                } break;
+                    
+                    } break;
 
                 case CardId.ShimmeringKoi:
                 {
@@ -237,12 +256,29 @@ namespace stonekart
                     race = Race.Fish;
                     basePower = 2;
                     baseToughness = 3;
-                        baseTriggeredAbilities.Add(new TriggeredAbility(this,
-                            thisETB(this),
-                            thisETBDescription + "draw a card.",
-                            LocationPile.FIELD, EventTiming.Post,
-                            new OwnerDraws(1)
-                            ));
+                    baseTriggeredAbilities.Add(new TriggeredAbility(this,
+                        thisETB(this),
+                        thisETBDescription + "draw a card.",
+                        LocationPile.FIELD, EventTiming.Post,
+                        new OwnerDraws(1)
+                        ));
+                } break;
+
+                case CardId.Belwas:
+                {
+                    basePower = 3;
+                    baseToughness = 2;
+                    whiteCost = 1;
+                    redCost = 1;
+                    greyCost = 1;
+                    type = Type.Creature;
+                    race = Race.Human;
+                    Aura a = new Aura(
+                        (crd) => crd.controller == this.controller && crd.colour == ManaColour.WHITE && crd != this,
+                        Modifiable.Power,
+                        1,
+                        "Other white creatures you control get +1/+0");
+                    auras.Add(a);
                 } break;
 
                 default:
@@ -253,8 +289,10 @@ namespace stonekart
 
             if (basePower != null)
             {
-                CurrentPower = basePower;
-                CurrentToughness = baseToughness;
+                power = new Modifiable<int>(add, sub);
+                power.setBaseValue(basePower.Value);
+                toughness = new Modifiable<int>(add, sub);
+                toughness.setBaseValue(baseToughness.Value);
             }
 
 
@@ -289,7 +327,12 @@ namespace stonekart
 
         #region commonEventFilters
 
-        private bool vanillaETB(GameEvent e)
+        private static Modifiable<int>.Operator add = (a, b) => a + b;
+        private static Modifiable<int>.Operator sub = (a, b) => a - b;
+
+        private static Clojurex never = () => false;
+
+        private static bool vanillaETB(GameEvent e)
         {
             if (e.type != GameEventType.MOVECARD) { return false; }
             MoveCardEvent moveEvent = (MoveCardEvent)e;
@@ -308,7 +351,7 @@ namespace stonekart
         }
 
         private const string thisETBDescription = "Whenever this card enters the battlefield, ";
-        private EventFilter thisETB(Card c)
+        private static EventFilter thisETB(Card c)
         {
             return new EventFilter(@e =>
             {
@@ -382,8 +425,7 @@ namespace stonekart
         
         public void damage(int d)
         {
-            CurrentToughness -= d;
-            notifyObserver();
+            modify(Modifiable.Toughness, -d, never);
         }
         
 
@@ -394,14 +436,18 @@ namespace stonekart
 
         public bool hasPT()
         {
-            return basePower != null;
+            return power != null;
         }
 
-        
+        public void modify(Modifiable m, int v, Clojurex c)
+        {
+            mods[(int)m].addModifier(v, c);
+            notifyObserver();
+        }
 
         public bool isDamaged()
         {
-            return CurrentToughness != baseToughness;
+            return false;
         }
 
         public bool canAttack()
@@ -421,8 +467,9 @@ namespace stonekart
 
         public void moveReset()
         {
-            CurrentPower = basePower;
-            CurrentToughness = baseToughness;
+            moveHackInt++;
+            power?.clear();
+            toughness?.clear();
             summoningSick = true;
         }
 
@@ -472,6 +519,13 @@ namespace stonekart
             return r;
         }
 
+        public void checkModifiers()
+        {
+            power?.check();
+            toughness?.check();
+
+            //notifyObserver();
+        }
         
 
         public string getArchtypeString()
@@ -500,6 +554,11 @@ namespace stonekart
                 b.AppendLine(v.ToString());
             }
 
+            foreach (var v in auras)
+            {
+                b.AppendLine(v.description);
+            }
+
             return b.ToString();
         }
 
@@ -520,6 +579,7 @@ namespace stonekart
         CallToArms,
         Ragnarok,
         ShimmeringKoi,
+        Belwas
     }
 
     public enum Type
@@ -552,5 +612,28 @@ namespace stonekart
     public enum KeyAbility
     {
         Fervor,
+    }
+
+    public enum Modifiable
+    {
+        Power,
+        Toughness,
+
+    }
+
+    public struct Aura
+    {
+        public readonly Func<Card, bool> filter;
+        public readonly Modifiable attribute;
+        public readonly int value;
+        public readonly string description;
+
+        public Aura(Func<Card, bool> filter, Modifiable attribute, int value, string description)
+        {
+            this.filter = filter;
+            this.attribute = attribute;
+            this.value = value;
+            this.description = description;
+        }
     }
 }

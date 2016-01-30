@@ -15,7 +15,7 @@ namespace stonekart
         private int health;
 
         //private Pile hand, graveyard, exile, field, deck;
-        public IEnumerable<Card> cards { get; private set; } 
+        
         private Pile[] piles;
 
         private LocationPlayer side;
@@ -138,8 +138,6 @@ namespace stonekart
 
         public void loadDeck(List<Card> deckList)
         {
-            cards = deckList;
-
             Location l = new Location(LocationPile.DECK, side);
             foreach (Card c in deckList)
             {

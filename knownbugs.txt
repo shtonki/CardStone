@@ -1,1 +1,2 @@
 ﻿* they're all features
+* if one calls notifyObsever at the wrong time cards get stuck in panels

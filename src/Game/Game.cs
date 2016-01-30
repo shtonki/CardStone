@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-//x
+
 namespace stonekart
 {
     public class Game
@@ -20,7 +20,10 @@ namespace stonekart
 
         private Card[] attackers, defenders;
 
-        private IEnumerable<Card> allCards => hero.cards.Concat(villain.cards); 
+        private IEnumerable<Card> allCards => cardFactory.allCards;
+        private IEnumerable<Card> heroCards => cardFactory.heroCards;
+        private IEnumerable<Card> villainCards => cardFactory.villainCards;
+        
 
         private bool active;
         private int step;
@@ -97,14 +100,14 @@ namespace stonekart
                 CardId.CallToArms,
                 CardId.CallToArms,
                 CardId.CallToArms,
-                CardId.TempleHealer,
-                CardId.TempleHealer,
-                CardId.TempleHealer,
-                CardId.TempleHealer,
-                CardId.ShimmeringKoi,
-                CardId.ShimmeringKoi,
-                CardId.ShimmeringKoi,
-                CardId.ShimmeringKoi,
+                CardId.Belwas, 
+                CardId.Belwas, 
+                CardId.Belwas, 
+                CardId.Belwas, 
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
             };
         }
 
@@ -131,6 +134,7 @@ namespace stonekart
             addBaseHandler(GameEventType.BURYCREATURE, _burycreature);
             addBaseHandler(GameEventType.GAINLIFE, _gainlife);
             addBaseHandler(GameEventType.SUMMONTOKEN, _summontoken);
+            addBaseHandler(GameEventType.MODIFYCARD, _modifycard);
         }
 
         private void addBaseHandler(GameEventType t, EventAction a)
@@ -138,6 +142,12 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _modifycard(GameEvent gevent)
+        {
+            ModifyCardEvent e = (ModifyCardEvent)gevent;
+            throw new Exception();
+            //e.modifiable.addModifier(e.value, e.clojure);
+        }
         private void _summontoken(GameEvent gevent)
         {
             SummonTokenEvent e = (SummonTokenEvent)gevent;
@@ -218,7 +228,7 @@ namespace stonekart
         }
         private void _burycreature(GameEvent gevent)
         {
-            BuryCreature e = (BuryCreature)gevent;
+            BuryCreatureEvent e = (BuryCreatureEvent)gevent;
             handleEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
         }
         private void _damagecreature(GameEvent gevent)
@@ -514,16 +524,59 @@ namespace stonekart
             step = (step + 1)%10;
             gameInterface.setStep(step, active);
         }
+        
 
         private void checkGameState()
         {
-            List<GameEvent> xd = new List<GameEvent>();
+            List<BuryCreatureEvent> xd = new List<BuryCreatureEvent>();
+            do
+            {
+                xd.Clear();
+                foreach (var v in allCards)
+                {
+                    v.checkModifiers();
+                }
 
+                var field = hero.field.cards.Concat(villain.field.cards);
+                var enumerable = field as Card[] ?? field.ToArray();
+
+                foreach (var v in enumerable)
+                {
+                    foreach (var a in v.auras)
+                    {
+                        foreach (var c in enumerable)
+                        {
+                            if (a.filter(c))
+                            {
+                                c.modify(a.attribute, a.value, () => true);
+                            }
+                        }
+                    }
+                }
+
+                var vs = allCards;
+
+                foreach (var v in hero.field.cards)
+                {
+                    if (v.currentToughness <= 0)
+                    {
+                        xd.Add(new BuryCreatureEvent(v));
+                    }
+                }
+
+
+                foreach (GameEvent v in xd)
+                {
+                    handleEvent(v);
+                }
+
+            } while (xd.Count > 0);
+            /*
             foreach (var v in hero.field.cards)
             {
                 if (v.currentToughness <= 0)
                 {
-                    xd.Add(new BuryCreature(v));
+                    xd.Add(new BuryCreatureEvent(v));
                 }
             }
 
@@ -531,14 +584,10 @@ namespace stonekart
             {
                 if (v.currentToughness <= 0)
                 {
-                    xd.Add(new BuryCreature(v));
+                    xd.Add(new BuryCreatureEvent(v));
                 }
             }
-
-            foreach (GameEvent v in xd)
-            {
-                handleEvent(v);
-            }
+            */
 
             foreach (TriggeredAbility v in waitingTriggeredAbilities)
             {
@@ -1001,6 +1050,12 @@ namespace stonekart
             private Dictionary<int, Card> cards = new Dictionary<int, Card>();
             private int ctr = 0;
 
+            private List<Card> hero = new List<Card>(40), villain = new List<Card>(40);
+
+            public IEnumerable<Card> heroCards => hero;
+            public IEnumerable<Card> villainCards => villain;
+            public IEnumerable<Card> allCards => hero.Concat(villain);
+
             public Card makeCard(Player owner, CardId id)
             {
                 int i = ctr++;
@@ -1009,6 +1064,19 @@ namespace stonekart
                 c.owner = owner;
                 c.controller = owner;
                 cards.Add(i, c);
+                if (owner.getSide() == LocationPlayer.HERO)
+                {
+                    hero.Add(c);
+                }
+                else if (owner.getSide() == LocationPlayer.VILLAIN)
+                {
+                    villain.Add(c);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+
                 return c;
             }
 

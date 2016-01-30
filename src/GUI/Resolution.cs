@@ -148,7 +148,7 @@ namespace stonekart
 
         public void save()
         {
-            using (StreamWriter writer = new StreamWriter(resolution + ".xml"))
+            using (StreamWriter writer = new StreamWriter("./res/RESOLUTION/" + resolution + ".xml"))
             {
                 writer.WriteLine("<resolution>");
                 foreach (Tuple<ElementDimensions, int> v in getAllPairs())

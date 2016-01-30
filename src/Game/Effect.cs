@@ -18,7 +18,14 @@ namespace stonekart
             subEffects = es;
 
             targetRules = new TargetRule[targetCount];
-            
+            int i = 0;
+            foreach (var v in es)
+            {
+                foreach (var x in v.targetRules)
+                {
+                    targetRules[i++] = x;
+                }
+            }
         }
 
         public List<GameEvent> resolve(Card c, Target[] ts)
@@ -176,6 +183,30 @@ namespace stonekart
             }
 
             return r;
+        }
+    }
+
+    public class AddTgns : SubEffect
+    {
+        public readonly Card card;
+        public readonly Modifiable attribute;
+        public readonly Clojurex filter;
+        public readonly int value;
+
+        public AddTgns(Card card, Modifiable attribute, Clojurex filter, int value)
+        {
+            this.card = card;
+            this.attribute = attribute;
+            this.filter = filter;
+            this.value = value;
+        }
+
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        {
+            return new GameEvent[]
+            {
+                new ModifyCardEvent(card, attribute, filter, value)
+            };
         }
     }
 }
