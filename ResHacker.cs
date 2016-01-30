@@ -30,7 +30,7 @@ namespace stonekart
         private const int HEIGHT = 500, WIDTH = 500;
         private ResHacker()
         {
-            Size = new Size(WIDTH + 15, HEIGHT);
+            Size = new Size(WIDTH + 40, HEIGHT + 70);
             BackColor = Color.LimeGreen;
 
             Panel f = new Panel();
@@ -72,7 +72,7 @@ namespace stonekart
                 TrackBar r = new TrackBar();
                 r.Size = new Size(WIDTH/2, 20);
                 r.Location = new Point(WIDTH/2 - 25, 0);
-                r.Maximum = 19;
+                r.Maximum = 20;
                 r.TickFrequency = r.Size.Width/42;
                 int i1 = i;
                 int v = 10;
@@ -124,7 +124,7 @@ namespace stonekart
 
             Controls.Add(f);
             f.Focus();
-            Size = f.Size;
+            //Size = f.Size;
         }
     }
 }

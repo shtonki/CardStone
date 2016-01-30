@@ -48,7 +48,7 @@
   </dim>
 
   <dim name="CardButtonPTFontSize">
-    <val>1</val>
+    <val>28</val>
   </dim>
 
   <dim name="CardButtonTypeTextLocationX">
@@ -100,27 +100,27 @@
   </dim>
 
   <dim name="CardButtonPTAreaSize">
-    <val>1</val>
+    <val>33</val>
   </dim>
 
   <dim name="CardButtonPTTextLocationP">
-    <val>1</val>
+    <val>-1</val>
   </dim>
 
   <dim name="CardButtonPTTextLocationY">
-    <val>1</val>
+    <val>250</val>
   </dim>
 
   <dim name="CardButtonPTTextLocationT">
-    <val>1</val>
+    <val>156</val>
   </dim>
 
   <dim name="HandPanelLocationX">
-    <val>1</val>
+    <val>610</val>
   </dim>
 
   <dim name="HandPanelLocationY">
-    <val>1</val>
+    <val>656</val>
   </dim>
 
   <dim name="HandPanelWidth">
@@ -132,55 +132,55 @@
   </dim>
 
   <dim name="HandPanelPaddingX">
-    <val>50</val>
+    <val>95</val>
   </dim>
 
   <dim name="HandPanelPaddingY">
-    <val>1</val>
+    <val>0</val>
   </dim>
 
   <dim name="HandPanelPaddingLeft">
-    <val>1</val>
+    <val>5</val>
   </dim>
 
   <dim name="HandPanelPaddingTop">
-    <val>1</val>
+    <val>5</val>
   </dim>
 
   <dim name="HeroFieldPanelLocationX">
-    <val>1</val>
+    <val>611</val>
   </dim>
 
   <dim name="HeroFieldPanelLocationY">
-    <val>1</val>
+    <val>330</val>
   </dim>
 
   <dim name="HeroFieldPanelWidth">
-    <val>1</val>
+    <val>700</val>
   </dim>
 
   <dim name="HeroFieldPanelHeight">
-    <val>1</val>
+    <val>320</val>
   </dim>
 
   <dim name="HeroFieldPanelPaddingX">
-    <val>1</val>
+    <val>183</val>
   </dim>
 
   <dim name="HeroFieldPanelPaddingY">
-    <val>1</val>
+    <val>0</val>
   </dim>
 
   <dim name="HeroFieldPanelPaddingLeft">
-    <val>1</val>
+    <val>5</val>
   </dim>
 
   <dim name="HeroFieldPanelPaddingTop">
-    <val>1</val>
+    <val>36</val>
   </dim>
 
   <dim name="StackPanelLocationX">
-    <val>1</val>
+    <val>405</val>
   </dim>
 
   <dim name="StackPanelLocationY">
@@ -188,31 +188,31 @@
   </dim>
 
   <dim name="StackPanelWidth">
-    <val>1</val>
+    <val>190</val>
   </dim>
 
   <dim name="StackPanelHeight">
-    <val>1</val>
+    <val>800</val>
   </dim>
 
   <dim name="StackPanelPaddingX">
-    <val>1</val>
+    <val>0</val>
   </dim>
 
   <dim name="StackPanelPaddingY">
-    <val>1</val>
+    <val>26</val>
   </dim>
 
   <dim name="StackPanelPaddingLeft">
-    <val>1</val>
+    <val>5</val>
   </dim>
 
   <dim name="StackPanelPaddingTop">
-    <val>1</val>
+    <val>5</val>
   </dim>
 
   <dim name="VillainFieldPanelLocationX">
-    <val>1</val>
+    <val>611</val>
   </dim>
 
   <dim name="VillainFieldPanelLocationY">
@@ -220,11 +220,11 @@
   </dim>
 
   <dim name="VillainFieldPanelWidth">
-    <val>1</val>
+    <val>700</val>
   </dim>
 
   <dim name="VillainFieldPanelHeight">
-    <val>1</val>
+    <val>320</val>
   </dim>
 
   <dim name="VillainFieldPanelPaddingX">
