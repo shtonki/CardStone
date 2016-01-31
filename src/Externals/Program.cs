@@ -23,69 +23,7 @@ namespace stonekart
             //ResHacker.open();
             GameController.startGame();
 
-
-            /*
-            while (true)
-            {
-                string s = Console.ReadLine();
-                string[] ss = s.Split(' ').Select(l => l.Trim()).ToArray();
-                if (ss[0] == "res")
-                {
-
-                    if (ss[1] == "s")
-                    {
-                        Resolution.set(ss[2], Int32.Parse(ss[3]));
-
-                        ImageLoader.updateResolution();
-                        GUI.updateAll();
-                    }
-
-                    if (ss[1] == "u")
-                    {
-                        ImageLoader.updateResolution();
-                        GUI.updateAll();
-                    }
-
-                    if (ss[1] == "l")
-                    {
-                        Console.WriteLine(Resolution.currentResolutionx);
-                        int i = 0;
-                        foreach (var v in Resolution.getAllPairs())
-                        {
-                            Console.WriteLine("{0}\t{1}{2}", i++, v.Item1.ToString().PadRight(35), v.Item2);
-                        }
-                    }
-
-                    if (ss[1] == "n")
-                    {
-                        Resolution.set((ElementDimensions)Int32.Parse(ss[2]), Int32.Parse(ss[3]));
-
-                        ImageLoader.updateResolution();
-                        GUI.updateAll();
-                    }
-
-                    if (ss[1] == "v")
-                    {
-                        Resolution.save();
-                    }
-
-                    if (ss[1] == "h")
-                    {
-                        Resolution.currentResolution.scale(3, 4);
-                        ImageLoader.updateResolution();
-                        GUI.updateAll();
-                    }
-
-                    if (ss[1] == "d")
-                    {
-                        Resolution.currentResolution.scale(4, 3);
-                        ImageLoader.updateResolution();
-                        GUI.updateAll();
-                    }
-                }
-               
-            }
-             */
+            
         }
 
 

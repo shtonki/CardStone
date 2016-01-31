@@ -14,6 +14,7 @@ namespace stonekart
             setup();
 
             start();
+            //GUI.transitionToDeckEditor();
         }
 
         private static void setup()

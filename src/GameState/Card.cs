@@ -283,7 +283,7 @@ namespace stonekart
 
                 default:
                 {
-                    throw new Exception("pls no");
+                    throw new Exception("pls no" + c.ToString());
                 }
             }
 
@@ -577,7 +577,6 @@ namespace stonekart
         Rapture,
         Squire,
         CallToArms,
-        Ragnarok,
         ShimmeringKoi,
         Belwas
     }
