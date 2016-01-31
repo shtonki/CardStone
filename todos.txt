@@ -6,3 +6,4 @@
 * implement showWindow in GUI
 * implement showCards in GameInterface
 * stop being OOgodx in GameEvent
+* fix GameInterface

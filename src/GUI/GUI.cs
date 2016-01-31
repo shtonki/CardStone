@@ -116,7 +116,7 @@ namespace stonekart
         }
 
         
-        private static readonly ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense = new ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense();
+        public static readonly ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense = new ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense();
 
         private static WaitFor<string> logInAs = new WaitFor<string>(); 
 

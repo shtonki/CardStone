@@ -9,7 +9,7 @@ namespace stonekart
 {
     public class CardButton : Button, GameUIElement, Observer, Resolutionable
     {
-
+        public static GameInterface dummy = new GameInterface(GUI.nonsense);
         //private static FontFamily fontFamilyA;
 
         private GameInterface gameInterface;
@@ -61,6 +61,11 @@ namespace stonekart
             };
 
             Click += clicked;
+        }
+
+        public CardButton(CardId c) : this(dummy)
+        {
+            card = new Card(c);
         }
 
         private void clicked(object o, EventArgs a)
