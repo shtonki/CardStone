@@ -362,21 +362,8 @@ namespace stonekart
             deckEditorPanel = new DeckEditorPanel();
             deckEditorPanel.Size = new Size(FRAMEWIDTH, FRAMEHEIGHT);
             deckEditorPanel.Visible = false;
-            KeyUp += new KeyEventHandler(KeyReleased);
-            KeyDown += OnKeyDown;
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Left) DeckEditorPanel.pressedArrow(-1);
-            else if (e.KeyCode == Keys.Right) DeckEditorPanel.pressedArrow(1);
-        }
-
-        private void KeyReleased(object sender, KeyEventArgs e)
-        {
-            DeckEditorPanel.addKeyToSearch(e.KeyCode);
-            deckEditorPanel.Invalidate();
-        }
 
         public void transitionTo(Panel p)
         {

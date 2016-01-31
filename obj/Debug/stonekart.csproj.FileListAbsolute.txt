@@ -1,0 +1,7 @@
+C:\Users\J-Dawg\cardstone\bin\Debug\cardstone.exe.config
+C:\Users\J-Dawg\cardstone\obj\Debug\Interop.MediaPlayer.dll
+C:\Users\J-Dawg\cardstone\obj\Debug\Interop.WMPLib.dll
+C:\Users\J-Dawg\cardstone\obj\Debug\stonekart.csproj.ResolveComReference.cache
+C:\Users\J-Dawg\cardstone\obj\Debug\stonekart.csprojResolveAssemblyReference.cache
+C:\Users\J-Dawg\cardstone\obj\Debug\stonekart.GUI.resources
+C:\Users\J-Dawg\cardstone\obj\Debug\stonekart.csproj.GenerateResource.Cache

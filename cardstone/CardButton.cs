@@ -34,27 +34,6 @@ namespace stonekart
             }
             catch (Exception e) { System.Console.WriteLine(e.Message); }
             fontFamilyA = a.Families[0];
-            /*
-            PTFont = new Font(horfamilj[0],
-                20,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel);
-
-            cardNameFont = new Font(horfamilj[0],
-                16,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel);
-
-            archTypeFont = new Font(horfamilj[0],
-                13,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel);
-
-            textFont = new Font(horfamilj[0],
-                13,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel);
-             */
         }
 
         public CardButton()
