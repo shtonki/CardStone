@@ -7,3 +7,6 @@
 * implement showCards in GameInterface
 * stop being OOgodx in GameEvent
 * fix GameInterface
+* shared rng
+* we're leaking memory through observers
+* make damage step and end combat step the same step

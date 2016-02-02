@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
@@ -7,20 +8,8 @@ namespace stonekart
 {
     internal class TurnPanel : Panel
     {
-        private const string resPath = @"res/IMG/button/";
-        private const int STEPS = 10;
-
-        private Image
-            refill,
-            draw,
-            main1,
-            startCombat,
-            attack,
-            block,
-            damage,
-            endCombat,
-            main2,
-            end;
+        private Image[] images = new Image[Enum.GetNames(typeof(TurnTracker.Step)).Length];
+        private ToggleBox[] toggleBoxes = new ToggleBox[Enum.GetNames(typeof(TurnTracker.Step)).Length];
 
         private int step = 0;
         private bool xd;
@@ -28,30 +17,59 @@ namespace stonekart
         public TurnPanel()
         {
             BackColor = Color.Red;
-            Size = new Size(70, 700);
+            //Size = new Size(70, 700);
+            /*
+            refill = Image.FromFile(Settings.resButton + "refill.png");
+            draw = Image.FromFile(Settings.resButton + "draw.png");
+            main1 = Image.FromFile(Settings.resButton + "main1.png");
+            startCombat = Image.FromFile(Settings.resButton + "startcombat.png");
+            attack = Image.FromFile(Settings.resButton + "attack.png");
+            block = Image.FromFile(Settings.resButton + "block.png");
+            damage = Image.FromFile(Settings.resButton + "damage.png");
+            endCombat = Image.FromFile(Settings.resButton + "endcombat.png");
+            main2 = Image.FromFile(Settings.resButton + "main2.png");
+            end = Image.FromFile(Settings.resButton + "end.png");
+            */
 
-            refill = Image.FromFile(resPath + "refill.png");
-            draw = Image.FromFile(resPath + "draw.png");
-            main1 = Image.FromFile(resPath + "main1.png");
-            startCombat = Image.FromFile(resPath + "startcombat.png");
-            attack = Image.FromFile(resPath + "attack.png");
-            block = Image.FromFile(resPath + "block.png");
-            damage = Image.FromFile(resPath + "damage.png");
-            endCombat = Image.FromFile(resPath + "endcombat.png");
-            main2 = Image.FromFile(resPath + "main2.png");
-            end = Image.FromFile(resPath + "end.png");
-            
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < toggleBoxes.Length; i++)
             {
                 ToggleBox b = new ToggleBox();
-                b.Location = new Point(i%2 * 60, (i/2)*70);
                 Controls.Add(b);
+                toggleBoxes[i] = b;
                 var i1 = i;
                 b.Click += (_, __) =>
                 {
                     System.Console.WriteLine(i1);
                     b.toggle();
                 };
+            }
+        }
+
+        public void setHeight(int i)
+        {
+            Size = new Size(i/10, i);
+            Invalidate();
+        }
+
+        protected override void OnResize(EventArgs eventargs)
+        {
+            base.OnResize(eventargs);
+
+            padPer = Size.Width;
+            int w = padPer - padSides;
+
+            for (int i = 0; i < toggleBoxes.Length; i++)
+            {
+                toggleBoxes[i].Size = new Size(10, 10);
+                toggleBoxes[i].Location = new Point(3, 3+i*padPer);
+            }
+            
+            
+            Size s = new Size(padPer, padPer);
+
+            for (int i = 0; i < images.Length; i++)
+            {
+                images[i] = ImageLoader.getStepImage((TurnTracker.Step)i, s);
             }
         }
 
@@ -62,17 +80,29 @@ namespace stonekart
             Invalidate();
         }
 
+        private int padSides, padPer;
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            if (images?[0] == null) { return; }
+
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            int height = Size.Height;
+            int width = Size.Width;
+            //todo(seba) find out if this leaks memory
+            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,         70, 140);
+            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 2 * width, 70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.DarkRed),     0, 3 * width, 70, 350);
+            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 8 * width, 70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 9 * width, 70, 70);
             
-            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,   70, 140);
-            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 140, 70, 70);
-            e.Graphics.FillRectangle(new SolidBrush(Color.DarkRed),     0, 210, 70, 350);
-            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 560,   70, 70);
-            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 630,   70, 70);
-            
+            for (int i = 0; i < images.Length; i++)
+            {
+                e.Graphics.DrawImage(images[i], padSides, padSides + i*padPer);
+            }
+            /*
             e.Graphics.DrawImage(refill, 4, 4);
             e.Graphics.DrawImage(draw, 4, 74);
             e.Graphics.DrawImage(main1, 4, 144);
@@ -83,18 +113,20 @@ namespace stonekart
             e.Graphics.DrawImage(endCombat, 4, 494);
             e.Graphics.DrawImage(main2, 4, 564);
             e.Graphics.DrawImage(end, 4, 634);
+            */
             
-            
-            e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.LightGray, 4), 1, 1 + step*70, 67, 67);
+            e.Graphics.DrawRectangle(new Pen(xd ? Color.Gold : Color.LightGray, 4), 1, 1 + step*width, width - 3, width - 3);
         }
         class ToggleBox : Panel
         {
-            private bool t;
+            public bool t { get; private set; }
+            private SolidBrush on, off;
 
             public ToggleBox()
             {
-                Size = new Size(10, 10);
                 BackColor = Color.Transparent;
+                on = new SolidBrush(Color.DarkOrchid);
+                off = new SolidBrush(Color.Lime);
             }
 
             public void toggle()
@@ -107,7 +139,7 @@ namespace stonekart
             {
                 base.OnPaint(e);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                e.Graphics.FillEllipse(new SolidBrush(t ? Color.DarkOrchid : Color.Lime), 0, 0, 9, 9);
+                e.Graphics.FillEllipse(t ? on : off, 0, 0, Size.Width - 1, Size.Height - 1);
                 //e.Graphics.DrawEllipse(new Pen(Color.DarkOrchid, 1), 0, 0, 10, 10);
             }
         }

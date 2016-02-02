@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,62 +15,72 @@ namespace stonekart
     /// </summary>
     class ImageLoader
     {
-        private const string cardArtPath = @"res/IMG/card/";
-        private const string framePath = @"res/IMG/frame/";
-        private const string postFrame = @"3.png";
+        private const int cruft = frames + steps;
+        private const int frames = 7;
+        private const int steps = 10;
 
-        private static Dictionary<CardId, Image> imageMap;
+        private static Dictionary<Size, Dictionary<string, Image>> imageMap;
 
-        private static Image[] frames = new Image[6];
+        private static Dictionary<string, Image> dflt;
+        private static Image nothing = Image.FromFile(Settings.resCard+"NOTHING.png");
 
         static ImageLoader()
         {
-            updateResolution();
+            imageMap = new Dictionary<Size, Dictionary<string, Image>>();
+            dflt = new Dictionary<string, Image>();
+        }
+        
+        public static Image getCardArt(CardId id, Size s)
+        {
+            return getImage(s, Settings.resCard + id + ".png");
         }
 
-        public static void updateResolution()
+        public static Image getFrame(Colour colour, Size s)
         {
-            int width = Resolution.get(ElementDimensions.CardButtonWidth);
-            int height = Resolution.get(ElementDimensions.CardButtonHeight);
-
-            //todo(seba) this is probably where we dispose of the things
-
-            frames[(int)ManaColour.WHITE] = resizeImage(Image.FromFile(framePath + "white" + postFrame), width, height);
-            frames[(int)ManaColour.BLUE] = resizeImage(Image.FromFile(framePath + "blue" + postFrame), width, height);
-            frames[(int)ManaColour.BLACK] = resizeImage(Image.FromFile(framePath + "black" + postFrame), width, height);
-            frames[(int)ManaColour.RED] = resizeImage(Image.FromFile(framePath + "red" + postFrame), width, height);
-            frames[(int)ManaColour.GREEN] = resizeImage(Image.FromFile(framePath + "green" + postFrame), width, height);
-
-            imageMap = new Dictionary<CardId, Image>();
+            return getImage(s, Settings.resFrame + colour + "3.png");
         }
 
-        public static Image getCardArt(CardId id)
+        public static Image getStepImage(TurnTracker.Step step, Size s)
         {
-            if (imageMap.ContainsKey(id))
-            {
-                return imageMap[id];
-            }
-
-            int width = Resolution.get(ElementDimensions.CardButtonArtWidth);
-            int height = Resolution.get(ElementDimensions.CardButtonArtHeight);
-            Image i;
-            try
-            {
-                i = Image.FromFile(cardArtPath + id + ".png");
-            }
-            catch (Exception)
-            {
-                i = Image.FromFile(cardArtPath + "NOTHING.png");
-            }
-            Image rz = resizeImage(i, width, height);
-            imageMap.Add(id, rz);
-            //rz.Save(id.ToString() + ".jpg");
-            return i;
+            return getImage(s, Settings.resButton + step + ".png");
         }
 
-        public static Image getFrame(Card c)
+        private static Image getImage(Size? s, string i)
         {
-            return frames[(int)c.colour];
+            if (s == null)
+            {
+                if (dflt.ContainsKey(i))
+                {
+                    return dflt[i];
+                }
+                Image m;
+                try
+                {
+                    m = Image.FromFile(i);
+                }
+                catch (FileNotFoundException e)
+                {
+                    m = nothing;
+                }
+                dflt[i] = m;
+                return dflt[i];
+            }
+
+            Dictionary<string, Image> images;
+            if (imageMap.ContainsKey(s.Value))
+            {
+                images = imageMap[s.Value];
+            }
+            else
+            {
+                images = new Dictionary<string, Image>();
+                imageMap.Add(s.Value, images);
+            }
+            if (!images.ContainsKey(i))
+            {
+                images[i] = resizeImage(getImage(null, i), s.Value.Width, s.Value.Height);
+            }
+            return images[i];
         }
 
         private static Image resizeImage(Image image, int width, int height)

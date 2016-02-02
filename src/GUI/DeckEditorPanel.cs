@@ -13,7 +13,6 @@ using System.Windows.Forms;
 namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
-        //Button, GameElement 
     {
         private static System.Timers.Timer searchTimer;
         private  System.Timers.Timer paintTimer;

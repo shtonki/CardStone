@@ -9,6 +9,6 @@ namespace stonekart
 {
     public interface Observer
     {
-        void notifyObserver(Observable o);
+        void notifyObserver(Observable observed, object args);
     }
 }
