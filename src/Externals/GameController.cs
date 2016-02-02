@@ -13,8 +13,8 @@ namespace stonekart
         {
             setup();
 
-            start();
-            //GUI.transitionToDeckEditor();
+            //start();
+            GUI.transitionToDeckEditor();
         }
 
         private static void setup()

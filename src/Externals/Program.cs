@@ -19,7 +19,7 @@ namespace stonekart
     {
         public static void Main(string[] args)
         {
-            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
+            //CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
             //ResHacker.open();
             GameController.startGame();
 
