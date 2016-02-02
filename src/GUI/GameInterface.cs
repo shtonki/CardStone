@@ -189,8 +189,9 @@ namespace stonekart
         public void showCards(Card[] cs)
         {
             Pile pl = new Pile(cs);
-            CardPanel p = new CardPanel(() => new CardButton(CardId.Kappa, 100), new LayoutArgs(false, false));
+            CardPanel p = new CardPanel(() => new CardButton(), new LayoutArgs(false, false));
             pl.addObserver(p);
+            p.Size = new Size(300, 150);
             p.BackColor = Color.Navy;
             GUI.showWindow(p);
         }

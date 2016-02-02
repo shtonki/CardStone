@@ -16,7 +16,7 @@ namespace stonekart
         //private GameInterface gameInterface;
         //private Card card;
 
-        private bool valid => Card != null;
+        private bool valid => Card != null && cardNameFont != null;
         public Card Card { get; private set; }
 
         private Colour colour;
@@ -108,12 +108,12 @@ namespace stonekart
             */
         }
 
-        public CardButton(GameInterface g, int height) : this()
+        public CardButton(Action<CardButton> f, int height) : this()
         {
             setHeight(height);
             Click += (object o, EventArgs a) =>
             {
-                g.gameElementPressed(getElement());
+                f(this);
             };
         }
 
@@ -127,11 +127,10 @@ namespace stonekart
             Size = new Size(h, (int)(h / 0.654f));
         }
 
-        public CardButton(CardId c, int height) : this()
+        public CardButton(CardId c) : this()
         {
             Card card = new Card(c);
             card.addObserver(this);
-            setHeight(height);
         }
         
 
@@ -344,44 +343,6 @@ namespace stonekart
         }
     }
 
-
-    class SnapCardButton : CardButton
-    {
-        private Point def, att;
-
-        private int xdd;
-
-        private bool dirty;
-
-        public SnapCardButton(GameInterface g, int i) : base(g, 0000000000)
-        {
-            throw new NotImplementedException(); //00000000
-            LocationChanged += (sender, args) => setLocation();
-            xdd = i;
-        }
-
-        public new void notifyObserver(Observable o, object[] args)
-        {
-            base.notifyObserver(o, args);
-
-            Card c = (Card)o;
-            Invoke(new Action(() => { dirty = true; Location = c.topped ? att : def; }));
-        }
-
-
-        private void setLocation()
-        {
-            if (dirty)
-            {
-                dirty = false;
-                return;
-            }
-
-            int x = Location.X;
-            int y = Location.Y;
-            def = new Point(x, y);
-            att = new Point(x, y + xdd);
-        }
-    }
+    
 
 }

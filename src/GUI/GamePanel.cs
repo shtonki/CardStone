@@ -52,9 +52,9 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
             */
-            
-            
-            handPanel = new CardPanel(()=>new CardButton(g, 300), new LayoutArgs(false, false));
+
+            Action<CardButton> a = (b) => g.gameElementPressed(new GameElement(b.Card));
+            handPanel = new CardPanel(()=>new CardButton(a, 300), new LayoutArgs(false, false));
             //handPanel.Location = new Point(400, 660);
 
 
@@ -68,16 +68,16 @@ namespace stonekart
             //villainPanel.Location = new Point(20, 10);
             
             //stackPanel = new CardBox(g, 190, 500);
-            stackPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(true, true, 0.25));
+            stackPanel = new CardPanel(() => new CardButton(a, 200), new LayoutArgs(true, true, 0.25));
             //stackPanel.Location = new Point(400, 20);
             //stackPanel.Size = new Size(190, 500);
 
             //heroFieldPanel = new FieldPanel(g, true);
-            heroFieldPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(false, false));
+            heroFieldPanel = new CardPanel(() => new CardButton(a, 200), new LayoutArgs(false, false));
             heroFieldPanel.BackColor = Color.MediumSeaGreen;
             //heroFieldPanel.Location = new Point(600, 330);
             
-            villainFieldPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(false, false));
+            villainFieldPanel = new CardPanel(() => new CardButton(a, 200), new LayoutArgs(false, false));
             villainFieldPanel.BackColor = Color.Maroon;
 
 

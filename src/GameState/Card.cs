@@ -122,6 +122,7 @@ namespace stonekart
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
             keyAbilities = new List<KeyAbility>();
+            auras = new List<Aura>();
         }
 
         //todo(seba) move this entire constructor to a XML document

@@ -146,7 +146,7 @@ namespace stonekart
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => invokeMe(o as Pile, args)));
+                BeginInvoke(new Action(() => invokeMe(o as Pile, args)));
             }
             else
             {

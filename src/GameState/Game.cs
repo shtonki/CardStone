@@ -126,14 +126,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
+                CardId.ShimmeringKoi, 
+                CardId.ShimmeringKoi, 
+                CardId.ShimmeringKoi, 
+                CardId.ShimmeringKoi, 
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
             };
         }
 
