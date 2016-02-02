@@ -127,10 +127,11 @@ namespace stonekart
             Size = new Size(h, (int)(h / 0.654f));
         }
 
-        public CardButton(CardId c)
+        public CardButton(CardId c, int height) : this()
         {
-            throw new NotImplementedException();
-            //card = new Card(c);
+            Card card = new Card(c);
+            card.addObserver(this);
+            setHeight(height);
         }
         
 

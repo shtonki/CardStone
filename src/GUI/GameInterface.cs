@@ -128,13 +128,13 @@ namespace stonekart
             GUI.globalEscape();
             waitForGameElement.signal(e);
         }
+
         public GameElement getNextGameElementPress()
         {
             GameElement r = waitForGameElement.wait();
             return r;
         }
-
-        //public Action resetFakeMana => gamePanel.heroPanel.resetFakeMana;
+        
         public void resetFakeMana()
         {
             gamePanel.heroPanel.resetFakeMana();
@@ -188,13 +188,11 @@ namespace stonekart
 
         public void showCards(Card[] cs)
         {
-            //throw new NotImplementedException();
-            /*
-            CardPanel p = new CardPanel(()=>new CardButton(this), )
-            p.Size = new Size(200, 200);
+            Pile pl = new Pile(cs);
+            CardPanel p = new CardPanel(() => new CardButton(CardId.Kappa, 100), new LayoutArgs(false, false));
+            pl.addObserver(p);
             p.BackColor = Color.Navy;
             GUI.showWindow(p);
-            */
         }
     }
 
