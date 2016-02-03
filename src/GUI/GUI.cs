@@ -58,7 +58,7 @@ namespace stonekart
         /// </summary>
         public static GameInterface createGameUI()
         {
-            GameInterface r = new GameInterface(nonsense);
+            GameInterface r = new GameInterface();
             frame.createGamePanel(r);
             return r;
         }
@@ -107,8 +107,23 @@ namespace stonekart
 
         public static WindowedPanel showWindow(Panel p)
         {
-            return null;
+            WindowedPanel w =  frame.Invoke(new Func<WindowedPanel>(() =>
+            {
+                var v = _showWindow(p);
+                frame.Controls.Add(v);
+                v.BringToFront();
+                return v;
+            })) as WindowedPanel;
+            return w;
         }
+
+        public static WindowedPanel _showWindow(Panel p)
+        {
+            WindowedPanel w = new WindowedPanel(p, "kappa");
+            frame.Controls.Add(w);
+            return w;
+        }
+        
 
         public static void showTell(string f, string m)
         {
@@ -116,7 +131,7 @@ namespace stonekart
         }
 
         
-        public static readonly ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense = new ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense();
+        
 
         private static WaitFor<string> logInAs = new WaitFor<string>(); 
 
@@ -172,48 +187,14 @@ namespace stonekart
             }
             else
             {
+                //Application.Exit();
                 frame.handleGlobalKeyDown(Keys.Escape);
             }
         }
-
-        public static void setResolution(Resolution r)
-        {
-            frame.updateResolution();
-        }
-
-        /*
-        public const int
-            NOTHING = 0,
-            CANCEL = 1,
-            ACCEPT = 2;
-            */
-        //todo(notme) sholdn't be const fam
+        
+        
         public const int FRAMEWIDTH = 1800, FRAMEHEIGHT = 1000;
-
-        public static void updateAll()
-        {
-            foreach (Control v in getAll())
-            {
-                if (v is Resolutionable)
-                {
-                    Resolutionable vr = v as Resolutionable;
-                    if (v.InvokeRequired)
-                    {
-                        v.Invoke(new Action(() =>
-                        {
-                            vr.updateResolution();
-                            //v.Invalidate();
-                        }));
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-            }
-
-            //frame.Invoke(new Action(frame.Invalidate));
-        }
+        
 
         public static IEnumerable<Control> getAll()
         {
@@ -228,20 +209,7 @@ namespace stonekart
                                       .Concat(controls);
         }
     }
-
-    public class ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense
-    {
-        private bool xd;
-
-        public ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense()
-        {
-            if (xd)
-            {
-                throw new Exception("naughty naughty");
-            }
-            xd = true;
-        }
-    }
+    
 
     public class WindowedPanel : Panel
     {

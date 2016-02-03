@@ -10,137 +10,236 @@ using System.Windows.Forms;
 
 namespace stonekart
 {
-    public struct PlacementArgs
-    {
-        public int paddingX;
-        public int paddingY;
-        public int paddingLeft;
-        public int paddingTop;
-
-        public PlacementArgs(int paddingX, int paddingY, int paddingLeft, int paddingTop)
-        {
-            this.paddingX = paddingX;
-            this.paddingY = paddingY;
-            this.paddingLeft = paddingLeft;
-            this.paddingTop = paddingTop;
-        }
-    }
 
     public struct LayoutArgs
     {
-        public readonly int columns;
-        public readonly int rows;
-
         public readonly bool topDown;
         public readonly bool reverseClippingOrder;
+        //public readonly double minPadding;
+        public readonly double maxPaddingFactor;
 
-        public LayoutArgs(int columns, int rows, bool topDown, bool reverseClippingOrder)
+        public LayoutArgs(bool topDown, bool reverseClippingOrder)
         {
-            this.columns = columns;
-            this.rows = rows;
             this.topDown = topDown;
             this.reverseClippingOrder = reverseClippingOrder;
+            maxPaddingFactor = 1.0;
+        }
+
+        public LayoutArgs(bool topDown, bool reverseClippingOrder, double maxPaddingFactor)
+        {
+            this.topDown = topDown;
+            this.reverseClippingOrder = reverseClippingOrder;
+            this.maxPaddingFactor = maxPaddingFactor;
         }
     }
 
     public sealed class CardPanel : Panel, Observer
     {
-        //public static int WIDTH = CardButton.WIDTH*6 + 5, HEIGHT = CardButton.HEIGHT + 5;
-        public static int WIDTH = 210*6+5, HEIGHT = 285;
-
         private LayoutArgs layoutArgs;
         
-        CardButton[] cardButtons;
+        List<CardButton> cardButtons;
 
-        public CardPanel(int buttons, Func<CardButton> buttonGenerator, LayoutArgs args)
+        private Func<CardButton> buttonGenerator;
+
+        public CardPanel(Func<CardButton> buttonGenerator, LayoutArgs args)
         {
             BackColor = Color.Pink;
             layoutArgs = args;
-            cardButtons = new CardButton[buttons];
-
-            for (int i = 0; i < buttons; i++)
-            {
-                int n = 0;
-                var button = buttonGenerator();
-                cardButtons[i] = button;
-                button.BringToFront();
-                Controls.Add(button);
-
-                if (true) //bring to front
-                {
-                    button.MouseEnter += (_, __) =>
-                    {
-                        n = Controls.GetChildIndex(button);
-                        Controls.SetChildIndex(button, 0);
-                    };
-
-                    button.MouseLeave += (_, __) =>
-                    {
-                        Controls.SetChildIndex(button, n);
-                    };
-                }
-            }
+            cardButtons = new List<CardButton>();
+            this.buttonGenerator = buttonGenerator;
         }
 
-        public void placeButtons(PlacementArgs a)
+        private const int sidePadding = 5;
+        private const int maxPerRow = 1000;
+
+        public void placeButtons()
         {
+            if (cardButtons.Count == 0) { return; }
+
+            int width = Size.Width;
+            int height = Size.Height;
+            int cardWidth = cardButtons[0].Width;
+            int cardHeight = cardButtons[0].Height;
+            int padding;
+            if (cardButtons.Count == 1)
+            {
+                padding = 0;
+            }
+            else
+            {   
+                if (layoutArgs.topDown)
+                {
+                    padding = Math.Min((height - cardHeight - (sidePadding << 1)) / (cardButtons.Count - 1), (int)(cardHeight*layoutArgs.maxPaddingFactor));
+                }
+                else
+                {
+                    padding = Math.Min((width - cardWidth - (sidePadding << 1)) / (cardButtons.Count - 1), (int)(cardWidth * layoutArgs.maxPaddingFactor));
+                }
+            }
+
+            for (int i = 0; i < cardButtons.Count; i++)
+            {
+                int x = i % maxPerRow;
+                int y = i / maxPerRow;
+
+                if (layoutArgs.topDown)
+                {
+                    int t = y;
+                    y = x;
+                    x = t;
+                }
+                cardButtons[i].Location = new Point(sidePadding + padding * x, sidePadding + padding * y); //hack using one padding
+            }
+
+            /*
             if (layoutArgs.topDown)
             {
                 int rows = layoutArgs.rows == 0 ? int.MaxValue : layoutArgs.rows;
                 
-                for (int i = 0; i < cardButtons.Length; i++)
+                for (int i = 0; i < cardButtons.Count; i++)
                 {
                     int x = i / rows;
                     int y = i % rows;
-                    cardButtons[i].Location = new Point(a.paddingLeft + a.paddingX * x, a.paddingTop + a.paddingY * y);
+                    cardButtons[i].Location = new Point(paddingLeft + paddingX * x, paddingTop + paddingY * y);
                 }
             }
             else
             {
                 int columns = layoutArgs.columns == 0 ? int.MaxValue : layoutArgs.columns;
-                for (int i = 0; i < cardButtons.Length; i++)
+                for (int i = 0; i < cardButtons.Count; i++)
                 {
                     int x = i%columns;
                     int y = i/columns;
-                    cardButtons[i].Location = new Point(a.paddingLeft + a.paddingX * x, a.paddingTop + a.paddingY * y);
+                    cardButtons[i].Location = new Point(paddingLeft + paddingX * x, paddingTop + paddingY * y);
                 }
             }
-
+            */
             bool interim = layoutArgs.reverseClippingOrder;
-            int interimx = cardButtons.Length;
+            int interimx = cardButtons.Count;
             for (int i = 0; i < interimx; i++)
             {
                 cardButtons[interim ? i : interimx - i - 1].BringToFront();
             }
         }
 
-
-        public void notifyObserver(Observable o)
+        protected override void OnResize(EventArgs eventargs)
         {
-            Form.CheckForIllegalCrossThreadCalls = false; //todo might be a hack bruh, actually entire function is a hack
-            Pile p = (Pile)o;
-
-            int height = Size.Height,
-                width = Size.Width;
-
-            if (p.cards.Count > cardButtons.Length)
+            //base.OnResize(eventargs);
+            int height = Size.Height;
+            int width = Size.Width;
+            foreach (CardButton c in cardButtons)
             {
-                throw new SyntaxErrorException();
+                if (layoutArgs.topDown)
+                {
+                    c.setWidth(width - sidePadding*2);
+                }
+                else
+                {
+                    c.setHeight(height - sidePadding*2);
+                }
             }
 
-            int i = 0;
-            for (; i < p.cards.Count; i++)
-            {
-                p.cards[i].setObserver(cardButtons[i]); 
-                cardButtons[i].setVisible(true);
-                cardButtons[i].Invalidate();
-            }
+            placeButtons();
+        }
 
-            for (; i < cardButtons.Length; i++)
+        public void notifyObserver(Observable o, object args)
+        {
+            if (InvokeRequired)
             {
-                cardButtons[i].setVisible(false);
+                Invoke(new Action(() => invokeMe(o as Pile, args)));
             }
-            Form.CheckForIllegalCrossThreadCalls = true;
+            else
+            {
+                invokeMe(o as Pile, args);
+            }
+        }
+
+        private void invokeMe(Pile pile, object args)
+        {
+            if (args == null) //draw from scratch
+            {
+
+                //Form.CheckForIllegalCrossThreadCalls = false;
+                foreach (CardButton b in cardButtons)
+                {
+                    Controls.Remove(b);
+                }
+                cardButtons.Clear();
+                foreach (Card c in pile.cards)
+                {
+                    CardButton b = buttonGenerator();
+                    cardButtons.Add(b);
+                    Controls.Add(b);
+                }
+
+                int height = Size.Height,
+                    width = Size.Width;
+
+                if (pile.cards.Count > cardButtons.Count)
+                {
+                    throw new SyntaxErrorException();
+                }
+
+                int i = 0;
+                for (; i < pile.cards.Count; i++)
+                {
+                    pile.cards[i].addObserver(cardButtons[i]);
+                    cardButtons[i].setVisible(true);
+                    cardButtons[i].Invalidate();
+                }
+
+                for (; i < cardButtons.Count; i++)
+                {
+                    cardButtons[i].setVisible(false);
+                }
+                //Form.CheckForIllegalCrossThreadCalls = true;
+            }
+            else if (args is object[])
+            {
+                object[] azs = (object[])args;
+                Card[] addUs;
+                if (azs[0] is Card[])
+                {
+                    addUs = (Card[])azs[0];
+                }
+                else
+                {
+                    addUs = new Card[] { azs[0] as Card };
+                }
+                bool add = (bool)azs[1];
+
+                foreach (Card card in addUs)
+                {
+                    if (add)
+                    {
+                        CardButton b = buttonGenerator();
+                        cardButtons.Add(b);
+                        Controls.Add(b);
+                        card.addObserver(b);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < cardButtons.Count; i++)
+                        {
+                            if (cardButtons[i].Card == card)
+                            {
+                                Controls.Remove(cardButtons[i]);
+                                cardButtons[i].close();
+                                cardButtons.RemoveAt(i);
+                            }
+                        }
+                    }
+                }
+            }
+            placeButtons();
+        }
+
+        public void close()
+        {
+            foreach (CardButton c in cardButtons)
+            {
+                c.close();
+            }
         }
     }
 }

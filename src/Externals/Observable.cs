@@ -10,26 +10,38 @@ namespace stonekart
 {
     public abstract class Observable
     {
-        private Observer observer;
+        private List<Observer> observers;
 
-        public void setObserver(Observer o)
+        public Observable()
         {
-            observer = o;
-            notifyObserver();
+            observers = new List<Observer>();
         }
 
-        //todo(seba) drink bleach
-        public Observer getObserver(ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense g)
+        public void addObserver(Observer o)
         {
-            if (g == null) { throw new Exception("even naughty naughtier"); }
-            return observer;
+            observers.Add(o);
+            o.notifyObserver(this, null);
+        }
+
+        public void removeObserver(Observer o)
+        {
+            observers.Remove(o);
+        }
+
+        public List<Observer> getObservers()
+        {
+            return observers;
         }
 
 
-        public void notifyObserver()
+        public void notifyObservers(object arg = null)
         {
-            if (observer == null) { return; }
-            observer.notifyObserver(this);
+            if (observers == null) { return; }
+            var inpt = arg ?? this;
+            foreach (Observer o in observers)
+            {
+                o.notifyObserver(this, inpt);
+            }
         }
     }
 }

@@ -109,12 +109,12 @@ namespace stonekart
 
         public ManaCost(int white, int blue, int black, int red, int green, int grey)
         {
-            Costs[(int)ManaColour.WHITE] = white;
-            Costs[(int)ManaColour.BLUE] = blue;
-            Costs[(int)ManaColour.BLACK] = black;
-            Costs[(int)ManaColour.RED] = red;
-            Costs[(int)ManaColour.GREEN] = green;
-            Costs[(int)ManaColour.GREY] = grey;
+            Costs[(int)Colour.WHITE] = white;
+            Costs[(int)Colour.BLUE] = blue;
+            Costs[(int)Colour.BLACK] = black;
+            Costs[(int)Colour.RED] = red;
+            Costs[(int)Colour.GREEN] = green;
+            Costs[(int)Colour.GREY] = grey;
 
             CMC = white + blue + black + red + green + grey;
         }

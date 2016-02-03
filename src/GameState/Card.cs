@@ -9,9 +9,20 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    
+    public enum Colour
+    {
+        WHITE,
+        BLUE,
+        BLACK,
+        RED,
+        GREEN,
+        GREY,
+    }
+
     public class Card : Observable
     {
+        
+
         private int id;
         public CardId cardId { get; private set; }
         public Location location { get; set; }
@@ -29,7 +40,7 @@ namespace stonekart
             set
             {
                 _topped = value;
-                notifyObserver();
+                notifyObservers();
             }
         }
 
@@ -37,7 +48,7 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
-        public readonly ManaColour colour;
+        public readonly Colour colour;
         public StackWrapper stackWrapper;
 
         private Modifiable<int>[] mods = new Modifiable<int>[Enum.GetNames(typeof(Modifiable)).Count()];
@@ -63,7 +74,7 @@ namespace stonekart
             set
             {
                 Attacking = value;
-                notifyObserver();
+                notifyObservers();
             }
         }
 
@@ -76,7 +87,7 @@ namespace stonekart
             set
             {
                 DefenderOf = value;
-                notifyObserver();
+                notifyObservers();
             }
         }
         public Card defendedBy
@@ -85,7 +96,7 @@ namespace stonekart
             set
             {
                 DefendedBy = value;
-                notifyObserver();
+                notifyObservers();
             }
         }
 
@@ -140,7 +151,7 @@ namespace stonekart
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
 
-            ManaColour? forceColour = null;
+            Colour? forceColour = null;
             int? basePower = null, baseToughness = null;
 
             switch (cardId)
@@ -244,7 +255,7 @@ namespace stonekart
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
-                    forceColour = ManaColour.WHITE;
+                    forceColour = Colour.WHITE;
                     
                     } break;
 
@@ -274,7 +285,7 @@ namespace stonekart
                     type = Type.Creature;
                     race = Race.Human;
                     Aura a = new Aura(
-                        (crd) => crd.controller == this.controller && crd.colour == ManaColour.WHITE && crd != this,
+                        (crd) => crd.controller == this.controller && crd.colour == Colour.WHITE && crd != this,
                         Modifiable.Power,
                         1,
                         "Other white creatures you control get +1/+0");
@@ -321,7 +332,7 @@ namespace stonekart
             }
             else
             {
-                colour = (ManaColour)n;
+                colour = (Colour)n;
             }
         }
 
@@ -442,7 +453,7 @@ namespace stonekart
         public void modify(Modifiable m, int v, Clojurex c)
         {
             mods[(int)m].addModifier(v, c);
-            notifyObserver();
+            notifyObservers();
         }
 
         public bool isDamaged()

@@ -7,6 +7,11 @@ namespace stonekart
 {
     static class Settings
     {
+        public static string resFont => @"RES/FONT/";
+        public static string resButton => @"RES/IMG/BUTTON/";
+        public static string resCard => @"RES/IMG/CARD/";
+        public static string resFrame => @"RES/IMG/FRAME/";
+
         public static string username { get; private set; }
 
 

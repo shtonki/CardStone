@@ -9,7 +9,7 @@ namespace stonekart
     /// <summary>
     /// A class representing an ordered set of cards
     /// </summary>
-    public class Pile : Observable
+    public class Pile : Observable//, IList<int>
     {
         public int Count { get { return cards.Count; }  }
 
@@ -26,13 +26,13 @@ namespace stonekart
         public void add(Card c)
         {
             cards.Add(c);
-            notifyObserver();
+            notifyObservers(new object[]{c, true});
         }
 
         public void remove(Card c)
         {
             cards.Remove(c);
-            notifyObserver();
+            notifyObservers(new object[] { c, false });
         }
 
         public Card peek()

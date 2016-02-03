@@ -11,9 +11,40 @@ using System.Windows.Forms.VisualStyles;
 
 namespace stonekart
 {
+    public class TurnTracker
+    {
+        public enum Step
+        {
+            UNTOP,
+            DRAW,
+            MAIN1,
+            STARTCOMBAT,
+            ATTACKERS,
+            DEFENDERS,
+            DAMAGE,
+            ENDCOMBAT,
+            MAIN2,
+            END,
+        }
+
+        public Step step { get; private set; }
+        public bool heroTurn;
+
+        public TurnTracker()
+        {
+        }
+
+        public void advanceTurn()
+        {
+            step = (Step)(((int)step + 1)%10);
+            heroTurn = step == 0 ? !heroTurn : heroTurn;
+        }
+    }
+
     public class Game
     {
-        private GameInterface gameInterface;
+
+        private GameInterface gameInterface { get; }
 
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
@@ -23,10 +54,9 @@ namespace stonekart
         private IEnumerable<Card> allCards => cardFactory.allCards;
         private IEnumerable<Card> heroCards => cardFactory.heroCards;
         private IEnumerable<Card> villainCards => cardFactory.villainCards;
-        
 
-        private bool active;
-        private int step;
+
+        private TurnTracker turn = new TurnTracker();
 
         public bool autoPass { get; set; }
 
@@ -96,23 +126,21 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.Belwas, 
-                CardId.Belwas, 
-                CardId.Belwas, 
-                CardId.Belwas, 
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
+                CardId.LightningBolt, 
             };
         }
 
         private void gameStart()
         {
+            turn.heroTurn = connection.asHomePlayer();
+
             handleEvent(new DrawEvent(hero, 4));
 
             loop();
@@ -175,7 +203,7 @@ namespace stonekart
             if (e.player == hero)
             {
 
-
+                gameInterface.showCards(new Card[] {e.player.deck.peek()});
                 int i = 0;
                 while (i++ < e.getCards())
                 {
@@ -185,7 +213,7 @@ namespace stonekart
                 //e.player.draw(e.getCards());
                 //e.player.notifyObserver();
                 //*/
-                e.player.notifyObserver();
+                e.player.notifyObservers();
             }
         }
         private void _cast(GameEvent gevent)
@@ -201,14 +229,14 @@ namespace stonekart
             stackxd.Push(v);
             v.card.stackWrapper = v;
 
-            v.card.owner?.notifyObserver();
+            v.card.owner?.notifyObservers();
         }
         private void _movecard(GameEvent gevent)
         {
             MoveCardEvent e = (MoveCardEvent)gevent;
             moveCardTo(e.card, e.to);
             e.card.moveReset();
-            e.card.owner.notifyObserver();
+            e.card.owner.notifyObservers();
         }
         private void _gainmanaorb(GameEvent gevent)
         {
@@ -237,59 +265,63 @@ namespace stonekart
             e.creature.damage(e.damage);
         }
         #endregion
-
+        
         private void loop()
         {
-            active = connection.asHomePlayer();
-            gameInterface.setStep(0, active);
-
             while (true)
             {
-                activePlayer =   active ? hero : villain;
-                inactivePlayer = active ? villain : hero;
+                gameInterface.setStep(turn);
 
-                autoPass = false;
+                switch (turn.step)
+                {
+                    case TurnTracker.Step.UNTOP:
+                    {
+                        activePlayer = turn.heroTurn ? hero : villain;
+                        inactivePlayer = turn.heroTurn ? villain : hero;
+                        autoPass = false;
 
-                //untop step
-                untopStep();
-                advanceStep();
+                        untopStep();
+                    } break;
 
-                //draw step
-                drawStep();
-                advanceStep();
+                    case TurnTracker.Step.DRAW:
+                    {
+                        drawStep();
+                    } break;
+                    case TurnTracker.Step.MAIN1:
+                    {
+                        mainStep(1);
+                    } break;
+                    case TurnTracker.Step.STARTCOMBAT:
+                    {
+                        startCombatStep();
+                    } break;
+                    case TurnTracker.Step.ATTACKERS:
+                    {
+                        attackersStep();
+                    } break;
+                    case TurnTracker.Step.DEFENDERS:
+                    {
+                        defendersStep();
+                    } break;
+                    case TurnTracker.Step.DAMAGE:
+                    {
+                        damageStep();
+                    } break;
+                    case TurnTracker.Step.ENDCOMBAT:
+                    {
+                        endCombatStep();
+                    } break;
+                    case TurnTracker.Step.MAIN2:
+                    {
+                        mainStep(2);
+                    } break;
+                    case TurnTracker.Step.END:
+                    {
+                        endStep();
+                    } break;
+                }
 
-                //main phase 1
-                mainStep(1);
-                advanceStep();
-
-                //startCombat
-                startCombatStep();
-                advanceStep();
-
-                //attackers
-                bool b = chooseAttackersStep();
-                advanceStep();
-
-                //defenders
-                if (b) { chooseDefendersStep(); }
-                advanceStep();
-
-                //combatDamage
-                if (b) { combatDamageStep(); }
-                advanceStep();
-
-                //endCombat
-                endCombatStep();
-                advanceStep();
-
-                //main2
-                mainStep(2);
-                advanceStep();
-
-                //end
-                endStep();
-                active = !active;
-                advanceStep();
+                turn.advanceTurn();
             }
         }
 
@@ -298,7 +330,7 @@ namespace stonekart
             handleEvent(new UntopPlayerEvent(activePlayer));
 
             int s;
-            if (active)
+            if (turn.heroTurn)
             {
                 gameInterface.showAddMana(true);
                 int c;
@@ -340,9 +372,9 @@ namespace stonekart
             givePriority(false);
         }
 
-        private bool chooseAttackersStep()
+        private bool attackersStep()
         {
-            if (active && !autoPass)
+            if (turn.heroTurn && !autoPass)
             {
                 attackers = chooseMultiple("Choose attackers", c =>
                 {
@@ -386,9 +418,9 @@ namespace stonekart
             return true;
         }
 
-        private void chooseDefendersStep()
+        private void defendersStep()
         {
-            if (active)
+            if (turn.heroTurn)
             {
                 defenders = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
                 Card[] v = demandMultiSelection().Select(@i => cardFactory.getCardById(i)).ToArray();
@@ -412,7 +444,7 @@ namespace stonekart
             givePriority(false);
         }
 
-        private void combatDamageStep()
+        private void damageStep()
         {
             foreach (var attacker in activePlayer.field.cards)
             {
@@ -473,7 +505,7 @@ namespace stonekart
             {
                 checkGameState();
                 CastAction action;
-                if (active)
+                if (turn.heroTurn)
                 {
                     action = castOrPass(main && stack.Count == 0);
                 }
@@ -482,9 +514,9 @@ namespace stonekart
                     action = demandCastOrPass();
                 }
 
-                if (action.isPass())  //active player passed
+                if (action.isPass())  //turn.heroTurn player passed
                 {
-                    if (active)
+                    if (turn.heroTurn)
                     {
                         action = demandCastOrPass();
                     }
@@ -519,11 +551,7 @@ namespace stonekart
         }
         
 
-        private void advanceStep()
-        {
-            step = (step + 1)%10;
-            gameInterface.setStep(step, active);
-        }
+        
         
 
         private void checkGameState()
@@ -993,6 +1021,10 @@ namespace stonekart
             if (card.location != null)
             {
                 pileFromLocation(card.location).remove(card);
+            }
+            else
+            {
+                Console.WriteLine("xddd");
             }
 
 

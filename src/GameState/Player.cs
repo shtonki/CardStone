@@ -51,7 +51,7 @@ namespace stonekart
         {
             curMana[i]++;
             maxMana[i]++;
-            notifyObserver();
+            notifyObservers();
         }
 
         public bool draw(int c = 1)
@@ -62,7 +62,7 @@ namespace stonekart
                 game.moveCardTo(deck.peek(), hand); //deck.peek().moveTo(hand);
             }
 
-            notifyObserver();
+            notifyObservers();
             return true;
         }
 
@@ -91,13 +91,13 @@ namespace stonekart
         public void setLifeRelative(int i)
         {
             health += i;
-            notifyObserver();
+            notifyObservers();
         }
 
         public void spendMana(int color, int amount)
         {
             curMana[color] -= amount;
-            notifyObserver();
+            notifyObservers();
         }
 
         public void spendMana(int[] i)
@@ -107,7 +107,7 @@ namespace stonekart
                 curMana[v]--;
             }
 
-            notifyObserver();
+            notifyObservers();
         }
 
 

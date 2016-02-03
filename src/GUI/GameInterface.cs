@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -18,12 +20,12 @@ namespace stonekart
 
         public Game game { get; private set; }
         public GamePanel gamePanel { get; private set; }
+        
 
-        private ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense nonsense;
 
-        public GameInterface(ThankGodThereIsNoFriendKeywordInThisLanguageOrIWouldntNeedToDoThisNonsense n)
+        public GameInterface()
         {
-            nonsense = n;
+
         }
 
         public void push()
@@ -64,15 +66,34 @@ namespace stonekart
             gamePanel.showAddMana(b);
         }
 
-        public CardButton getCardButton(Card c)
+        public IEnumerable<Control> getCardButtons(Card c)
         {
-            return c.getObserver(nonsense) as CardButton;
+            List<Control> r = new List<Control>();
+
+            foreach (Observer o in c.getObservers())
+            {
+                if (o is CardButton)
+                {
+                    r.Add((Control)o);
+                }
+            }
+
+            return r;
         }
 
-        public PlayerButton getPlayerButton(Player p)
+        public List<PlayerButton> getPlayerButton(Player p)
         {
-            PlayerPanel o = p.getObserver(nonsense) as PlayerPanel;
-            return o.playerButton;
+            List<PlayerButton> r = new List<PlayerButton>();
+
+            foreach (Observer o in p.getObservers())
+            {
+                if (o is PlayerPanel)
+                {
+                    r.Add(((PlayerPanel)o).playerPortrait);
+                }
+            }
+
+            return r;
         }
 
         public void addArrow(GameUIElement from, GameUIElement to)
@@ -90,9 +111,9 @@ namespace stonekart
             gamePanel.setObservers(h, v, s);
         }
 
-        public void setStep(int s, bool a)
+        public void setStep(TurnTracker t)
         {
-            gamePanel.setStep(s, a);
+            gamePanel.setStep((int)t.step, t.heroTurn);
         }
 
         public void sendMessage(string s)
@@ -129,7 +150,7 @@ namespace stonekart
             gamePanel.heroPanel.adjustFakeMana(c, -1);
         }
 
-        public ManaColour getManaColour()
+        public Colour getManaColour()
         {
             while (true)
             {
@@ -163,6 +184,17 @@ namespace stonekart
                     gameElementPressed(new GameElement(Choice.PASS));
                 } break;
             }
+        }
+
+        public void showCards(Card[] cs)
+        {
+            //throw new NotImplementedException();
+            /*
+            CardPanel p = new CardPanel(()=>new CardButton(this), )
+            p.Size = new Size(200, 200);
+            p.BackColor = Color.Navy;
+            GUI.showWindow(p);
+            */
         }
     }
 

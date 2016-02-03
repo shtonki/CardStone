@@ -27,7 +27,7 @@ namespace stonekart
             gameInterface = g;
 
             BackColor = Color.CornflowerBlue;
-            Size = new Size(300, 140);
+            //Size = new Size(300, 140);
 
             textLabel = new Label();
             textLabel.Size = new Size(280, 40);
@@ -81,19 +81,34 @@ namespace stonekart
             {
                 return;
             }
-            Invoke(new Action(() => { textLabel.Text = s; }));
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { textLabel.Text = s; }));
+            }
+            else
+            {
+                textLabel.Text = s;
+            }
 
         }
 
         public void showButtons(uint i)
         {
-            Invoke(new Action(() =>
-            {
-                accept.Visible = (i & (int)Choice.ACCEPT) != 0;
-                cancel.Visible = (i & (int)Choice.CANCEL) != 0;
-                pass.Visible   = (i & (int)Choice.PASS)   != 0;
-            }));
+            setVisibleSafe(accept, (i & (int)Choice.ACCEPT) != 0);
+            setVisibleSafe(cancel, (i & (int)Choice.CANCEL) != 0);
+            setVisibleSafe(pass, (i & (int)Choice.PASS) != 0);
+        }
 
+        private static void setVisibleSafe(Control c, bool v)
+        {
+            if (c.InvokeRequired)
+            {
+                c.Invoke(new Action(() => c.Visible = v));
+            }
+            else
+            {
+                c.Visible = v;
+            }
         }
 
         private void buttonPressed(ChoiceButton b)
