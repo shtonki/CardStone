@@ -40,9 +40,9 @@ namespace stonekart
             return getImage(s, Settings.resFrame + colour + "3.png");
         }
 
-        public static Image getStepImage(TurnTracker.Step step, Size s)
+        public static Image getStepImage(string file, Size s)
         {
-            return getImage(s, Settings.resButton + step + ".png");
+            return getImage(s, Settings.resButton + file + ".png");
         }
 
         private static Image getImage(Size? s, string i)

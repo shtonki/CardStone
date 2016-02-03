@@ -69,7 +69,7 @@ namespace stonekart
 
             for (int i = 0; i < images.Length; i++)
             {
-                images[i] = ImageLoader.getStepImage((TurnTracker.Step)i, s);
+                images[i] = ImageLoader.getStepImage(((TurnTracker.Step)i).ToString(), s);
             }
         }
 
