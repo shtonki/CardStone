@@ -231,14 +231,14 @@ namespace stonekart
         }
     }
 
-    public class AddTgns : SubEffect
+    public class SubEffectModifyUntil : SubEffect
     {
         public readonly Card card;
         public readonly Modifiable attribute;
         public readonly Clojurex filter;
         public readonly int value;
 
-        public AddTgns(Card card, Modifiable attribute, Clojurex filter, int value)
+        public SubEffectModifyUntil(Card card, Modifiable attribute, Clojurex filter, int value)
         {
             this.card = card;
             this.attribute = attribute;
@@ -246,11 +246,31 @@ namespace stonekart
             this.value = value;
         }
 
+        public SubEffectModifyUntil(TargetRule t, Modifiable attribute, Clojurex filter, int value)
+        {
+            targets = new []{t};
+            this.attribute = attribute;
+            this.filter = filter;
+            this.value = value;
+        }
+
+        private static Card asd(Card c, IEnumerator<Target> ts)
+        {
+            if (c == null)
+            {
+                var t = ts.Current;
+                ts.MoveNext();
+                return t.getCard();
+            }
+            else return c;
+        }
+
         public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
         {
+            Card b = asd(card, ts);
             return new GameEvent[]
             {
-                new ModifyCardEvent(card, attribute, filter, value)
+                new ModifyCardEvent(b, attribute, filter, value)
             };
         }
     }
