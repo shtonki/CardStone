@@ -306,6 +306,7 @@ namespace stonekart
 
         public void close()
         {
+            if (closed) { return; }
             closed = true;
             if (Parent.InvokeRequired)
             {
