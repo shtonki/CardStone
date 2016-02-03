@@ -9,10 +9,7 @@ namespace stonekart
     {
         private GameInterface gameInterface;
 
-        private ChoiceButton
-            cancel,
-            accept,
-            pass;
+        private ChoiceButton[] buttons = new ChoiceButton[BUTTONS];
 
         private Label textLabel;
 
@@ -34,43 +31,21 @@ namespace stonekart
             textLabel.Location = new Point(10, 10);
             textLabel.Font = new Font(new FontFamily("Comic Sans MS"), 14);
 
-            accept = new ChoiceButton(Choice.ACCEPT);
-            accept.Visible = false;
-            accept.BackColor = Color.GhostWhite;
-            accept.Text = "Accept";
-            accept.Font = new Font(new FontFamily("Comic Sans MS"), 12);
-            accept.Location = new Point(40, 100);
-            accept.Click += (sender, args) =>
+            for (int i = 0; i < buttons.Length; i++)
             {
-                buttonPressed(accept);
-            };
-
-            cancel = new ChoiceButton(Choice.CANCEL);
-            cancel.Visible = false;
-            cancel.BackColor = Color.GhostWhite;
-            cancel.Text = "Cancel";
-            cancel.Font = new Font(new FontFamily("Comic Sans MS"), 12);
-            cancel.Location = new Point(140, 100);
-            cancel.Click += (sender, args) =>
-            {
-                buttonPressed(cancel);
-            };
-
-            pass = new ChoiceButton(Choice.PASS);
-            pass.Visible = false;
-            pass.BackColor = Color.GhostWhite;
-            pass.Text = "Pass";
-            pass.Font = new Font(new FontFamily("Comic Sans MS"), 12);
-            pass.Location = new Point(140, 100);
-            pass.Click += (sender, args) =>
-            {
-                buttonPressed(pass);
-            };
+                ChoiceButton b = new ChoiceButton();
+                b.BackColor = Color.GhostWhite;
+                b.Font = new Font(new FontFamily("Comic Sans MS"), 12);
+                b.Location = new Point(5 + (i % 3) * 80, 100 + 50*(i/3));
+                b.Click += (sender, args) =>
+                {
+                    buttonPressed(b);
+                };
+                buttons[i] = b;
+                Controls.Add(b);
+            }
 
             Controls.Add(textLabel);
-            Controls.Add(accept);
-            Controls.Add(cancel);
-            Controls.Add(pass);
 
 
         }
@@ -92,11 +67,33 @@ namespace stonekart
 
         }
 
-        public void showButtons(uint i)
+        public void showButtons(Choice[] cs)
         {
-            setVisibleSafe(accept, (i & (int)Choice.ACCEPT) != 0);
-            setVisibleSafe(cancel, (i & (int)Choice.CANCEL) != 0);
-            setVisibleSafe(pass, (i & (int)Choice.PASS) != 0);
+            int i = 0;
+            for (; i < cs.Length; i++)
+            {
+                if (cs[i] == Choice.PADDING) { continue; }
+                ChoiceButton b = buttons[i];
+                b.choice = cs[i];
+                safeSetText(b, cs[i].ToString());
+                setVisibleSafe(buttons[i], true);
+            }
+            for (; i < BUTTONS; i++)
+            {
+                setVisibleSafe(buttons[i], false);
+            }
+        }
+
+        private static void safeSetText(Button b, string s)
+        {
+            if (b.InvokeRequired)
+            {
+                b.Invoke(new Action(() => b.Text = s));
+            }
+            else
+            {
+                b.Text = s;
+            }
         }
 
         private static void setVisibleSafe(Control c, bool v)
@@ -115,21 +112,22 @@ namespace stonekart
         {
             gameInterface.gameElementPressed(b.getElement());
         }
+
+        private const int BUTTONS = 6;
     }
 
 
     class ChoiceButton : Button, GameUIElement
     {
-        private Choice choice;
+        public Choice choice { get; set; }
 
         public GameElement getElement()
         {
             return new GameElement(choice);
         }
 
-        public ChoiceButton(Choice c)
+        public ChoiceButton()
         {
-            choice = c;
             Size = new Size(80, 40);
         }
 
@@ -138,9 +136,11 @@ namespace stonekart
 
     public enum Choice
     {
-        ACCEPT = 1,
-        CANCEL = 2,
-        PASS   = 4,
-        //... = 4, 8, 16
+        PADDING,
+        Accept,
+        Cancel,
+        Pass,
+        Yes,
+        No,
     }
 }

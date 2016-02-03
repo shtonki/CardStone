@@ -15,8 +15,8 @@ namespace stonekart
     {
         //todo(seba) make this an actual stack and not just retarded
         private string poppedMessage;
-        private uint poppedButtons;
-        private uint currentButtons;
+        private Choice[] poppedButtons;
+        private Choice[] currentButtons = new Choice[] {};
 
         public Game game { get; private set; }
         public GamePanel gamePanel { get; private set; }
@@ -54,10 +54,7 @@ namespace stonekart
 
         public void setChoiceButtons(params Choice[] cs)
         {
-            uint i = cs.Aggregate<Choice, uint>(0, (current, choice) => current | (uint)choice);
-
-            currentButtons = i;
-            gamePanel.showButtons(i);
+            gamePanel.showButtons(cs);
         }
 
         //hack overhaul this
@@ -98,7 +95,42 @@ namespace stonekart
 
         public void addArrow(GameUIElement from, GameUIElement to)
         {
-            gamePanel.addArrow(@from, to);
+            gamePanel.addArrow(from, to);
+        }
+
+        public void addArrows(CardButton f, IEnumerable<Target> ts)
+        {
+            foreach (Target t in ts)
+            {
+                Observable o;
+                if (t.isCard())
+                {
+                    o = t.getCard();
+                }
+                else if (t.isPlayer())
+                {
+                    o = t.getPlayer();
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                foreach (var v in o.getObservers())
+                {
+                    if (v is CardButton)
+                    {
+                        addArrow(f, v as CardButton);
+                    }
+                    else if (v is PlayerPanel)
+                    {
+                        addArrow(f, (v as PlayerPanel).playerPortrait);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
         }
 
         public void clearArrows()
@@ -128,13 +160,27 @@ namespace stonekart
             GUI.globalEscape();
             waitForGameElement.signal(e);
         }
+
         public GameElement getNextGameElementPress()
         {
             GameElement r = waitForGameElement.wait();
             return r;
         }
 
-        //public Action resetFakeMana => gamePanel.heroPanel.resetFakeMana;
+        public Choice getChoice(string message, params Choice[] cs)
+        {
+            setMessage(message);
+            setChoiceButtons(cs);
+            while (true)
+            {
+                GameElement g = getNextGameElementPress();
+                if (g.choice != null)
+                {
+                    return g.choice.Value;
+                }
+            }
+        }
+
         public void resetFakeMana()
         {
             gamePanel.heroPanel.resetFakeMana();
@@ -181,22 +227,57 @@ namespace stonekart
                 case  Keys.F6:
                 {
                     game.autoPass = !game.autoPass;
-                    gameElementPressed(new GameElement(Choice.PASS));
+                    gameElementPressed(new GameElement(Choice.Pass));
                 } break;
             }
         }
 
-        public void showCards(Card[] cs)
+        public CardPanelControl showCards(params Card[] cs)
         {
-            //throw new NotImplementedException();
-            /*
-            CardPanel p = new CardPanel(()=>new CardButton(this), )
-            p.Size = new Size(200, 200);
-            p.BackColor = Color.Navy;
-            GUI.showWindow(p);
-            */
+            Pile pl = new Pile(cs);
+            CardPanelControl c = new CardPanelControl(pl);
+            return c;
         }
     }
 
-    
+    public class CardPanelControl
+    {
+        public CardPanel panel { get; private set; }
+        private Pile pile;
+        private WaitFor<Card> waiter = new WaitFor<Card>();
+        private WindowedPanel window;
+
+        public CardPanelControl(Pile p)
+        {
+            panel = new CardPanel(() => 
+            {
+                var b = new CardButton(new FML(clickedCallback));
+                b.setHeight(150);
+                return b;
+            }, new LayoutArgs(false, false));
+            panel.Size = new Size(300, 150);
+            panel.BackColor = Color.Navy;
+            p.addObserver(panel);
+            window = GUI.showWindow(panel);
+        }
+        
+
+        public Card waitForCard()
+        {
+            return waiter.wait();
+        }
+
+        public void closeWindow()
+        {
+            //todo(seba) something needs to be released here
+            window.close();
+        }
+
+        private void clickedCallback(CardButton b)
+        {
+            Card c = b.Card;
+            waiter.signal(c);
+        }
+
+    }
 }

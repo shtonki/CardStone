@@ -161,7 +161,7 @@ namespace stonekart
 
                 gi.push();
                 gi.setFakeManas(Costs);
-                gi.setChoiceButtons(Choice.CANCEL);
+                gi.setChoiceButtons(Choice.Cancel);
 
                 while (c != CMC)
                 {
@@ -169,7 +169,7 @@ namespace stonekart
 
                     GameElement element = gi.getNextGameElementPress();
 
-                    if (element.choice != null && element.choice == Choice.CANCEL)
+                    if (element.choice != null && element.choice == Choice.Cancel)
                     {
                         gi.resetFakeMana();
                         gi.pop();

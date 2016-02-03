@@ -85,6 +85,9 @@ namespace stonekart
 
         private static Image resizeImage(Image image, int width, int height)
         {
+            if (width == 0) { width = 1; }
+            if (height == 0) { height = 1; }
+
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);
 

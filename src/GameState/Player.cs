@@ -20,7 +20,7 @@ namespace stonekart
 
         private LocationPlayer side;
 
-        private Game game;
+        public Game game { get; private set; }
 
         public Player(Game g, LocationPlayer l)
         {

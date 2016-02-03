@@ -15,21 +15,15 @@ namespace stonekart
     {
         public readonly bool topDown;
         public readonly bool reverseClippingOrder;
-        //public readonly double minPadding;
+        public readonly int snap;
         public readonly double maxPaddingFactor;
 
-        public LayoutArgs(bool topDown, bool reverseClippingOrder)
-        {
-            this.topDown = topDown;
-            this.reverseClippingOrder = reverseClippingOrder;
-            maxPaddingFactor = 1.0;
-        }
-
-        public LayoutArgs(bool topDown, bool reverseClippingOrder, double maxPaddingFactor)
+        public LayoutArgs(bool topDown, bool reverseClippingOrder, double maxPaddingFactor = 1.0, int snap = 1)
         {
             this.topDown = topDown;
             this.reverseClippingOrder = reverseClippingOrder;
             this.maxPaddingFactor = maxPaddingFactor;
+            this.snap = snap;
         }
     }
 
@@ -37,7 +31,7 @@ namespace stonekart
     {
         private LayoutArgs layoutArgs;
         
-        List<CardButton> cardButtons;
+        private List<CardButton> cardButtons;
 
         private Func<CardButton> buttonGenerator;
 
@@ -51,6 +45,7 @@ namespace stonekart
 
         private const int sidePadding = 5;
         private const int maxPerRow = 1000;
+        private const double snapDistance = 0.9;
 
         public void placeButtons()
         {
@@ -122,21 +117,27 @@ namespace stonekart
             }
         }
 
+        private void sizeButton(CardButton b)
+        {
+            int height = Size.Height;
+            int width = Size.Width;
+            if (layoutArgs.topDown)
+            {
+                b.setWidth(width - sidePadding * 2);
+            }
+            else
+            {
+                b.setHeight(height - sidePadding * 2);
+            }
+        }
+
         protected override void OnResize(EventArgs eventargs)
         {
             //base.OnResize(eventargs);
-            int height = Size.Height;
-            int width = Size.Width;
-            foreach (CardButton c in cardButtons)
+            
+            foreach (CardButton b in cardButtons)
             {
-                if (layoutArgs.topDown)
-                {
-                    c.setWidth(width - sidePadding*2);
-                }
-                else
-                {
-                    c.setHeight(height - sidePadding*2);
-                }
+                sizeButton(b);
             }
 
             placeButtons();
@@ -146,7 +147,7 @@ namespace stonekart
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => invokeMe(o as Pile, args)));
+                BeginInvoke(new Action(() => invokeMe(o as Pile, args)));
             }
             else
             {
@@ -158,7 +159,9 @@ namespace stonekart
         {
             if (args == null) //draw from scratch
             {
-
+                args = new Object[] {pile.cards.ToArray(), true};
+                invokeMe(pile, args);
+                return;
                 //Form.CheckForIllegalCrossThreadCalls = false;
                 foreach (CardButton b in cardButtons)
                 {
@@ -171,28 +174,19 @@ namespace stonekart
                     cardButtons.Add(b);
                     Controls.Add(b);
                 }
-
-                int height = Size.Height,
-                    width = Size.Width;
-
+                
                 if (pile.cards.Count > cardButtons.Count)
                 {
                     throw new SyntaxErrorException();
                 }
-
-                int i = 0;
-                for (; i < pile.cards.Count; i++)
+                
+                for (int i = 0; i < pile.cards.Count; i++)
                 {
                     pile.cards[i].addObserver(cardButtons[i]);
                     cardButtons[i].setVisible(true);
                     cardButtons[i].Invalidate();
                 }
-
-                for (; i < cardButtons.Count; i++)
-                {
-                    cardButtons[i].setVisible(false);
-                }
-                //Form.CheckForIllegalCrossThreadCalls = true;
+                
             }
             else if (args is object[])
             {
@@ -216,6 +210,7 @@ namespace stonekart
                         cardButtons.Add(b);
                         Controls.Add(b);
                         card.addObserver(b);
+                        sizeButton(b);
                     }
                     else
                     {
@@ -241,5 +236,7 @@ namespace stonekart
                 c.close();
             }
         }
+        
     }
+    
 }

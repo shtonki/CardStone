@@ -10,3 +10,4 @@
 * shared rng
 * we're leaking memory through observers
 * make damage step and end combat step the same step
+* refactor getX in GameInterface

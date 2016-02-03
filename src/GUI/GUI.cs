@@ -104,6 +104,7 @@ namespace stonekart
             return showWindow(p, "", false, null);
         }
         */
+        
 
         public static WindowedPanel showWindow(Panel p)
         {
@@ -117,13 +118,18 @@ namespace stonekart
             return w;
         }
 
-        public static WindowedPanel _showWindow(Panel p)
+        private static WindowedPanel _showWindow(Panel p)
         {
-            WindowedPanel w = new WindowedPanel(p, "kappa");
+            WindowedPanelArgs a = new WindowedPanelArgs("", true, true, false);   
+            return _showWindow(p, a);
+        }
+
+        private static WindowedPanel _showWindow(Panel p, WindowedPanelArgs a)
+        {
+            WindowedPanel w = new WindowedPanel(p, a);
             frame.Controls.Add(w);
             return w;
         }
-        
 
         public static void showTell(string f, string m)
         {
@@ -211,24 +217,40 @@ namespace stonekart
     }
     
 
+    public struct WindowedPanelArgs
+    {
+        public readonly string title;
+        public readonly bool closeable;
+        public readonly bool minimizable;
+        public readonly bool resizable;
+
+        public WindowedPanelArgs(string title, bool closeable, bool minimizable, bool resizable)
+        {
+            this.title = title;
+            this.closeable = closeable;
+            this.minimizable = minimizable;
+            this.resizable = resizable;
+        }
+    }
+
     public class WindowedPanel : Panel
     {
         private bool dragging, drawContent = true, closed;
         private Size xd;
         private Control content;
 
-        public WindowedPanel(Control c, string barTitle)
+        public WindowedPanel(Control c, WindowedPanelArgs args)
         {
             content = c;
 
             Size = c.Size + new Size(0, 20);
             c.Location = new Point(0, 20);
 
-            Panel bar = new Panel();
+            Label bar = new Label();
             bar.Size = new Size(Size.Width - 20, 20);
             bar.Location = new Point(0, 0);
             bar.BackColor = Color.DarkOrchid;
-            bar.Text = barTitle;
+            bar.Text = args.title ?? "";
 
             Button x = new Button();
             x.Size = new Size(20, 20);
@@ -259,10 +281,10 @@ namespace stonekart
                 }
             };
 
-            bar.MouseDown += (sender, args) =>
+            bar.MouseDown += (sender, ags) =>
             {
                 dragging = true;
-                xd = new Size(args.X, args.Y);
+                xd = new Size(ags.X, ags.Y);
             };
 
             bar.MouseUp += (asd, sdf) =>
@@ -270,10 +292,10 @@ namespace stonekart
                 dragging = false;
             };
 
-            bar.MouseMove += (sender, args) =>
+            bar.MouseMove += (sender, ags) =>
             {
                 if (!dragging) { return; }
-                Location = Location - xd + new Size(args.X, args.Y);
+                Location = Location - xd + new Size(ags.X, ags.Y);
             };
 
             Controls.Add(x);
@@ -285,7 +307,14 @@ namespace stonekart
         public void close()
         {
             closed = true;
-            Parent.Controls.Remove(this);
+            if (Parent.InvokeRequired)
+            {
+                Parent.Invoke(new Action(() => Parent.Controls.Remove(this)));
+            }
+            else
+            {
+                Parent.Controls.Remove(this);
+            }
         }
 
         public Control getContent()

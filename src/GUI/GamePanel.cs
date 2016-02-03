@@ -52,9 +52,10 @@ namespace stonekart
             textPanel.Controls.Add(outputBox);
             textPanel.Controls.Add(inputBox);
             */
-            
-            
-            handPanel = new CardPanel(()=>new CardButton(g, 300), new LayoutArgs(false, false));
+
+            Action<CardButton> clickCallBack = (b) => g.gameElementPressed(new GameElement(b.Card));
+            FML f = new FML(clickCallBack, g.addArrows, g.clearArrows);
+            handPanel = new CardPanel(()=>new CardButton(f), new LayoutArgs(false, false));
             //handPanel.Location = new Point(400, 660);
 
 
@@ -68,16 +69,16 @@ namespace stonekart
             //villainPanel.Location = new Point(20, 10);
             
             //stackPanel = new CardBox(g, 190, 500);
-            stackPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(true, true, 0.25));
+            stackPanel = new CardPanel(() => new CardButton(f), new LayoutArgs(true, true, 0.25));
             //stackPanel.Location = new Point(400, 20);
             //stackPanel.Size = new Size(190, 500);
 
             //heroFieldPanel = new FieldPanel(g, true);
-            heroFieldPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(false, false));
+            heroFieldPanel = new CardPanel(() => new SnapCardButton(f, true), new LayoutArgs(false, false));
             heroFieldPanel.BackColor = Color.MediumSeaGreen;
             //heroFieldPanel.Location = new Point(600, 330);
             
-            villainFieldPanel = new CardPanel(() => new CardButton(g, 200), new LayoutArgs(false, false));
+            villainFieldPanel = new CardPanel(() => new SnapCardButton(f, false), new LayoutArgs(false, false));
             villainFieldPanel.BackColor = Color.Maroon;
 
 
@@ -108,12 +109,12 @@ namespace stonekart
             double fkme = 0.06*height;
 
             int fieldPanelW = (int)(width * 0.6 - fkme);
-            int fieldPanelX = (int)(width * 0.5 + fkme);
+            int fieldPanelX = (int)(width * 0.4 + fkme);
 
-            int handPanelX = (int)(width * 0.5);
-            int handPanelY = (int)(height * 0.600);
-            int handPanelW = (int)(width * 0.5);
-            int handPanelH = (int)(height * 0.400);
+            int handPanelX = (int)(width * 0.4);
+            int handPanelY = (int)(height * 0.7);
+            int handPanelW = (int)(width * 0.6);
+            int handPanelH = (int)(height * 0.3);
             handPanel.Location = new Point(handPanelX, handPanelY);
             handPanel.Size = new Size(handPanelW, handPanelH);
 
@@ -128,14 +129,13 @@ namespace stonekart
             villainFieldPanel.Size = new Size(fieldPanelW, villainFieldPanelH);
 
 
-            int turnPanelX = (int)(width * 0.5);
+            int turnPanelX = (int)(width * 0.4);
             int turnPanelY = (int)(height * 0);
-            int turnPanelW = (int)(width * 0.06);
             int turnPanelH = (int)(height * 0.6);
             turnPanel.Location = new Point(turnPanelX, turnPanelY);
             turnPanel.setHeight(turnPanelH);
 
-            int stackPanelX = (int)(width * 0.3);
+            int stackPanelX = (int)(width * 0.16);
             int stackPanelY = (int)(height * 0);
             int stackPanelW = (int)(width * 0.10);
             int stackPanelH = (int)(height * 0.6);
@@ -179,9 +179,9 @@ namespace stonekart
         }
         
 
-        public void showButtons(uint i)
+        public void showButtons(Choice[] cs)
         {
-            choicePanel.showButtons(i);
+            choicePanel.showButtons(cs);
         }
 
         public void showAddMana(bool b)
