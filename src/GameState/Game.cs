@@ -126,14 +126,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.Testx,
-                CardId.Testx,
-                CardId.Testx,
-                CardId.Testx,
-                CardId.Kappa,
-                CardId.Kappa,
-                CardId.Kappa,
-                CardId.Kappa,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
             };
         }
 
