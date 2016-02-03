@@ -13,7 +13,7 @@ namespace stonekart
         {
             setup();
 
-            //start();
+            start();
         }
 
         private static void setup()
