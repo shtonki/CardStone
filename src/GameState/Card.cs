@@ -46,7 +46,7 @@ namespace stonekart
         private Type type;
         private Race? race;
         private SubType? subType;
-        public readonly Colour colour;
+        public Colour colour;
         public StackWrapper stackWrapper;
 
         private Modifiable<int>[] mods = new Modifiable<int>[Enum.GetNames(typeof(Modifiable)).Count()];
@@ -164,13 +164,13 @@ namespace stonekart
                     race = Race.Salamander;
                 } break;
 
-                case CardId.BearCavalary:
+                case CardId.GrizzlyBear:
                 {
                     greenCost = 2;
                     type = Type.Creature;
                     race = Race.Bear;
                     subType = SubType.Warrior;
-                    basePower = 2;
+                    basePower = 3;
                     baseToughness = 3;
                 } break;
 
@@ -201,7 +201,7 @@ namespace stonekart
 
                 case CardId.PropheticVision:
                 {
-                    blueCost = 1;
+                    blueCost = 2;
                     type = Type.Sorcery;
                     fx.Add(new OwnerDraws(2));
                     castDescription = "Draw 2 cards";
@@ -291,13 +291,30 @@ namespace stonekart
                     auras.Add(a);
                 } break;
 
-                case CardId.Testx:
+                case CardId.AlterFuture:
                 {
                     blueCost = 1;
                     type = Type.Sorcery;
                     fx.Add(new Timelapse(3));
                     fx.Add(new OwnerDraws(1));
                     castDescription = "Timelapse 3\nDraw a card.";
+                } break;
+
+                case CardId.GrizzlyCub:
+                {
+                    greenCost = 1;
+                    type = Type.Creature;
+                    race = Race.Bear;
+                    basePower = 2;
+                    baseToughness = 2;
+                } break;
+
+                case CardId.EvolveFangs:
+                {
+                    greenCost = 1;
+                    type = Type.Instant;
+                    fx.Add(new SubEffectModifyUntil(new TargetRule(TargetRules.ZAPPABLE), Modifiable.Power, untilEndOfTurn, 3));
+                    castDescription = "Target creature gets +3/+0" + untilEOTDescription;
                 } break;
 
                 default:
@@ -344,12 +361,20 @@ namespace stonekart
             }
         }
 
+        
+
         #region commonEventFilters
 
         private static Modifiable<int>.Operator add = (a, b) => a + b;
         private static Modifiable<int>.Operator sub = (a, b) => a - b;
 
         private static Clojurex never = () => false;
+
+        private bool untilEndOfTurn()
+        {
+            return owner.game.currentStep == Step.END;
+        }
+        private const string untilEOTDescription = " until end of turn.";
 
         private static bool vanillaETB(GameEvent e)
         {
@@ -534,6 +559,7 @@ namespace stonekart
             r.controller = b.controller;
             r.owner = b.owner;
             r.type = Type.Ability;
+            r.colour = b.colour;
 
             return r;
         }
@@ -543,7 +569,7 @@ namespace stonekart
             power?.check();
             toughness?.check();
 
-            //notifyObserver();
+            notifyObservers();
         }
         
 
@@ -586,7 +612,7 @@ namespace stonekart
     {
         Kappa,
         //FrenziedPiranha,
-        BearCavalary,
+        GrizzlyBear,
         LightningBolt,
         SolemnAberration,
         PropheticVision,
@@ -598,7 +624,9 @@ namespace stonekart
         CallToArms,
         ShimmeringKoi,
         Belwas,
-        Testx,
+        AlterFuture,
+        EvolveFangs,
+        GrizzlyCub,
     }
 
     public enum Type

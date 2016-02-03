@@ -18,7 +18,7 @@ namespace stonekart
         public readonly int snap;
         public readonly double maxPaddingFactor;
 
-        public LayoutArgs(bool topDown, bool reverseClippingOrder, double maxPaddingFactor = 1.0, int snap = 1)
+        public LayoutArgs(bool topDown, bool reverseClippingOrder, double maxPaddingFactor = 1.0, int snap = 0)
         {
             this.topDown = topDown;
             this.reverseClippingOrder = reverseClippingOrder;

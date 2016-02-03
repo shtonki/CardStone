@@ -21,7 +21,7 @@ namespace stonekart
         public Game game { get; private set; }
         public GamePanel gamePanel { get; private set; }
         
-
+        private Stack<Tuple<string, Choice[]>> cruft = new Stack<Tuple<string, Choice[]>>();
 
         public GameInterface()
         {
@@ -30,6 +30,7 @@ namespace stonekart
 
         public void push()
         {
+            cruft.Push(new Tuple<string, Choice[]>());
             poppedMessage = gamePanel.message;
             poppedButtons = currentButtons;
             clear();
