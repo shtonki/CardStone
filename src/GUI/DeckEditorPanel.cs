@@ -42,6 +42,38 @@ namespace stonekart
             //saveButton.Image = ImageLoader.
         }
 
+        private void saveDeck()
+        {
+            StreamWriter file = new StreamWriter(@"res\deck.txt");
+            foreach (var id in myDeckIsHard)
+            {
+                file.WriteLine(id);
+            }
+            file.Close();
+        }
+
+        public List<CardId> loadDeckFromFile()
+        {
+            List<CardId> myDeck = new List<CardId>();
+            try
+            { 
+                using (StreamReader sr = new StreamReader(@"res\deck.txt"))
+                {
+                    foreach(CardId id in myDeck)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != null) myDeck.Add((CardId)Enum.Parse(typeof(CardId), line));
+                        //Console.WriteLine((CardId)Enum.Parse(typeof(CardId), line));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+            return myDeck;
+        }
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
