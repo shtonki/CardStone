@@ -160,7 +160,7 @@ namespace stonekart
 
             Portraits = new Dictionary<Image, PortraitInfo>();
             Point p = new Point(100, FRAMEHEIGHT / 2);
-            foreach (CardId id in Enum.GetValues(typeof(CardId)))
+            /*foreach (CardId id in Enum.GetValues(typeof(CardId)))
             {
                 var img = ImageLoader.getCardArt(id);
                 Portraits.Add(img, new PortraitInfo(new Rectangle(p, new Size(img.Width, img.Height)), id));
@@ -178,7 +178,7 @@ namespace stonekart
                 new Size(arrowLeft.Width, arrowLeft.Height)), null));
 
             Portraits.Add(save, new PortraitInfo(new Rectangle(new Point(FRAMEWIDTH - 128, 50), new Size(save.Width, save.Height)), null));
-
+            */
         }
 
         public static void pressedArrow(int direction)

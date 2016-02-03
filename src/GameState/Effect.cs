@@ -99,7 +99,7 @@ namespace stonekart
 
         protected override GameEvent[] resolveHero(Card c, IEnumerator<Target> ts, Game g)
         {
-            CardPanelControl p = g.gameInterface.showCards(c.owner.hand.cards.Take(n).ToArray());
+            CardPanelControl p = g.gameInterface.showCards(c.owner.deck.cards.Take(n).ToArray());
             Choice v = g.gameInterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
             p.closeWindow();
             if (v == Choice.Yes)
