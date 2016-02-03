@@ -44,7 +44,7 @@ namespace stonekart
     public class Game
     {
 
-        private GameInterface gameInterface { get; }
+        public GameInterface gameInterface { get; private set; }
 
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
         private Pile stack;
@@ -60,7 +60,7 @@ namespace stonekart
 
         public bool autoPass { get; set; }
 
-        private GameConnection connection;
+        public GameConnection connection { get; private set; }
         private CardFactory cardFactory;
 
         private EventHandler[] baseEventHandlers = new EventHandler[Enum.GetNames(typeof(GameEventType)).Length];
@@ -126,14 +126,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
-                CardId.LightningBolt, 
+                CardId.Testx,
+                CardId.Testx,
+                CardId.Testx,
+                CardId.Testx,
+                CardId.Kappa,
+                CardId.Kappa,
+                CardId.Kappa,
+                CardId.Kappa,
             };
         }
 
@@ -202,10 +202,8 @@ namespace stonekart
 
             if (e.player == hero)
             {
-
-                gameInterface.showCards(new Card[] {e.player.deck.peek()});
                 int i = 0;
-                while (i++ < e.getCards())
+                while (i++ < e.cardCount)
                 {
                     handleEvent(new MoveCardEvent(e.player.deck.peek(), e.player.hand.location));
                 }
@@ -645,7 +643,7 @@ namespace stonekart
             else
             {
                 gameInterface.setMessage("You have priority");
-                gameInterface.setChoiceButtons(Choice.PASS);
+                gameInterface.setChoiceButtons(Choice.Pass);
 
                 a = _castOrPass(main);
 
@@ -667,7 +665,7 @@ namespace stonekart
                     if (chosenGameElement.choice != null)
                     {
                         Choice choice = chosenGameElement.choice.Value;
-                        if (choice == Choice.PASS)
+                        if (choice == Choice.Pass)
                         {
                             gameInterface.clear();
                             return new CastAction();
@@ -721,7 +719,7 @@ namespace stonekart
         {
             gameInterface.push();
             gameInterface.setMessage("Select target(s)");
-            gameInterface.setChoiceButtons(Choice.CANCEL);
+            gameInterface.setChoiceButtons(Choice.Cancel);
 
             Target[] targets = new Target[a.targetCount];
             TargetRule[] rules = a.targetRules;
@@ -739,7 +737,7 @@ namespace stonekart
                 {
                     t = new Target(chosenGameElement.card);
                 }
-                else if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.CANCEL)
+                else if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.Cancel)
                 {
                     targets = null;
                     break;
@@ -788,11 +786,11 @@ namespace stonekart
             List<Card> cards = new List<Card>();
             while (true) 
             {
-                gameInterface.setChoiceButtons(Choice.ACCEPT);
+                gameInterface.setChoiceButtons(Choice.PADDING, Choice.Accept);
                 while (true)
                 {
                     GameElement chosenGameElement = gameInterface.getNextGameElementPress();
-                    if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.ACCEPT)
+                    if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.Accept)
                     {
                         gameInterface.clear();
 
@@ -830,7 +828,7 @@ namespace stonekart
             //todo(seba) could keep track of undefended attackers
             List<Card> blockers = new List<Card>();
 
-            gameInterface.setChoiceButtons(Choice.ACCEPT);
+            gameInterface.setChoiceButtons(Choice.Accept);
             while (true)
             {
                 Card blocker, blocked;
@@ -839,7 +837,7 @@ namespace stonekart
                 {
                     blocker = blocked = null;
                     gameInterface.setMessage("Choose defenders");
-                    gameInterface.setChoiceButtons(Choice.ACCEPT);
+                    gameInterface.setChoiceButtons(Choice.Accept);
 
                     while (blocker == null)
                     {
@@ -863,7 +861,7 @@ namespace stonekart
                         }
                         else if (chosenGameElement.choice != null)
                         {
-                            if (chosenGameElement.choice.Value == Choice.ACCEPT)
+                            if (chosenGameElement.choice.Value == Choice.Accept)
                             {
                                 goto end;   // *unzips fedora*
                             }
@@ -871,7 +869,7 @@ namespace stonekart
                     }
 
                     gameInterface.setMessage("Blocking what?");
-                    gameInterface.setChoiceButtons(Choice.CANCEL);
+                    gameInterface.setChoiceButtons(Choice.Cancel);
 
                     while (blocked == null)
                     {
@@ -882,7 +880,7 @@ namespace stonekart
                         }
                         else if (e.choice != null)
                         {
-                            if (e.choice.Value == Choice.CANCEL)
+                            if (e.choice.Value == Choice.Cancel)
                             {
                                 break;
                             }

@@ -52,7 +52,6 @@ namespace stonekart
 
         public int targetCount => subEffects.Sum(v => v.targetCount);
         
-
         public string explanation => Explanation;
     }
 
@@ -68,6 +67,52 @@ namespace stonekart
         }
 
         abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts);
+    }
+
+    public abstract class SeperateActionSubEffect : SubEffect
+    {
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        {
+            Game g = c.owner.game;
+            if (c.owner.getSide() == LocationPlayer.HERO)
+            {
+                return resolveHero(c, ts, g);
+            }
+            else
+            {
+                return resolveVillain(c, ts, g);
+            }
+        }
+
+        protected abstract GameEvent[] resolveHero(Card c, IEnumerator<Target> ts, Game g);
+        protected abstract GameEvent[] resolveVillain(Card c, IEnumerator<Target> ts, Game g);
+    }
+
+    public class Timelapse : SeperateActionSubEffect
+    {
+        private int n;
+
+        public Timelapse(int n)
+        {
+            this.n = n;
+        }
+
+        protected override GameEvent[] resolveHero(Card c, IEnumerator<Target> ts, Game g)
+        {
+            CardPanelControl p = g.gameInterface.showCards(c.owner.hand.cards.Take(n).ToArray());
+            Choice v = g.gameInterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
+            p.closeWindow();
+            if (v == Choice.Yes)
+            {
+                c.owner.deck.shuffle();
+            }
+            return new GameEvent[]{};
+        }
+
+        protected override GameEvent[] resolveVillain(Card c, IEnumerator<Target> ts, Game g)
+        {
+            return new GameEvent[] { };
+        }
     }
 
     public class OwnerDraws : SubEffect

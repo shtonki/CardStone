@@ -45,23 +45,19 @@ namespace stonekart
 
     class DrawEvent : PlayerEvent
     {
-        private int cs;
+        public int cardCount { get; private set; }
 
         public DrawEvent(Player plr) : base(plr, GameEventType.DRAW)
         {
-            cs = 1;
+            cardCount = 1;
         }
 
         public DrawEvent(Player plr, int cards) : base(plr, GameEventType.DRAW)
         {
-            cs = cards;
+            cardCount = cards;
         }
-        
 
-        public int getCards()
-        {
-            return cs;
-        }
+        
     }
 
     class CastEvent : GameEvent

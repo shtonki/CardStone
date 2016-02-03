@@ -14,6 +14,8 @@ namespace stonekart
         public int Count { get { return cards.Count; }  }
 
         public Location location { get; private set; }
+        
+        public List<Card> cards { get; private set; }
 
         public Pile(Location l)
         {
@@ -21,7 +23,11 @@ namespace stonekart
             cards = new List<Card>();
         }
 
-        public List<Card> cards { get; private set; }
+        public Pile(Card[] cs)
+        {
+            cards = new List<Card>(cs);
+        }
+
 
         public void add(Card c)
         {
@@ -53,6 +59,7 @@ namespace stonekart
                 cards[k] = cards[n];
                 cards[n] = value;
             }
+            notifyObservers();
         }
         
 

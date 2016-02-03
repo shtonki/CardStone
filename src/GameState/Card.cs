@@ -21,8 +21,6 @@ namespace stonekart
 
     public class Card : Observable
     {
-        
-
         private int id;
         public CardId cardId { get; private set; }
         public Location location { get; set; }
@@ -122,6 +120,7 @@ namespace stonekart
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
             keyAbilities = new List<KeyAbility>();
+            auras = new List<Aura>();
         }
 
         //todo(seba) move this entire constructor to a XML document
@@ -212,8 +211,8 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Creature;
-                    basePower = 2;
-                    baseToughness = 2;
+                    basePower = 1;
+                    baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
                 } break;
 
@@ -290,6 +289,15 @@ namespace stonekart
                         1,
                         "Other white creatures you control get +1/+0");
                     auras.Add(a);
+                } break;
+
+                case CardId.Testx:
+                {
+                    blueCost = 1;
+                    type = Type.Sorcery;
+                    fx.Add(new Timelapse(3));
+                    fx.Add(new OwnerDraws(1));
+                    castDescription = "Timelapse 3\nDraw a card.";
                 } break;
 
                 default:
@@ -589,7 +597,8 @@ namespace stonekart
         Squire,
         CallToArms,
         ShimmeringKoi,
-        Belwas
+        Belwas,
+        Testx,
     }
 
     public enum Type
