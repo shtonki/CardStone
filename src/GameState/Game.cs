@@ -13,20 +13,6 @@ namespace stonekart
 {
     public class TurnTracker
     {
-        public enum Step
-        {
-            UNTOP,
-            DRAW,
-            MAIN1,
-            STARTCOMBAT,
-            ATTACKERS,
-            DEFENDERS,
-            DAMAGE,
-            ENDCOMBAT,
-            MAIN2,
-            END,
-        }
-
         public Step step { get; private set; }
         public bool heroTurn;
 
@@ -41,9 +27,23 @@ namespace stonekart
         }
     }
 
+    public enum Step
+    {
+        UNTOP,
+        DRAW,
+        MAIN1,
+        STARTCOMBAT,
+        ATTACKERS,
+        DEFENDERS,
+        DAMAGE,
+        ENDCOMBAT,
+        MAIN2,
+        END,
+    }
+
     public class Game
     {
-
+        public Step currentStep => turn.step;
         public GameInterface gameInterface { get; private set; }
 
         private Player hero, villain, homePlayer, awayPlayer, activePlayer, inactivePlayer;
@@ -126,14 +126,18 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
+                CardId.GrizzlyCub,
+                CardId.GrizzlyCub,
+                CardId.GrizzlyCub,
+                CardId.GrizzlyCub,
+                CardId.GrizzlyCub,
+                CardId.GrizzlyCub,
+                CardId.EvolveFangs, 
+                CardId.EvolveFangs, 
+                CardId.EvolveFangs, 
+                CardId.EvolveFangs, 
+                CardId.EvolveFangs, 
+                CardId.EvolveFangs, 
             };
         }
 
@@ -173,8 +177,7 @@ namespace stonekart
         private void _modifycard(GameEvent gevent)
         {
             ModifyCardEvent e = (ModifyCardEvent)gevent;
-            throw new Exception();
-            //e.modifiable.addModifier(e.value, e.clojure);
+            e.card.modify(e.modifiable, e.value, e.clojure);
         }
         private void _summontoken(GameEvent gevent)
         {
@@ -272,7 +275,7 @@ namespace stonekart
 
                 switch (turn.step)
                 {
-                    case TurnTracker.Step.UNTOP:
+                    case Step.UNTOP:
                     {
                         activePlayer = turn.heroTurn ? hero : villain;
                         inactivePlayer = turn.heroTurn ? villain : hero;
@@ -281,39 +284,39 @@ namespace stonekart
                         untopStep();
                     } break;
 
-                    case TurnTracker.Step.DRAW:
+                    case Step.DRAW:
                     {
                         drawStep();
                     } break;
-                    case TurnTracker.Step.MAIN1:
+                    case Step.MAIN1:
                     {
                         mainStep(1);
                     } break;
-                    case TurnTracker.Step.STARTCOMBAT:
+                    case Step.STARTCOMBAT:
                     {
                         startCombatStep();
                     } break;
-                    case TurnTracker.Step.ATTACKERS:
+                    case Step.ATTACKERS:
                     {
                         attackersStep();
                     } break;
-                    case TurnTracker.Step.DEFENDERS:
+                    case Step.DEFENDERS:
                     {
                         defendersStep();
                     } break;
-                    case TurnTracker.Step.DAMAGE:
+                    case Step.DAMAGE:
                     {
                         damageStep();
                     } break;
-                    case TurnTracker.Step.ENDCOMBAT:
+                    case Step.ENDCOMBAT:
                     {
                         endCombatStep();
                     } break;
-                    case TurnTracker.Step.MAIN2:
+                    case Step.MAIN2:
                     {
                         mainStep(2);
                     } break;
-                    case TurnTracker.Step.END:
+                    case Step.END:
                     {
                         endStep();
                     } break;
@@ -563,14 +566,14 @@ namespace stonekart
                     v.checkModifiers();
                 }
 
-                var field = hero.field.cards.Concat(villain.field.cards);
-                var enumerable = field as Card[] ?? field.ToArray();
+                var fld = hero.field.cards.Concat(villain.field.cards);
+                var field = fld as Card[] ?? fld.ToArray();
 
-                foreach (var v in enumerable)
+                foreach (var v in field)
                 {
                     foreach (var a in v.auras)
                     {
-                        foreach (var c in enumerable)
+                        foreach (var c in field)
                         {
                             if (a.filter(c))
                             {
@@ -582,7 +585,7 @@ namespace stonekart
 
                 var vs = allCards;
 
-                foreach (var v in hero.field.cards)
+                foreach (var v in field)
                 {
                     if (v.currentToughness <= 0)
                     {

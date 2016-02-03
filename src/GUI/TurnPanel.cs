@@ -8,8 +8,8 @@ namespace stonekart
 {
     internal class TurnPanel : Panel
     {
-        private Image[] images = new Image[Enum.GetNames(typeof(TurnTracker.Step)).Length];
-        private ToggleBox[] toggleBoxes = new ToggleBox[Enum.GetNames(typeof(TurnTracker.Step)).Length];
+        private Image[] images = new Image[Enum.GetNames(typeof(Step)).Length];
+        private ToggleBox[] toggleBoxes = new ToggleBox[Enum.GetNames(typeof(Step)).Length];
 
         private int step = 0;
         private bool xd;
@@ -69,7 +69,7 @@ namespace stonekart
 
             for (int i = 0; i < images.Length; i++)
             {
-                images[i] = ImageLoader.getStepImage(((TurnTracker.Step)i).ToString(), s);
+                images[i] = ImageLoader.getStepImage(((Step)i).ToString(), s);
             }
         }
 

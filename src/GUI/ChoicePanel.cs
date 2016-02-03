@@ -35,6 +35,7 @@ namespace stonekart
             {
                 ChoiceButton b = new ChoiceButton();
                 b.BackColor = Color.GhostWhite;
+                b.Visible = false;
                 b.Font = new Font(new FontFamily("Comic Sans MS"), 12);
                 b.Location = new Point(5 + (i % 3) * 80, 100 + 50*(i/3));
                 b.Click += (sender, args) =>
