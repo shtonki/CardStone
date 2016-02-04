@@ -42,7 +42,8 @@ namespace stonekart
             {
                 normalButtons[i] = new Button();
             }
-            
+
+            yard.Click += clickGraveyard;
             
             Controls.Add(health);
             Controls.Add(deck);
@@ -177,6 +178,11 @@ namespace stonekart
             }
         }
 
+        private void clickGraveyard(object o, EventArgs a)
+        {
+            game.showGraveyard(player);
+        }
+
         public void notifyObserver(Observable o, object args)
         {
             player = (Player)o;
@@ -203,6 +209,7 @@ namespace stonekart
                 b.Text = s;
             }
         }
+        
 
         protected override void OnPaint(PaintEventArgs e)
         {

@@ -324,7 +324,7 @@ namespace stonekart
                     type = Type.Sorcery;
                     fx.Add(new SubEffectPlayerDiscard(1, true));
                     castDescription =
-                        "Look at target players hand and choose 1 card from it. That player discards the chosen card.";
+                        "Look at target players hand and choose 1 card from it. The chosen card is discarded.";
                 } break;
 
                 default:

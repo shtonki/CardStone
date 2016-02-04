@@ -149,17 +149,20 @@ namespace stonekart
                 CardId.Haunt, 
                 CardId.Haunt, 
                 CardId.Haunt, 
-                CardId.Haunt, 
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
-                CardId.EvolveFangs,
                 CardId.EvolveFangs,
                 CardId.EvolveFangs,
                 CardId.EvolveFangs,
                 CardId.EvolveFangs,
             };
+        }
+
+        public void winGame(bool wonnered)
+        {
+            //GameController.
         }
 
         #region eventHandlers

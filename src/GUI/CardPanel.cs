@@ -35,12 +35,14 @@ namespace stonekart
 
         private Func<CardButton> buttonGenerator;
 
-        public CardPanel(Func<CardButton> buttonGenerator, LayoutArgs args)
+        public CardPanel(Func<CardButton> buttonGenerator, LayoutArgs args, Pile p = null)
         {
             BackColor = Color.Pink;
             layoutArgs = args;
             cardButtons = new List<CardButton>();
             this.buttonGenerator = buttonGenerator;
+
+            p?.addObserver(this);
         }
 
         private const int sidePadding = 5;

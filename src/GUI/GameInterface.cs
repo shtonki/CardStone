@@ -239,7 +239,16 @@ namespace stonekart
             CardPanelControl c = new CardPanelControl(pl);
             return c;
         }
+        
+        public void showGraveyard(Player p)
+        {
+            CardPanel l = new CardPanel(() => new CardButton(), new LayoutArgs(false, false),p.graveyard);
+            GUI.showWindow(l, new WindowedPanelArgs("Graveyard", true, true, false));
+            
+        }
     }
+
+
 
     public class CardPanelControl
     {

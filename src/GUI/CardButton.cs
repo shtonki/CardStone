@@ -215,7 +215,7 @@ namespace stonekart
             TextLocationX =     (int)Math.Round(CardHeight * 0.075f);
             TextLocationY =     (int)Math.Round(CardHeight * 0.646428571428571f);
             TextWidth =         (int)Math.Round(CardHeight * 0.464285714285714f);
-            TextHeight =        (int)Math.Round(CardHeight * 0.132142857142857f);
+            TextHeight =        (int)Math.Round(CardHeight * 0.172142857142857f);
             ManaOrbLocationX =  (int)Math.Round(CardHeight * 0.55f);
             ManaOrbLocationY =  (int)Math.Round(CardHeight * 0.025f);
             ManaOrbSize =       (int)Math.Round(CardHeight * 0.0392857142857143f);
@@ -223,9 +223,9 @@ namespace stonekart
             GreyCostLocationX = (int)Math.Round(CardHeight * 0.00357142857142857f);
             GreyCostLocationY = (int)Math.Round(CardHeight * -0.00357142857142857f);
             PTAreaSize =        (int)Math.Round(CardHeight * 0.117857142857143f);
-            PTTextLocationP =   (int)Math.Round(CardHeight * 0.012f);
+            PTTextLocationP =   (int)Math.Round(CardHeight * 0.013f);
             PTTextLocationY =   (int)Math.Round(CardHeight * 0.892857142857143f);
-            PTTextLocationT =   (int)Math.Round(CardHeight * 0.555142857142857f);
+            PTTextLocationT =   (int)Math.Round(CardHeight * 0.554142857142857f);
 
             TextRectangle = new Rectangle(TextLocationX, TextLocationY, TextWidth, TextHeight);
 
@@ -370,7 +370,7 @@ namespace stonekart
         {
             base.OnResize(e);
             CardHeight = (int)(Size.Height*snapDistance);
-            /*
+            
             CardWidth = (int)(Size.Width);
             ArtHeight = (int)Math.Round(CardHeight * 0.483857142857143f);
             ArtWidth = (int)Math.Round(CardHeight * 0.513142857142857f);
@@ -410,12 +410,6 @@ namespace stonekart
             cardNameFont = FontLoader.getFont(FontLoader.MANGALB, NameFontSize);
             textFont = FontLoader.getFont(FontLoader.MANGALB, TextFontSize);
             PTFont = FontLoader.getFont(FontLoader.MANGALB, PTFontSize);
-            /*
-            int height = Resolution.get(ElementDimensions.CardButtonHeight),
-                width =  Resolution.get(ElementDimensions.CardButtonWidth);
-            Size = new Size(width, height);
-            */
-            //Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs pevent)

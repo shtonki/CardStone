@@ -291,10 +291,13 @@ namespace stonekart
             {
                 r = new Card[cards];
                 CardPanelControl p = g.gameInterface.showCards(victim.hand.cards.ToArray());
+                g.gameInterface.setContext("Pick a card");
                 for (int i = 0; i < cards; i++)
                 {
                     r[i] = p.waitForCard();
                 }
+                g.gameInterface.clearContext();
+                p.closeWindow();
                 g.sendMultiSelection(r);
             }
             else
