@@ -42,7 +42,8 @@ namespace stonekart
             {
                 normalButtons[i] = new Button();
             }
-            
+
+            yard.Click += clickGraveyard;
             
             Controls.Add(health);
             Controls.Add(deck);
@@ -177,6 +178,11 @@ namespace stonekart
             }
         }
 
+        private void clickGraveyard(object o, EventArgs a)
+        {
+            game.showGraveyard(player);
+        }
+
         public void notifyObserver(Observable o, object args)
         {
             player = (Player)o;
@@ -185,9 +191,9 @@ namespace stonekart
             updateManaDisplay();
 
             safeSetText(health, player.getHealth().ToString());
-            safeSetText(deck, player.deck.Count.ToString());
-            safeSetText(hand, player.hand.Count.ToString());
-            safeSetText(yard, player.graveyard.Count.ToString());
+            safeSetText(deck, player.deck.count.ToString());
+            safeSetText(hand, player.hand.count.ToString());
+            safeSetText(yard, player.graveyard.count.ToString());
             
             Invalidate();
         }
@@ -203,6 +209,7 @@ namespace stonekart
                 b.Text = s;
             }
         }
+        
 
         protected override void OnPaint(PaintEventArgs e)
         {

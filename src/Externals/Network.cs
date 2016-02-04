@@ -350,7 +350,7 @@ namespace stonekart
 
             if (t == typeof(DeclareDeckAction))
             {
-                return new DeclareDeckAction();
+                return new DeclareDeckAction(new CardId[30]);
             }
 
             if (t == typeof(SelectAction))

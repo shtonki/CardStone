@@ -243,7 +243,7 @@ namespace stonekart
         {
         }
     }
-
+    
     class ModifyCardEvent : GameEvent
     {
         public readonly Card card;

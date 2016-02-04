@@ -159,20 +159,19 @@ namespace stonekart
             {
                 var paid = costs;
 
-                gi.push();
                 gi.setFakeManas(Costs);
-                gi.setChoiceButtons(Choice.Cancel);
+                gi.setContext("", Choice.Cancel);
 
                 while (c != CMC)
                 {
-                    gi.setMessage("Pay " + cz[5]);
+                    gi.changeMessage("Pay " + cz[5]);
 
                     GameElement element = gi.getNextGameElementPress();
 
                     if (element.choice != null && element.choice == Choice.Cancel)
                     {
                         gi.resetFakeMana();
-                        gi.pop();
+                        gi.clearContext();
                         return null;
                     }
 
@@ -190,7 +189,7 @@ namespace stonekart
                 }
 
                 gi.resetFakeMana();
-                gi.pop();
+                gi.clearContext();
                 return r;
             }
         }

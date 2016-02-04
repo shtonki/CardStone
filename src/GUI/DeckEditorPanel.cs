@@ -131,11 +131,11 @@ namespace stonekart
 
         private bool removeFromDeck(CardId id)
         {
-            for(int i = myDeckIsHard.Count-1; i >= 0; i--)
+            for(int i = myDeckIsHard.count-1; i >= 0; i--)
             {
-                if (myDeckIsHard.cards[i].cardId == id)
+                if (myDeckIsHard[i].cardId == id)
                 {
-                    myDeckIsHard.remove(myDeckIsHard.cards[i]);
+                    myDeckIsHard.remove(myDeckIsHard[i]);
                     return true;
                 }
             }

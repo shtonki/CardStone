@@ -13,41 +13,41 @@ namespace stonekart
     /// </summary>
     public class GameInterface
     {
-        //todo(seba) make this an actual stack and not just retarded
-        private string poppedMessage;
-        private Choice[] poppedButtons;
-        private Choice[] currentButtons = new Choice[] {};
+        private Choice[] currentButtons;
 
         public Game game { get; private set; }
         public GamePanel gamePanel { get; private set; }
+
         
+
         private Stack<Tuple<string, Choice[]>> cruft = new Stack<Tuple<string, Choice[]>>();
 
         public GameInterface()
         {
-
+            currentButtons = new Choice[] { };
         }
+        
 
-        public void push()
+        public void clearContext()
         {
-            //cruft.Push(new Tuple<string, Choice[]>());
-            poppedMessage = gamePanel.message;
-            poppedButtons = currentButtons;
-            clear();
+            var t = cruft.Pop();
+            gamePanel.message = t.Item1;
+            gamePanel.showButtons(t.Item2);
         }
 
-        public void pop()
+        public void setContext(string message, params Choice[] cs)
         {
-            gamePanel.message = poppedMessage;
-            gamePanel.showButtons(poppedButtons);
+            cruft.Push(new Tuple<string, Choice[]>(gamePanel.message, currentButtons));
+            gamePanel.showButtons(cs);
+            gamePanel.message = message;
+            currentButtons = cs;
         }
 
-        public void clear()
+        public void changeMessage(string s)
         {
-            gamePanel.message = "";
-            setChoiceButtons();
+            
         }
-
+        /*
         public void setMessage(string s)
         {
             gamePanel.message = s;
@@ -57,7 +57,7 @@ namespace stonekart
         {
             gamePanel.showButtons(cs);
         }
-
+        */
         //hack overhaul this
         public void showAddMana(bool b)
         {
@@ -170,13 +170,13 @@ namespace stonekart
 
         public Choice getChoice(string message, params Choice[] cs)
         {
-            setMessage(message);
-            setChoiceButtons(cs);
+            setContext(message, cs);
             while (true)
             {
                 GameElement g = getNextGameElementPress();
                 if (g.choice != null)
                 {
+                    clearContext();
                     return g.choice.Value;
                 }
             }
@@ -239,7 +239,16 @@ namespace stonekart
             CardPanelControl c = new CardPanelControl(pl);
             return c;
         }
+        
+        public void showGraveyard(Player p)
+        {
+            CardPanel l = new CardPanel(() => new CardButton(), new LayoutArgs(false, false),p.graveyard);
+            GUI.showWindow(l, new WindowedPanelArgs("Graveyard", true, true, false));
+            
+        }
     }
+
+
 
     public class CardPanelControl
     {

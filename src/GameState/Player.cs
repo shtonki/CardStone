@@ -58,20 +58,14 @@ namespace stonekart
         {
             for (int i = 0; i < c; i++)
             {
-                if (deck.Count == 0) { return false; }
+                if (deck.count == 0) { return false; }
                 game.moveCardTo(deck.peek(), hand); //deck.peek().moveTo(hand);
             }
 
             notifyObservers();
             return true;
         }
-
-        public void shuffleDeck()
-        {
-            deck.shuffle();
-        }
-
-
+        
         public int getCurrentMana(int color)
         {
             return curMana[color];
