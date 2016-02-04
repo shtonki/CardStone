@@ -16,7 +16,7 @@ namespace stonekart
         const int paddingX = 8;
         const int paddingY = 8;
         const int CARDS_PER_ROW = 6;
-        
+
         public DeckEditorPanel()
         {
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
@@ -32,21 +32,30 @@ namespace stonekart
                 cards[i].MouseDown += (_, __) =>
                 {
                     if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
-                    else if (__.Button == MouseButtons.Right) loadDeckFromFile(); //removeFromDeck(cards[i0].Card.cardId);
+                    else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
                 };
             }
 
+            Button xdButton = new Button();
+            xdButton.Image = ImageLoader.getStepImage("defenders", new Size(60, 60));
+
+            xdButton.MouseDown += (_, __) =>
+            {
+                loadDeckFromFile((s) => loadIntoEditor(loadDeck(s)));
+            };
+            Controls.Add(xdButton);
+
             saveButton = new Button();
-            saveButton.Image = ImageLoader.getStepImage("save", new Size(60,60));
+            saveButton.Image = ImageLoader.getStepImage("save", new Size(60, 60));
             saveButton.Size = saveButton.Image.Size;
-            
+
             saveButton.MouseDown += (_, __) =>
             {
                 saveDeck();
             };
 
             tb = new TextBox();
-            
+
             Controls.Add(tb);
             Controls.Add(p);
             Controls.Add(saveButton);
@@ -62,15 +71,13 @@ namespace stonekart
             file.Close();
         }
 
-        public List<CardId> loadDeckFromFile()
+        public void loadDeckFromFile(Action<string> buttonClickedCallBack)
         {
             var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
             Panel deckAsker = new Panel();
             deckAsker.Size = new Size(500, 200);
-            deckAsker.Location = new Point(Size.Width/2, (Size.Height/3)*2);
-            WaitFor<string> wotisthis = new WaitFor<string>();
+            deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
-            string deckPath = "";
             foreach (string name in deckNames)
             {
                 var xd = new Button();
@@ -78,20 +85,23 @@ namespace stonekart
                 xd.Location = new Point(0, Y);
                 Y += xd.Height;
 
-                xd.MouseDown += (_, __) => 
+                xd.MouseDown += (_, __) =>
                 {
-                    deckPath = name;
+                    buttonClickedCallBack(name);
                 };
                 deckAsker.Controls.Add(xd);
             }
             GUI.showWindow(deckAsker);
-            Console.WriteLine(deckPath);
+        }
+
+        public List<CardId> loadDeck(string deckName)
+        {
             List<CardId> myDeck = new List<CardId>();
             try
-            { 
-                using (StreamReader sr = new StreamReader(deckPath))
+            {
+                using (StreamReader sr = new StreamReader(deckName))
                 {
-                    foreach(CardId id in myDeck)
+                    foreach (CardId id in myDeck)
                     {
                         string line = sr.ReadLine();
                         if (line != null) myDeck.Add((CardId)Enum.Parse(typeof(CardId), line));
@@ -106,6 +116,16 @@ namespace stonekart
             return myDeck;
         }
 
+        private void loadIntoEditor(List<CardId> deck)
+        {
+            myDeckIsHard.cards.Clear();
+            for (int i = 0; i < myDeckIsHard.Count; i++)
+            {
+                myDeckIsHard.add(new Card(deck[i]));
+            }
+            
+        }
+
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
@@ -117,9 +137,9 @@ namespace stonekart
             for (int i = 0; i < cards.Length; i++)
             {
                 x += cards[i].Width;
-                if (i % CARDS_PER_ROW == 0) x = cards[0].Size.Width*2;
-                cards[i].setWidth(Size.Width/cards.Length);
-                cards[i].Location = new Point(x + (i%CARDS_PER_ROW)*paddingX, cards[i].Size.Height + cards[i].Size.Height * (i/CARDS_PER_ROW));
+                if (i % CARDS_PER_ROW == 0) x = cards[0].Size.Width * 2;
+                cards[i].setWidth(Size.Width / cards.Length);
+                cards[i].Location = new Point(x + (i % CARDS_PER_ROW) * paddingX, cards[i].Size.Height + cards[i].Size.Height * (i / CARDS_PER_ROW));
             }
         }
 
@@ -131,7 +151,7 @@ namespace stonekart
 
         private bool removeFromDeck(CardId id)
         {
-            for(int i = myDeckIsHard.Count-1; i >= 0; i--)
+            for (int i = myDeckIsHard.Count - 1; i >= 0; i--)
             {
                 if (myDeckIsHard.cards[i].cardId == id)
                 {
