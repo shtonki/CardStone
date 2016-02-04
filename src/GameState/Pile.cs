@@ -11,53 +11,64 @@ namespace stonekart
     /// </summary>
     public class Pile : Observable//, IList<int>
     {
-        public int Count { get { return cards.Count; }  }
+        public Card this[int key]
+        {
+            get { return Cards[key]; }
+            set { Cards[key] = value; }
+        }
+
+        public int count { get { return Cards.Count; }  }
 
         public Location location { get; private set; }
-        
-        public List<Card> cards { get; private set; }
+
+        public IEnumerable<Card> cards => Cards;
+
+        private List<Card> Cards;
 
         public Pile(Location l)
         {
             location = l;
-            cards = new List<Card>();
+            Cards = new List<Card>();
         }
 
         public Pile(Card[] cs)
         {
-            cards = new List<Card>(cs);
+            Cards = new List<Card>(cs);
         }
 
+        public void clear()
+        {
+            Cards.Clear();
+            notifyObservers();
+        }
 
         public void add(Card c)
         {
-            cards.Add(c);
+            Cards.Add(c);
             notifyObservers(new object[]{c, true});
         }
 
         public void remove(Card c)
         {
-            cards.Remove(c);
+            Cards.Remove(c);
             notifyObservers(new object[] { c, false });
         }
 
         public Card peek()
         {
-            return cards[cards.Count - 1];
+            return Cards[count - 1];
         }
 
-        private static Random rng = new Random();
-
-        public void shuffle()
+        public void shuffle(Random rng)
         {
-            int n = cards.Count;
+            int n = count;
             while (n > 1)
             {
                 n--;
                 int k = rng.Next(n + 1);
-                Card value = cards[k];
-                cards[k] = cards[n];
-                cards[n] = value;
+                Card value = Cards[k];
+                Cards[k] = Cards[n];
+                Cards[n] = value;
             }
             notifyObservers();
         }

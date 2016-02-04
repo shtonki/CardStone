@@ -106,30 +106,23 @@ namespace stonekart
         */
         
 
+        public static WindowedPanel showWindow(Panel p, WindowedPanelArgs args)
+        {
+            return frame.Invoke(new Func<WindowedPanel>(() =>
+            {
+                WindowedPanel w = new WindowedPanel(p, args);
+                frame.Controls.Add(w);
+                w.BringToFront();
+                return w;
+            })) as WindowedPanel;
+        }
+
         public static WindowedPanel showWindow(Panel p)
         {
-            WindowedPanel w =  frame.Invoke(new Func<WindowedPanel>(() =>
-            {
-                var v = _showWindow(p);
-                frame.Controls.Add(v);
-                v.BringToFront();
-                return v;
-            })) as WindowedPanel;
-            return w;
+            WindowedPanelArgs a = new WindowedPanelArgs("", false, false, false);   
+            return showWindow(p, a);
         }
-
-        private static WindowedPanel _showWindow(Panel p)
-        {
-            WindowedPanelArgs a = new WindowedPanelArgs("", true, true, false);   
-            return _showWindow(p, a);
-        }
-
-        private static WindowedPanel _showWindow(Panel p, WindowedPanelArgs a)
-        {
-            WindowedPanel w = new WindowedPanel(p, a);
-            frame.Controls.Add(w);
-            return w;
-        }
+        
 
         public static void showTell(string f, string m)
         {
@@ -247,39 +240,47 @@ namespace stonekart
             c.Location = new Point(0, 20);
 
             Label bar = new Label();
-            bar.Size = new Size(Size.Width - 20, 20);
+            bar.Size = new Size(Size.Width, 20);
             bar.Location = new Point(0, 0);
             bar.BackColor = Color.DarkOrchid;
             bar.Text = args.title ?? "";
 
-            Button x = new Button();
-            x.Size = new Size(20, 20);
-            x.Location = new Point(Size.Width - 20, 0);
-            x.BackColor = Color.Red;
+            List<Button> buttons = new List<Button>();
 
-            Button t = new Button();
-            t.Size = new Size(20, 20);
-            t.Location = new Point(Size.Width - 40, 0);
-            t.BackColor = Color.Orange;
-
-            x.Click += (a, b) =>
+            if (args.closeable)
             {
-                close();
-            };
+                Button x = new Button();
+                x.BackColor = Color.Red;
+                buttons.Add(x);
+                x.Click += (a, b) =>
+                {
+                    close();
+                };
+            }
 
-            t.Click += (a, b) =>
+            if (args.minimizable)
             {
-                drawContent = !drawContent;
+                Button t = new Button();
+                t.BackColor = Color.Orange;
+                buttons.Add(t);
+                t.Click += (a, b) =>
+                {
+                    drawContent = !drawContent;
 
-                if (drawContent)
-                {
-                    Size = c.Size + new Size(0, 20);
-                }
-                else
-                {
-                    Size = new Size(Size.Width, 20);
-                }
-            };
+                    if (drawContent)
+                    {
+                        Size = c.Size + new Size(0, 20);
+                    }
+                    else
+                    {
+                        Size = new Size(Size.Width, 20);
+                    }
+                };
+            }
+
+            
+
+            
 
             bar.MouseDown += (sender, ags) =>
             {
@@ -298,8 +299,14 @@ namespace stonekart
                 Location = Location - xd + new Size(ags.X, ags.Y);
             };
 
-            Controls.Add(x);
-            Controls.Add(t);
+            int i = 1;
+            foreach (Button b in buttons)
+            {
+                b.Location = new Point(Size.Width - i++*20, 0);
+                b.Size = new Size(20, 20);
+                Controls.Add(b);
+            }
+            
             Controls.Add(bar);
             Controls.Add(c);
         }

@@ -36,7 +36,7 @@ namespace stonekart
 
             foreach (SubEffect e in subEffects)
             {
-                foreach (var v in e.resolve(c, targetEnumerator))
+                foreach (var v in e.resolve(c, targetEnumerator, c.owner.game))
                 {
                     r.Add(v);
                 }
@@ -66,29 +66,12 @@ namespace stonekart
             targets = new TargetRule[0];
         }
 
-        abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts);
+        abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g);
+        
     }
+    
 
-    public abstract class SeperateActionSubEffect : SubEffect
-    {
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
-        {
-            Game g = c.owner.game;
-            if (c.owner.getSide() == LocationPlayer.HERO)
-            {
-                return resolveHero(c, ts, g);
-            }
-            else
-            {
-                return resolveVillain(c, ts, g);
-            }
-        }
-
-        protected abstract GameEvent[] resolveHero(Card c, IEnumerator<Target> ts, Game g);
-        protected abstract GameEvent[] resolveVillain(Card c, IEnumerator<Target> ts, Game g);
-    }
-
-    public class Timelapse : SeperateActionSubEffect
+    public class Timelapse : SubEffect
     {
         private int n;
 
@@ -97,21 +80,27 @@ namespace stonekart
             this.n = n;
         }
 
-        protected override GameEvent[] resolveHero(Card c, IEnumerator<Target> ts, Game g)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
-            CardPanelControl p = g.gameInterface.showCards(c.owner.deck.cards.Take(n).ToArray());
-            Choice v = g.gameInterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
-            p.closeWindow();
-            if (v == Choice.Yes)
+            Choice shuffle;
+            if (c.owner.getSide() == LocationPlayer.HERO)
             {
-                c.owner.deck.shuffle();
+                CardPanelControl p = g.gameInterface.showCards(c.owner.deck.cards.Take(n).ToArray());
+                shuffle = g.gameInterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
+                g.sendSelection((int)shuffle);
+                p.closeWindow();
             }
+            else
+            {
+                shuffle = (Choice)g.demandSelection();
+            }
+            
+            if (shuffle == Choice.Yes)
+            {
+                g.shuffleDeck(c.owner);
+            }
+            g.gameInterface.showCards(c.owner.deck.cards.Take(2).ToArray());
             return new GameEvent[]{};
-        }
-
-        protected override GameEvent[] resolveVillain(Card c, IEnumerator<Target> ts, Game g)
-        {
-            return new GameEvent[] { };
         }
     }
 
@@ -124,7 +113,7 @@ namespace stonekart
             i = cards;
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> _)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> _, Game g)
         {
             GameEvent e = new DrawEvent(c.controller, i);
             return new[] {e};
@@ -147,7 +136,7 @@ namespace stonekart
             d = damage;
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
 
             GameEvent[] r = new GameEvent[targets.Length];
@@ -180,7 +169,7 @@ namespace stonekart
             targets[0] = new TargetRule(TargetRules.CREATUREONFIELD);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
             GameEvent[] r = new GameEvent[1];
             Target v = ts.Current;
@@ -199,7 +188,7 @@ namespace stonekart
             life = n;
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
             GameEvent[] l = {new GainLifeEvent(c.controller, life)};
             return l;
@@ -218,7 +207,7 @@ namespace stonekart
             
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
             GameEvent[] r = new GameEvent[count];
 
@@ -254,24 +243,71 @@ namespace stonekart
             this.value = value;
         }
 
-        private static Card asd(Card c, IEnumerator<Target> ts)
-        {
-            if (c == null)
-            {
-                var t = ts.Current;
-                ts.MoveNext();
-                return t.getCard();
-            }
-            else return c;
-        }
+        
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts)
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
         {
-            Card b = asd(card, ts);
+            Card t;
+            if (card == null)
+            {
+                var r = ts.Current;
+                ts.MoveNext();
+                t = r.getCard();
+            }
+            else
+            {
+                t = card;
+            }
             return new GameEvent[]
             {
-                new ModifyCardEvent(b, attribute, filter, value)
+                new ModifyCardEvent(t, attribute, filter, value)
             };
         }
     }
+
+    public class SubEffectPlayerDiscard : SubEffect
+    {
+        private int cards;
+        private bool castersChoice;
+
+        public SubEffectPlayerDiscard(int cards, bool castersChoice)
+        {
+            this.cards = cards;
+            this.castersChoice = castersChoice;
+            targets = new TargetRule[] {new TargetRule(TargetRules.PLAYER), };
+        }
+
+        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        {
+            if (cards != 1)
+            {
+                throw new NotImplementedException();
+            }
+
+            Card[] r;
+            Player victim = ts.Current.getPlayer();
+            ts.MoveNext();
+            if (castersChoice == c.ownedByMe)
+            {
+                r = new Card[cards];
+                CardPanelControl p = g.gameInterface.showCards(victim.hand.cards.ToArray());
+                g.gameInterface.setContext("Pick a card");
+                for (int i = 0; i < cards; i++)
+                {
+                    r[i] = p.waitForCard();
+                }
+                g.gameInterface.clearContext();
+                p.closeWindow();
+                g.sendMultiSelection(r);
+            }
+            else
+            {
+                r = g.demandMultiSelectionAsCards();
+            }
+            return r.Select(crd => new MoveCardEvent(crd, LocationPile.GRAVEYARD)).ToArray();
+
+        }
+    }
+
+    
 }

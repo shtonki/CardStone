@@ -39,7 +39,6 @@ namespace stonekart
                 var i1 = i;
                 b.Click += (_, __) =>
                 {
-                    System.Console.WriteLine(i1);
                     b.toggle();
                 };
             }

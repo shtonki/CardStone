@@ -73,7 +73,11 @@ namespace stonekart
             int i = 0;
             for (; i < cs.Length; i++)
             {
-                if (cs[i] == Choice.PADDING) { continue; }
+                if (cs[i] == Choice.PADDING)
+                {
+                    setVisibleSafe(buttons[i], false);
+                    continue;
+                }
                 ChoiceButton b = buttons[i];
                 b.choice = cs[i];
                 safeSetText(b, cs[i].ToString());
