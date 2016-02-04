@@ -20,7 +20,7 @@ namespace stonekart
         {
         }
 
-        public void advanceTurn()
+        public void advanceStep()
         {
             step = (Step)(((int)step + 1)%10);
             heroTurn = step == 0 ? !heroTurn : heroTurn;
@@ -69,6 +69,8 @@ namespace stonekart
 
         private List<TriggeredAbility> waitingTriggeredAbilities = new List<TriggeredAbility>();
 
+        private Random deckShuffler;
+
         public Game(GameConnection cn, GameInterface g)
         {
             gameInterface = g;
@@ -88,15 +90,8 @@ namespace stonekart
             
 
             gameInterface.setObservers(hero, villain, stack);
-        }
-
-        public void start()
-        {
 
             CardId[] myCards = loadDeck();
-
-            bool starting = connection.asHomePlayer();
-
             raiseAction(new DeclareDeckAction(myCards));
             CardId[] otherCards = demandDeck();
 
@@ -110,46 +105,63 @@ namespace stonekart
             else
             {
                 otherDeck = cardFactory.makeList(villain, otherCards);
-                myDeck = cardFactory.makeList(hero, myCards);                
+                myDeck = cardFactory.makeList(hero, myCards);
             }
 
             hero.loadDeck(myDeck);
             villain.loadDeck(otherDeck);
+        }
 
-            hero.shuffleDeck();
-            villain.shuffleDeck();
+        public void start()
+        {
+            bool home = connection.asHomePlayer();
+            int seed;
+            bool goingFirst;
+            if (home)
+            {
+                Random r = new Random();
+                seed = r.Next();
 
-            gameStart();
+                Choice c = gameInterface.getChoice("Do you want to go first?", Choice.Yes, Choice.No);
+                goingFirst = c == Choice.Yes;
+                raiseAction(new MultiSelectAction(new int[]{seed, (int)c}));
+            }
+            else
+            {
+                int[] fml = demandMultiSelection();
+                seed = fml[0];
+                goingFirst = fml[1] == (int)Choice.No;
+            }
+            deckShuffler = new Random(seed);
+            turn.heroTurn = goingFirst;
+            shuffleDeck(homePlayer);
+            shuffleDeck(awayPlayer);
+            handleEvent(new DrawEvent(hero, 4));
+            handleEvent(new DrawEvent(villain, 4));
+            loop();
         }
 
         private CardId[] loadDeck()
         {
             return new[]
             {
+                CardId.Haunt, 
+                CardId.Haunt, 
+                CardId.Haunt, 
+                CardId.Haunt, 
+                CardId.Haunt, 
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
-                CardId.GrizzlyCub,
-                CardId.GrizzlyCub,
-                CardId.EvolveFangs, 
-                CardId.EvolveFangs, 
-                CardId.EvolveFangs, 
-                CardId.EvolveFangs, 
-                CardId.EvolveFangs, 
-                CardId.EvolveFangs, 
+                CardId.EvolveFangs,
+                CardId.EvolveFangs,
+                CardId.EvolveFangs,
+                CardId.EvolveFangs,
+                CardId.EvolveFangs,
             };
         }
 
-        private void gameStart()
-        {
-            turn.heroTurn = connection.asHomePlayer();
-
-            handleEvent(new DrawEvent(hero, 4));
-
-            loop();
-        }
-        
         #region eventHandlers
         private void setupEventHandlers()
         {
@@ -202,20 +214,14 @@ namespace stonekart
         private void _draw(GameEvent gevent)
         {
             DrawEvent e = (DrawEvent)gevent;
-
-            if (e.player == hero)
+            
+            int i = 0;
+            while (i++ < e.cardCount)
             {
-                int i = 0;
-                while (i++ < e.cardCount)
-                {
-                    handleEvent(new MoveCardEvent(e.player.deck.peek(), e.player.hand.location));
-                }
-
-                //e.player.draw(e.getCards());
-                //e.player.notifyObserver();
-                //*/
-                e.player.notifyObservers();
+                handleEvent(new MoveCardEvent(e.player.deck.peek(), e.player.hand.location));
             }
+            e.player.notifyObservers();
+            
         }
         private void _cast(GameEvent gevent)
         {
@@ -298,7 +304,11 @@ namespace stonekart
                     } break;
                     case Step.ATTACKERS:
                     {
-                        attackersStep();
+                        if (!attackersStep()) //no attackers were declared
+                        {
+                            turn.advanceStep(); //skip defenders
+                            turn.advanceStep(); //skip damage
+                        }
                     } break;
                     case Step.DEFENDERS:
                     {
@@ -322,7 +332,7 @@ namespace stonekart
                     } break;
                 }
 
-                turn.advanceTurn();
+                turn.advanceStep();
             }
         }
 
@@ -381,13 +391,11 @@ namespace stonekart
                 {
                     if (c.owner == hero && c.canAttack() && !(c.attacking))
                     {
-                        //clearMe.Add(cb);
                         c.attacking = true;
                         return true;
                     }
                     else
                     {
-                        //clearMe.Remove(c);
                         c.attacking = false;
                         return false;
                     }
@@ -550,8 +558,11 @@ namespace stonekart
 
             }
         }
-        
 
+        public void shuffleDeck(Player p)
+        {
+            p.deck.shuffle(deckShuffler);
+        }
         
         
 
@@ -645,12 +656,9 @@ namespace stonekart
             }
             else
             {
-                gameInterface.setMessage("You have priority");
-                gameInterface.setChoiceButtons(Choice.Pass);
-
+                gameInterface.setContext("Your turn to act.", Choice.Pass);
                 a = _castOrPass(main);
-
-                gameInterface.clear();
+                gameInterface.clearContext();
             }
 
             raiseAction(a);
@@ -670,12 +678,11 @@ namespace stonekart
                         Choice choice = chosenGameElement.choice.Value;
                         if (choice == Choice.Pass)
                         {
-                            gameInterface.clear();
                             return new CastAction();
                         }
                         else
                         {
-                            Console.WriteLine(choice);
+                            throw new Exception(); //paranoid
                         }
                     }
                     else if (chosenGameElement.card != null)
@@ -703,8 +710,7 @@ namespace stonekart
 
                         Target[] targets = getTargets(a); 
                         if (targets == null) { continue; }
-
-                        gameInterface.clear();
+                        
                         var sw = new StackWrapper(c, a, targets);
                         return new CastAction(sw, v);
                     }
@@ -720,10 +726,7 @@ namespace stonekart
         //todo(seba) allow canceling
         private Target[] getTargets(Ability a)
         {
-            gameInterface.push();
-            gameInterface.setMessage("Select target(s)");
-            gameInterface.setChoiceButtons(Choice.Cancel);
-
+            gameInterface.setContext("Select target(s)", Choice.Cancel);
             Target[] targets = new Target[a.targetCount];
             TargetRule[] rules = a.targetRules;
 
@@ -751,19 +754,19 @@ namespace stonekart
                     targets[i++] = t;
                 }
             }
-            gameInterface.pop();
+            gameInterface.clearContext();
             return targets;
         }
 
         private CastAction demandCastOrPass()
         {
-            gameInterface.setMessage("Opponent has priority");
+            gameInterface.setContext("Opponents turn to act.");
             var v = connection.demandAction(typeof(CastAction)) as CastAction;
-            gameInterface.setMessage("");
+            gameInterface.clearContext();
             return v;
         }
 
-        private int demandSelection()
+        public int demandSelection()
         {
             var v = connection.demandAction(typeof (SelectAction)) as SelectAction;
             return v.getSelection();
@@ -775,28 +778,50 @@ namespace stonekart
             return v.getIds();
         }
 
-        private int[] demandMultiSelection()
+        public int[] demandMultiSelection()
         {
             var v = connection.demandAction(typeof(MultiSelectAction)) as MultiSelectAction;
             return v.getSelections();
         }
 
+        public Card[] demandMultiSelectionAsCards()
+        {
+            int[] ids = demandMultiSelection();
+            Card[] r = new Card[ids.Length];
+            for (int i = 0; i < ids.Length; i++)
+            {
+                r[i] = cardFactory.getCardById(ids[i]);
+            }
+            return r;
+        }
+
+        public void sendSelection(int i)
+        {
+            raiseAction(new SelectAction(i));
+        }
+
+        public void sendMultiSelection(params int[] ns)
+        {
+            raiseAction(new MultiSelectAction(ns));
+        }
+
+        public void sendMultiSelection(params Card[] ns)
+        {
+            raiseAction(new MultiSelectAction(ns));
+        }
 
         private Card[] chooseMultiple(string message, Func<Card, bool> xd)
         {
-            gameInterface.setMessage(message);
-
             List<Card> cards = new List<Card>();
-            while (true) 
+            gameInterface.setContext(message, Choice.PADDING, Choice.Accept);
+            while (true)
             {
-                gameInterface.setChoiceButtons(Choice.PADDING, Choice.Accept);
                 while (true)
                 {
                     GameElement chosenGameElement = gameInterface.getNextGameElementPress();
                     if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.Accept)
                     {
-                        gameInterface.clear();
-
+                        gameInterface.clearContext();
                         return cards.ToArray();
                     }
                     else if (chosenGameElement.card != null)
@@ -831,7 +856,6 @@ namespace stonekart
             //todo(seba) could keep track of undefended attackers
             List<Card> blockers = new List<Card>();
 
-            gameInterface.setChoiceButtons(Choice.Accept);
             while (true)
             {
                 Card blocker, blocked;
@@ -839,9 +863,7 @@ namespace stonekart
                 while (true)
                 {
                     blocker = blocked = null;
-                    gameInterface.setMessage("Choose defenders");
-                    gameInterface.setChoiceButtons(Choice.Accept);
-
+                    gameInterface.setContext("Choose a defender", Choice.PADDING, Choice.Accept);
                     while (blocker == null)
                     {
                         GameElement chosenGameElement = gameInterface.getNextGameElementPress();
@@ -870,9 +892,8 @@ namespace stonekart
                             }
                         }
                     }
-
-                    gameInterface.setMessage("Blocking what?");
-                    gameInterface.setChoiceButtons(Choice.Cancel);
+                    gameInterface.clearContext();
+                    gameInterface.setContext("Defending what?", Choice.Cancel);
 
                     while (blocked == null)
                     {
@@ -889,7 +910,7 @@ namespace stonekart
                             }
                         }
                     }
-
+                    gameInterface.clearContext();
                     if (blocked != null)
                     {
                         blocker.defenderOf = blocked;
@@ -900,7 +921,7 @@ namespace stonekart
             }
 
             end:
-            gameInterface.setChoiceButtons();
+            gameInterface.clearContext();
             Card[] bkds = blockers.Select(@c => c.defenderOf).ToArray();
             return new Tuple<Card[], Card[]>(blockers.ToArray(), bkds);
         }

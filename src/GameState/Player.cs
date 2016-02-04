@@ -65,13 +65,7 @@ namespace stonekart
             notifyObservers();
             return true;
         }
-
-        public void shuffleDeck()
-        {
-            deck.shuffle();
-        }
-
-
+        
         public int getCurrentMana(int color)
         {
             return curMana[color];

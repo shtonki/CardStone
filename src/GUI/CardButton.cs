@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace stonekart
@@ -95,8 +96,20 @@ namespace stonekart
             brushes[(int)Colour.GREY] = new SolidBrush(Color.Gray);
 
             Visible = true;
-            
+            int i = 0;
+            MouseEnter += (_, __) =>
+            {
+                i = Parent.Controls.GetChildIndex(this);
+                Parent.Controls.SetChildIndex(this, 0);
+            };
+
+            MouseLeave += (_, __) =>
+            {
+                if (Parent == null) { return; }
+                Parent.Controls.SetChildIndex(this, i);
+            };
         }
+        
 
         public CardButton(FML arg) : this()
         {
@@ -177,7 +190,7 @@ namespace stonekart
                 isDamaged = card.isDamaged();
             }
 
-            targets = card?.stackWrapper?.targets ?? (IEnumerable<Target>)notahack;
+            targets = card.stackWrapper?.targets ?? (IEnumerable<Target>)notahack;
 
             Invalidate();
         }
@@ -355,7 +368,9 @@ namespace stonekart
 
         protected override void OnResize(EventArgs e)
         {
+            base.OnResize(e);
             CardHeight = (int)(Size.Height*snapDistance);
+            /*
             CardWidth = (int)(Size.Width);
             ArtHeight = (int)Math.Round(CardHeight * 0.483857142857143f);
             ArtWidth = (int)Math.Round(CardHeight * 0.513142857142857f);
@@ -400,7 +415,7 @@ namespace stonekart
                 width =  Resolution.get(ElementDimensions.CardButtonWidth);
             Size = new Size(width, height);
             */
-            Invalidate();
+            //Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs pevent)

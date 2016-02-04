@@ -26,6 +26,7 @@ namespace stonekart
         public Location location { get; set; }
         public Player owner { get; set; }
         public Player controller { get; set; }
+        public bool ownedByMe => owner.getSide() == LocationPlayer.HERO; 
 
         private bool Attacking;
         private Card DefenderOf;
@@ -313,8 +314,17 @@ namespace stonekart
                 {
                     greenCost = 1;
                     type = Type.Instant;
-                    fx.Add(new SubEffectModifyUntil(new TargetRule(TargetRules.ZAPPABLE), Modifiable.Power, untilEndOfTurn, 3));
+                    fx.Add(new SubEffectModifyUntil(new TargetRule(TargetRules.CREATUREONFIELD), Modifiable.Power, untilEndOfTurn, 3));
                     castDescription = "Target creature gets +3/+0" + untilEOTDescription;
+                } break;
+
+                case CardId.Haunt:
+                {
+                    blackCost = 1;
+                    type = Type.Sorcery;
+                    fx.Add(new SubEffectPlayerDiscard(1, true));
+                    castDescription =
+                        "Look at target players hand and choose 1 card from it. That player discards the chosen card.";
                 } break;
 
                 default:
@@ -627,6 +637,7 @@ namespace stonekart
         AlterFuture,
         EvolveFangs,
         GrizzlyCub,
+        Haunt,
     }
 
     public enum Type

@@ -46,9 +46,7 @@ namespace stonekart
             return cards[cards.Count - 1];
         }
 
-        private static Random rng = new Random();
-
-        public void shuffle()
+        public void shuffle(Random rng)
         {
             int n = cards.Count;
             while (n > 1)
