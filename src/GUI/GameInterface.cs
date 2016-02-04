@@ -48,6 +48,16 @@ namespace stonekart
             setChoiceButtons();
         }
 
+        public void setContext(string message, params Choice[] cs)
+        {
+            
+        }
+
+        public void changeMessage(string s)
+        {
+            
+        }
+
         public void setMessage(string s)
         {
             gamePanel.message = s;
