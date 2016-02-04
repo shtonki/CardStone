@@ -191,9 +191,9 @@ namespace stonekart
             updateManaDisplay();
 
             safeSetText(health, player.getHealth().ToString());
-            safeSetText(deck, player.deck.Count.ToString());
-            safeSetText(hand, player.hand.Count.ToString());
-            safeSetText(yard, player.graveyard.Count.ToString());
+            safeSetText(deck, player.deck.count.ToString());
+            safeSetText(hand, player.hand.count.ToString());
+            safeSetText(yard, player.graveyard.count.ToString());
             
             Invalidate();
         }

@@ -145,10 +145,6 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.Haunt, 
-                CardId.Haunt, 
-                CardId.Haunt, 
-                CardId.Haunt, 
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
                 CardId.GrizzlyCub,
@@ -157,6 +153,28 @@ namespace stonekart
                 CardId.EvolveFangs,
                 CardId.EvolveFangs,
                 CardId.EvolveFangs,
+                CardId.GrizzlyBear,
+                CardId.GrizzlyBear,
+                CardId.GrizzlyBear,
+                CardId.GrizzlyBear,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.TempleHealer,
+                CardId.Belwas,
+                CardId.Belwas,
+                CardId.Belwas,
+                CardId.Belwas,
+                CardId.Rapture,
+                CardId.Rapture,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
             };
         }
 
@@ -519,7 +537,7 @@ namespace stonekart
                 CastAction action;
                 if (turn.heroTurn)
                 {
-                    action = castOrPass(main && stack.Count == 0);
+                    action = castOrPass(main && stack.count == 0);
                 }
                 else
                 {
@@ -549,7 +567,7 @@ namespace stonekart
                 }
                 else //both passed
                 {
-                    if (stack.Count > 0)
+                    if (stack.count > 0)
                     {
                         resolveTop();                        
                     }

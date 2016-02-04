@@ -177,14 +177,14 @@ namespace stonekart
                     Controls.Add(b);
                 }
                 
-                if (pile.cards.Count > cardButtons.Count)
+                if (pile.count > cardButtons.Count)
                 {
                     throw new SyntaxErrorException();
                 }
                 
-                for (int i = 0; i < pile.cards.Count; i++)
+                for (int i = 0; i < pile.count; i++)
                 {
-                    pile.cards[i].addObserver(cardButtons[i]);
+                    pile[i].addObserver(cardButtons[i]);
                     cardButtons[i].setVisible(true);
                     cardButtons[i].Invalidate();
                 }
