@@ -101,7 +101,7 @@ namespace stonekart
             {
                 using (StreamReader sr = new StreamReader(deckName))
                 {
-                    foreach (CardId id in myDeck)
+                    while(!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
                         if (line != null) myDeck.Add((CardId)Enum.Parse(typeof(CardId), line));
@@ -118,12 +118,12 @@ namespace stonekart
 
         private void loadIntoEditor(List<CardId> deck)
         {
-            myDeckIsHard.cards.Clear();
-            for (int i = 0; i < myDeckIsHard.Count; i++)
+            Console.WriteLine(deck.Count);
+            myDeckIsHard.clear();
+            for (int i = 0; i < deck.Count; i++)
             {
                 myDeckIsHard.add(new Card(deck[i]));
             }
-            
         }
 
         protected override void OnResize(EventArgs eventargs)
