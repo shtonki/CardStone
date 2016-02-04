@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-
+using System.Linq;
 namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
@@ -19,7 +19,6 @@ namespace stonekart
         
         public DeckEditorPanel()
         {
-            
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
             myDeckIsHard = new Pile(new Card[] { });
@@ -33,7 +32,7 @@ namespace stonekart
                 cards[i].MouseDown += (_, __) =>
                 {
                     if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
-                    else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
+                    else if (__.Button == MouseButtons.Right) loadDeckFromFile(); //removeFromDeck(cards[i0].Card.cardId);
                 };
             }
 
@@ -65,15 +64,32 @@ namespace stonekart
 
         public List<CardId> loadDeckFromFile()
         {
+            var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
             Panel deckAsker = new Panel();
             deckAsker.Size = new Size(500, 200);
             deckAsker.Location = new Point(Size.Width/2, (Size.Height/3)*2);
+            WaitFor<string> wotisthis = new WaitFor<string>();
+            int Y = 0;
+            string deckPath = "";
+            foreach (string name in deckNames)
+            {
+                var xd = new Button();
+                xd.Text = name;
+                xd.Location = new Point(0, Y);
+                Y += xd.Height;
+
+                xd.MouseDown += (_, __) => 
+                {
+                    deckPath = name;
+                };
+                deckAsker.Controls.Add(xd);
+            }
             GUI.showWindow(deckAsker);
-            
+            Console.WriteLine(deckPath);
             List<CardId> myDeck = new List<CardId>();
             try
             { 
-                using (StreamReader sr = new StreamReader(@"deck.txt"))
+                using (StreamReader sr = new StreamReader(deckPath))
                 {
                     foreach(CardId id in myDeck)
                     {
