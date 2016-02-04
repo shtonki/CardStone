@@ -190,6 +190,18 @@ namespace stonekart
                 }
                 
             }
+            else if (args == pile)
+            {
+                foreach (CardButton b in cardButtons)
+                {
+                    Controls.Remove(b);
+                }
+
+                cardButtons.Clear();
+
+                args = new Object[] { pile.cards.ToArray(), true };
+                invokeMe(pile, args);
+            }
             else if (args is object[])
             {
                 object[] azs = (object[])args;
@@ -200,7 +212,7 @@ namespace stonekart
                 }
                 else
                 {
-                    addUs = new Card[] { azs[0] as Card };
+                    addUs = new Card[] {azs[0] as Card};
                 }
                 bool add = (bool)azs[1];
 
@@ -227,6 +239,10 @@ namespace stonekart
                         }
                     }
                 }
+            }
+            else
+            {
+                throw new Exception();
             }
             placeButtons();
         }
