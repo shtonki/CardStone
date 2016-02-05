@@ -44,7 +44,7 @@ namespace stonekart
         }
 
         private string name;
-        private Type type;
+        private CardType cardType;
         private Race? race;
         private SubType? subType;
         public Colour colour;
@@ -161,14 +161,14 @@ namespace stonekart
                     blueCost = 2;
                     basePower = 1;
                     baseToughness = 3;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Salamander;
                 } break;
 
                 case CardId.GrizzlyBear:
                 {
                     greenCost = 2;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Bear;
                     subType = SubType.Warrior;
                     basePower = 3;
@@ -178,7 +178,7 @@ namespace stonekart
                 case CardId.LightningBolt:
                 {
                     redCost = 1;
-                    type = Type.Instant;
+                    cardType = CardType.Instant;
                     fx.Add(new Ping(3, TargetLambda.ZAPPABLE));
                     castDescription = "Deal 3 damage to target player or creature.";
                 } break;
@@ -186,7 +186,7 @@ namespace stonekart
                 case CardId.ForkedLightning:
                 {
                     redCost = 1;
-                    type = Type.Sorcery;
+                    cardType = CardType.Sorcery;
                     fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
                     fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
                     castDescription = "Deal 1 damage to 2 target players or creatures.";
@@ -195,7 +195,7 @@ namespace stonekart
                 case CardId.SolemnAberration:
                 {
                     blackCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Zombie;
                     basePower = 2;
                     baseToughness = 1;
@@ -204,15 +204,15 @@ namespace stonekart
                 case CardId.PropheticVision:
                 {
                     blueCost = 2;
-                    type = Type.Sorcery;
+                    cardType = CardType.Sorcery;
                     fx.Add(new Draw(false, 2));
                     castDescription = "Draw 2 cards";
                 } break;
 
-                case CardId.FrothingGoblin:
+                case CardId.FrothingGnome:
                 {
                     redCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     basePower = 1;
                     baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
@@ -222,7 +222,7 @@ namespace stonekart
                 {
                     whiteCost = 3;
                     greyCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Human;
                     subType = SubType.Cleric;
                     basePower = 4;
@@ -238,7 +238,7 @@ namespace stonekart
                 {
                     whiteCost = 2;
                     greyCost = 1;
-                    type = Type.Instant;
+                    cardType = CardType.Instant;
                     fx.Add(new MoveTo(LocationPile.EXILE, TargetLambda.ZAPPABLECREATURE));
                     castDescription = "Exile target creature";
                 } break;
@@ -246,14 +246,14 @@ namespace stonekart
                 case CardId.CallToArms:
                 {
                     whiteCost = 1;
-                    type = Type.Sorcery;
+                    cardType = CardType.Sorcery;
                     fx.Add(new SummonTokens(TargetLambda.CONTROLLER, 2, CardId.Squire));
                     castDescription = "Summon two Squires.";
                 } break;
 
                 case CardId.Squire:
                 {
-                    type = Type.Token;
+                    cardType = CardType.Token;
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
@@ -265,7 +265,7 @@ namespace stonekart
                 {
                     blueCost = 1;
                     greyCost = 0;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Fish;
                     basePower = 2;
                     baseToughness = 3;
@@ -283,7 +283,7 @@ namespace stonekart
                     baseToughness = 2;
                     whiteCost = 2;
                     greyCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Human;
                     Aura a = new Aura(
                         (crd) => crd.controller == this.controller && crd.colour == Colour.WHITE && crd != this,
@@ -296,7 +296,7 @@ namespace stonekart
                 case CardId.AlterTime:
                 {
                     blueCost = 1;
-                    type = Type.Sorcery;
+                    cardType = CardType.Sorcery;
                     fx.Add(new Timelapse(2));
                     fx.Add(new Draw(false, 1));
                     castDescription = "Timelapse 2\nDraw a card.";
@@ -305,7 +305,7 @@ namespace stonekart
                 case CardId.GrizzlyCub:
                 {
                     greenCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Bear;
                     basePower = 2;
                     baseToughness = 2;
@@ -314,7 +314,7 @@ namespace stonekart
                 case CardId.EvolveFangs:
                 {
                     greenCost = 1;
-                    type = Type.Instant;
+                    cardType = CardType.Instant;
                     fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, untilEndOfTurn, 3));
                     castDescription = "Target creature gets +3/+0" + untilEOTDescription;
                 } break;
@@ -323,7 +323,7 @@ namespace stonekart
                 {
                     name = "Ila's Gambit";
                     blackCost = 1;
-                    type = Type.Sorcery;
+                    cardType = CardType.Sorcery;
                     fx.Add(new Duress((_) => true));
                     fx.Add(new GainLife(false, -2));
                     castDescription =
@@ -335,7 +335,7 @@ namespace stonekart
                     blackCost = 1;
                     blueCost = 1;
                     greyCost = 1;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
                     race = Race.Zombie;
                     subType = SubType.Wizard;
                     basePower = 2;
@@ -346,17 +346,30 @@ namespace stonekart
                 case CardId.Unmake:
                 {
                     blueCost = 1;
-                    type = Type.Instant;
+                    cardType = CardType.Instant;
                     fx.Add(new MoveTo(LocationPile.HAND, TargetLambda.ZAPPABLECREATURE));
                     castDescription = "Return target creature to its owners hand";
                 } break;
 
-                case CardId.GnomeCannoneer:
+                case CardId.GnomishCannoneer:
                 {
                     redCost = 2;
-                    type = Type.Creature;
+                    cardType = CardType.Creature;
+                    race = Race.Gnome;
+                    basePower = 2;
+                    baseToughness = 2;
                         triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " deal 1 damage to target player or creature.", 
                             LocationPile.FIELD, EventTiming.Post, new Ping(1, TargetLambda.ZAPPABLE) ));
+                } break;
+
+                case CardId.SteamBolt:
+                {
+                    redCost = 1;
+                    blueCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
+                    fx.Add(new Draw(false, 1));
+                    castDescription = "Deal 1 damage to target creature or player.\nDraw a card.";
                 } break;
 
                 default:
@@ -378,7 +391,7 @@ namespace stonekart
             castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
             Cost cc = new Cost(castingCost);
             ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND, castDescription);
-            castAbility.setInstant(type == Type.Instant);
+            castAbility.setInstant(cardType == CardType.Instant);
 
             baseActivatedAbilities.Add(castAbility);
 
@@ -509,9 +522,9 @@ namespace stonekart
 
 
 
-        public Type getType()
+        public CardType getType()
         {
-            return type;
+            return cardType;
         }
 
         public IList<ActivatedAbility> getAvailableActivatedAbilities(bool canSorc)
@@ -630,7 +643,7 @@ namespace stonekart
             r.dummyFor = a;
             r.controller = b.controller;
             r.owner = b.owner;
-            r.type = Type.Ability;
+            r.cardType = CardType.Ability;
             r.colour = b.colour;
 
             return r;
@@ -647,7 +660,7 @@ namespace stonekart
 
         public string getArchtypeString()
         {
-            return type.ToString() +
+            return cardType.ToString() +
                 (race != null ? " - " + race.ToString() + " " : "") +
                 (subType != null ? subType.ToString() : "");
         }
@@ -689,7 +702,7 @@ namespace stonekart
         SolemnAberration,
         PropheticVision,
         ForkedLightning,
-        FrothingGoblin,
+        FrothingGnome,
         TempleHealer,
         Rapture,
         Squire,
@@ -702,10 +715,11 @@ namespace stonekart
         IlasGambit,
         YungLich,
         Unmake,
-        GnomeCannoneer,
+        GnomishCannoneer,
+        SteamBolt,
     }
 
-    public enum Type
+    public enum CardType
     {
         Creature,
         Instant,
@@ -722,7 +736,7 @@ namespace stonekart
         Fish,
         Bear,
         Zombie,
-        Goblin,
+        Gnome,
     }
 
     public enum SubType

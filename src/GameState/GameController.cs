@@ -73,16 +73,30 @@ namespace stonekart
         {
             return new[]
             {
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
                 CardId.LightningBolt,
                 CardId.LightningBolt,
                 CardId.LightningBolt,
                 CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.Unmake,
+                CardId.Unmake,
+                CardId.Unmake,
+                CardId.Unmake,
             };
         }
 
@@ -93,7 +107,7 @@ namespace stonekart
 
         private EventHandler[] baseEventHandlers = new EventHandler[Enum.GetNames(typeof(GameEventType)).Length];
         private Stack<StackWrapper> stackxd;
-        private List<TriggeredAbility> waitingTriggeredAbilities = new List<TriggeredAbility>();
+        private List<StackWrapper> waitingTriggeredAbilities = new List<StackWrapper>();
 
         #region eventHandlers
         private void setupEventHandlers()
@@ -541,13 +555,8 @@ namespace stonekart
             }
             */
 
-            foreach (TriggeredAbility v in waitingTriggeredAbilities)
+            foreach (StackWrapper w in waitingTriggeredAbilities)
             {
-                if (v.targetCount != 0)
-                {
-                    throw new NotImplementedException();
-                }
-                StackWrapper w = new StackWrapper(Card.createDummy(v), v, emptyTargetList);
                 handleEvent(new CastEvent(w));
             }
 
@@ -821,7 +830,7 @@ namespace stonekart
                 //throw new NotImplementedException();
                 game.stack.remove(card);
             }
-            else if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+            else if (card.getType() == CardType.Instant || card.getType() == CardType.Sorcery)
             {
                 handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
             }
@@ -872,21 +881,35 @@ namespace stonekart
             timingListLambda(timingLists[(int)EventTiming.Post]);
         }
 
-        public void raiseTriggeredAbility(TriggeredAbility a)
-        {
-            waitingTriggeredAbilities.Add(a);
-        }
-
         private void timingListLambda(LinkedList<TriggeredAbility> l)
         {
             foreach (TriggeredAbility ability in l)
             {
-                if (ability.card.location.pile != ability.pile) { continue; } 
-                
-                if (ability.targetCount != 0) { throw new Exception("nopers2222"); }
-                
-                raiseTriggeredAbility(ability);
-                
+                if (ability.card.location.pile != ability.pile) { continue; }
+                StackWrapper w;
+                if (ability.targetCount == 0)
+                {
+
+                    w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
+                }
+                else
+                {
+                    if (ability.card.owner.isHero)
+                    {
+                        gameInterface.showCards(ability.card);
+                        Target[] targets = getTargets(ability);
+                        w = new StackWrapper(Card.createDummy(ability), ability, targets);
+                        gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
+                    }
+                    else
+                    {
+                        var v = gameInterface.demandCastAction();
+                        w = v.getStackWrapper();
+                    }
+                }
+
+                waitingTriggeredAbilities.Add(w);
+
             }
         }
         
