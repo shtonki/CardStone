@@ -263,8 +263,8 @@ namespace stonekart
 
                 case CardId.ShimmeringKoi:
                 {
-                    blueCost = 2;
-                    greyCost = 2;
+                    blueCost = 1;
+                    greyCost = 0;
                     type = Type.Creature;
                     race = Race.Fish;
                     basePower = 2;
@@ -293,13 +293,13 @@ namespace stonekart
                     auras.Add(a);
                 } break;
 
-                case CardId.AlterFuture:
+                case CardId.AlterTime:
                 {
                     blueCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new Timelapse(3));
+                    fx.Add(new Timelapse(2));
                     fx.Add(new Draw(false, 1));
-                    castDescription = "Timelapse 3\nDraw a card.";
+                    castDescription = "Timelapse 2\nDraw a card.";
                 } break;
 
                 case CardId.GrizzlyCub:
@@ -340,7 +340,15 @@ namespace stonekart
                     subType = SubType.Wizard;
                     basePower = 2;
                     baseToughness = 2;
-                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + "draw a card.", LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + "draw a card.", LocationPile.GRAVEYARD, EventTiming.Post, new Draw(false, 1)));
+                } break;
+
+                case CardId.Unmake:
+                {
+                    blueCost = 1;
+                    type = Type.Instant;
+                    fx.Add(new MoveTo(LocationPile.HAND, TargetLambda.ZAPPABLECREATURE));
+                    castDescription = "Return target creature to its owners hand";
                 } break;
 
                 default:
@@ -680,11 +688,12 @@ namespace stonekart
         CallToArms,
         ShimmeringKoi,
         Belwas,
-        AlterFuture,
+        AlterTime,
         EvolveFangs,
         GrizzlyCub,
         IlasGambit,
         YungLich,
+        Unmake,
     }
 
     public enum Type

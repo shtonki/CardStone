@@ -73,14 +73,17 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.YungLich, 
-                CardId.YungLich, 
-                CardId.YungLich, 
-                CardId.YungLich, 
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
             };
         }
 
@@ -116,6 +119,11 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _shuffle(GameEvent gevent)
+        {
+            ShuffleDeckEvent e = (ShuffleDeckEvent)gevent;
+            shuffleDeck(e.player);
+        }
         private void _modifycard(GameEvent gevent)
         {
             ModifyCardEvent e = (ModifyCardEvent)gevent;
@@ -845,7 +853,7 @@ namespace stonekart
             {
                 foreach (TriggeredAbility a in c.triggeredAbilities)
                 {
-                    if (a.filter(e) && c.location.pile == a.pile)
+                    if (a.filter(e))
                     {
                         timingLists[(int)a.timing].AddLast(a);
                     }
@@ -874,7 +882,7 @@ namespace stonekart
         {
             foreach (TriggeredAbility ability in l)
             {
-                //if (ability.card.location.pile != ability.pile) { continue; } 
+                if (ability.card.location.pile != ability.pile) { continue; } 
                 
                 if (ability.targetCount != 0) { throw new Exception("nopers2222"); }
                 
@@ -892,7 +900,7 @@ namespace stonekart
             }
             else
             {
-                Console.WriteLine("xddd");
+
             }
 
 

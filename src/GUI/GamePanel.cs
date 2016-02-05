@@ -84,9 +84,9 @@ namespace stonekart
             double fkme = 0.06*height;
 
             int fieldPanelW = (int)(width * 0.6 - fkme);
-            int fieldPanelX = (int)(width * 0.4 + fkme);
+            int fieldPanelX = (int)(width * 0.245 + fkme);
 
-            int handPanelX = (int)(width * 0.4);
+            int handPanelX = (int)(width * 0.152);
             int handPanelY = (int)(height * 0.7);
             int handPanelW = (int)(width * 0.6);
             int handPanelH = (int)(height * 0.3);
@@ -104,13 +104,13 @@ namespace stonekart
             villainFieldPanel.Size = new Size(fieldPanelW, villainFieldPanelH);
 
 
-            int turnPanelX = (int)(width * 0.4);
+            int turnPanelX = (int)(width * 0.245);
             int turnPanelY = (int)(height * 0);
             int turnPanelH = (int)(height * 0.6);
             turnPanel.Location = new Point(turnPanelX, turnPanelY);
             turnPanel.setHeight(turnPanelH);
 
-            int stackPanelX = (int)(width * 0.308);
+            int stackPanelX = (int)(width * 0.152);
             int stackPanelY = (int)(height * 0);
             int stackPanelW = (int)(width * 0.09);
             int stackPanelH = (int)(height * 0.6);
@@ -133,7 +133,7 @@ namespace stonekart
             villainPanel.Location = new Point(playerPanelX, villainPanelY);
             villainPanel.Size = new Size(playerPanelW, playerPanelH);
 
-            int cardInfoPanelX = (int)(width * 0.152);
+            int cardInfoPanelX = (int)(width * (1-0.154));
             int cardInfoPanelY = (int)(height * 0);
             int cardInfoPanelW = (int)(width * 0.154);
             int cardInfoPanelH = (int)(height * 0.6);

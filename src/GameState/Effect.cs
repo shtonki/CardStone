@@ -159,8 +159,7 @@ namespace stonekart
             
             if (shuffle == Choice.Yes)
             {
-                throw new NotImplementedException();
-                //g.shuffleDeck(c.owner);
+                return new GameEvent[] {new ShuffleDeckEvent(player),};
             }
             return new GameEvent[]{};
         }

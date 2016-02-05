@@ -26,6 +26,7 @@ namespace stonekart
         GAINLIFE,
         SUMMONTOKEN,
         MODIFYCARD,
+        SHUFFLEDECK,
     }
 
     /// <summary>
@@ -191,6 +192,13 @@ namespace stonekart
             damage = dmg;
         }
         
+    }
+
+    class ShuffleDeckEvent : PlayerEvent
+    {
+        public ShuffleDeckEvent(Player plr) : base(plr, GameEventType.SHUFFLEDECK)
+        {
+        }
     }
 
     class GainLifeEvent : PlayerEvent
