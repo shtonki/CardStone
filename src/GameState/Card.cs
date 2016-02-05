@@ -372,6 +372,22 @@ namespace stonekart
                     castDescription = "Deal 1 damage to target creature or player.\nDraw a card.";
                 } break;
 
+                case CardId.Jew:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 2;
+                    baseToughness = 2;
+                        EventFilter f = (gameEvent) =>
+                        {
+                            if (gameEvent.type != GameEventType.STEP) return false;
+                            StepEvent stepevent = (StepEvent)gameEvent;
+                            return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
+                        };
+                        triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
+                        LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                } break;
+
                 default:
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -479,6 +495,7 @@ namespace stonekart
                 return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card == c;
             };
         }
+
         private const string thisDiesDescription = "Whenever this card enters a graveyard from the battlefield, ";
         private static EventFilter thisDies(Card c)
         {
@@ -717,6 +734,7 @@ namespace stonekart
         Unmake,
         GnomishCannoneer,
         SteamBolt,
+        Jew,
     }
 
     public enum CardType

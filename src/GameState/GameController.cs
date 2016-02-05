@@ -73,30 +73,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.Unmake,
-                CardId.Unmake,
-                CardId.Unmake,
-                CardId.Unmake,
+                CardId.Jew,
+                CardId.Jew,
+                CardId.Jew,
+                CardId.Jew,
+                CardId.Jew,
+                CardId.Jew,
+                CardId.Jew,
+
             };
         }
 
@@ -286,7 +270,7 @@ namespace stonekart
             {
                 gameInterface.setStep(game.currentStep, game.herosTurn);
                 doStepStuff(game.currentStep);
-                handleEvent(new StepEvent(game.currentStep));
+                handleEvent(new StepEvent(game.currentStep, game.activePlayer));
                 givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
                 game.advanceStep();
             }
