@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace stonekart
@@ -25,10 +26,14 @@ namespace stonekart
             myDeckIsHard = new Pile(new Card[] { });
             p = new CardPanel(new Func<CardButton>(() => new CardButton()), new LayoutArgs(true, true));
             myDeckIsHard.addObserver(p);
+            Card[] ids =
+                ((CardId[])Enum.GetValues(typeof (CardId))).Select(id => new Card(id))
+                    .OrderBy(card => card.colour)
+                    .ToArray();
             for (int i = 0; i < nrOfCards; i++)
             {
                 int i0 = i;
-                cards[i] = new CardButton((CardId)i);
+                cards[i] = new CardButton(ids[i].cardId);
                 Controls.Add(cards[i]);
                 cards[i].MouseDown += (_, __) =>
                 {

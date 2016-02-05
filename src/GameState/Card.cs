@@ -257,7 +257,7 @@ namespace stonekart
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
-                    //forceColour = Colour.WHITE;
+                    forceColour = Colour.WHITE;
                     
                     } break;
 
