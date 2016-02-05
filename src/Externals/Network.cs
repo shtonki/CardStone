@@ -215,7 +215,7 @@ namespace stonekart
                     var ss = m.message.Split(',');
                     GameConnection c = new GameConnection(ss[0], ss[1] == "home");
                     Network.addGameConnection(ss[0], c);
-                    GameController.newGame(c);
+                    CentralShitterModule.newGame(c);
 
                 } break;
 
@@ -247,7 +247,7 @@ namespace stonekart
 
         private Semaphore smf;
         private AutoResetEvent mre;
-        private Game game;
+        private GameController game;
 
         /// <summary>
         /// Creates a GameConnection with a user
@@ -265,9 +265,9 @@ namespace stonekart
             smf = new Semaphore(1, 1);
         }
         
-        public void setGame(Game g)
+        public void setGame(GameController g)
         {
-            //todo this really isn't pretty
+            //hack this really isn't pretty
             game = g;
         }
 

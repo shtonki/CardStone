@@ -23,10 +23,10 @@ namespace stonekart
         RESOLVE,
         DAMAGEPLAYER,
         DAMAGECREATURE,
-        BURYCREATURE,
         GAINLIFE,
         SUMMONTOKEN,
         MODIFYCARD,
+        SHUFFLEDECK,
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ namespace stonekart
             from = card.location;
         }
 
-        public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.owner.getSide()))
+        public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.owner.side))
         {
             
         }
@@ -147,29 +147,11 @@ namespace stonekart
 
     class StepEvent : GameEvent
     {
-        private int s;
+        public Step step { get; private set; }
 
-        public const int
-            UNTOP = 0,
-            DRAW = 1,
-            MAIN1 = 2,
-            BEGINCOMBAT = 3,
-            ATTACKERS = 4,
-            DEFENDERS = 5,
-            DAMAGE = 6,
-            ENDCOMBAT = 7,
-            MAIN2 = 8,
-            END = 9;
-
-
-        public StepEvent(int step) : base(GameEventType.STEP)
+        public StepEvent(Step step) : base(GameEventType.STEP)
         {
-            s = step;
-        }
-
-        public int getStep()
-        {
-            return s;
+            this.step = step;
         }
     }
 
@@ -212,6 +194,13 @@ namespace stonekart
         
     }
 
+    class ShuffleDeckEvent : PlayerEvent
+    {
+        public ShuffleDeckEvent(Player plr) : base(plr, GameEventType.SHUFFLEDECK)
+        {
+        }
+    }
+
     class GainLifeEvent : PlayerEvent
     {
         public int life { get; private set; }
@@ -235,13 +224,6 @@ namespace stonekart
             damage = dmg;
         }
         
-    }
-
-    class BuryCreatureEvent : CardEvent
-    {
-        public BuryCreatureEvent(Card card) : base(card, GameEventType.BURYCREATURE)
-        {
-        }
     }
     
     class ModifyCardEvent : GameEvent

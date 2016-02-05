@@ -22,7 +22,7 @@ namespace stonekart
             //CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-us");
             //ResHacker.open();
             
-            GameController.startGame();
+            CentralShitterModule.startGame();
 
             
         }

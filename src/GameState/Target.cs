@@ -9,50 +9,34 @@ namespace stonekart
     //todo(seba) make it work more like a union
     public class Target
     {
-        private Player p;
-        private Card c;
+        public Player player { get; private set; }
+        public Card card { get; private set; }
+        public bool isPlayer => player != null;
+        public bool isCard => card != null;
+
 
         public Target(Player player)
         {
-            p = player;
+            this.player = player;
         }
 
         public Target(Card card)
         {
-            c = card;
+            this.card = card;
         }
 
-        public bool isPlayer()
-        {
-            return p != null;
-        }
-
-        public bool isCard()
-        {
-            return c != null;
-        }
-
-        public Card getCard()
-        {
-            return c;
-        }
-
-        public Player getPlayer()
-        {
-            return p;
-        }
     }
 
     public class TargetRule
     {
         private List<Func<Target, bool>> checks; 
 
-        public TargetRule(TargetRules r) : this(howDoIInlineFunctionsxd(r).ToArray())
+        public TargetRule(TargetLambda r) : this(howDoIInlineFunctionsxd(r).ToArray())
         {
             
         }
 
-        public TargetRule(params Func<Target, bool>[] fs)
+        private TargetRule(params Func<Target, bool>[] fs)
         {
             checks = new List<Func<Target, bool>>(fs);
         }
@@ -62,42 +46,48 @@ namespace stonekart
             return checks.All(v => v(t));
         }
 
-        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetRules r)
+        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetLambda r)
         {
             List<Func<Target, bool>> rt = new List<Func<Target, bool>>();
 
             switch (r)
             {
-                case TargetRules.ANY:
+                case TargetLambda.ANY:
                 {
                     rt.Add(@t => true);
                 } break;
 
-                case TargetRules.PLAYER:
+                case TargetLambda.PLAYER:
                 {
-                    rt.Add(@t => t.isPlayer());
+                    rt.Add(@t => t.isPlayer);
                 } break;
 
-                case TargetRules.ZAPPABLE:
+                case TargetLambda.ZAPPABLE:
                 {
-                    rt.Add(@t => t.isPlayer() ||
-                                 t.getCard().location.pile == LocationPile.FIELD);
+                    rt.Add(@t => t.isPlayer ||
+                                 t.card.location.pile == LocationPile.FIELD);
                 } break;
-                case TargetRules.CREATUREONFIELD:
+                case TargetLambda.ZAPPABLECREATURE:
                 {
-                    rt.Add(@t => t.isCard() && t.getCard().location.pile == LocationPile.FIELD);
+                    rt.Add(@t => t.isCard && t.card.location.pile == LocationPile.FIELD);
                 } break;
+
+                default:
+                    throw new Exception();
             }
 
             return rt;
         }
     }
 
-    public enum TargetRules
+    public enum TargetLambda
     {
+        SELF,
+        CONTROLLER,
+
         ANY,
         PLAYER,
         ZAPPABLE,
-        CREATUREONFIELD,
+        ZAPPABLECREATURE,
     }
 }

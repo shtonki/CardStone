@@ -13,19 +13,22 @@ namespace stonekart
         public readonly Action<CardButton> clickCallBack;
         public readonly Action<CardButton, IEnumerable<Target>> addArrows;
         public readonly Action clearArrows;
-
+        public readonly Action<CardButton> mouseEnters;
+        
         public FML(Action<CardButton> clickCallBack)
         {
             this.clickCallBack = clickCallBack;
             addArrows = (_, __) => { };
             clearArrows = () => { };
+            mouseEnters = (_) => { };
         }
 
-        public FML(Action<CardButton> clickCallBack, Action<CardButton, IEnumerable<Target>> addArrows, Action clearArrows)
+        public FML(Action<CardButton> clickCallBack, Action<CardButton, IEnumerable<Target>> addArrows, Action clearArrows, Action<CardButton> mouseEnters)
         {
             this.clickCallBack = clickCallBack;
             this.addArrows = addArrows;
             this.clearArrows = clearArrows;
+            this.mouseEnters = mouseEnters;
         }
     }
 
@@ -121,6 +124,7 @@ namespace stonekart
             MouseEnter += (sender, args) =>
             {
                 arg.addArrows(this, targets);
+                arg.mouseEnters(this);
             };
 
             MouseLeave += (sender, args) =>
@@ -202,7 +206,7 @@ namespace stonekart
             CardHeight = Size.Height;
             CardWidth = Size.Width;
             ArtHeight =         (int)Math.Round(CardHeight * 0.483857142857143f);
-            ArtWidth =          (int)Math.Round(CardHeight * 0.513142857142857f);
+            ArtWidth =          (int)Math.Round(CardHeight * 0.519142857142857f);
             ArtLocationX =      (int)Math.Round(CardHeight * 0.0648571428571429f);
             ArtLocationY =      (int)Math.Round(CardHeight * 0.104142857142857f);
             NameLocationX =     (int)Math.Round(CardHeight * 0.0321428571428571f);
