@@ -56,9 +56,11 @@ namespace stonekart
             }
             else
             {
+                gameInterface.setContext("Get outflipped bwoi");
                 seed = gameInterface.demandSelection();
                 Choice c = (Choice)gameInterface.demandSelection();
                 goingFirst = c == Choice.No;
+                gameInterface.clearContext();
             }
             deckShuffler = new Random(seed);
             shuffleDeck(homePlayer);
@@ -73,11 +75,25 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.AlterTime,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
+                CardId.FrothingGnome,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.SteamBolt,
+                CardId.Unmake,
+                CardId.Unmake,
+                CardId.Unmake,
                 CardId.ForkedLightning,
                 CardId.ForkedLightning,
                 CardId.ForkedLightning,
@@ -91,7 +107,7 @@ namespace stonekart
 
         private EventHandler[] baseEventHandlers = new EventHandler[Enum.GetNames(typeof(GameEventType)).Length];
         private Stack<StackWrapper> stackxd;
-        private List<TriggeredAbility> waitingTriggeredAbilities = new List<TriggeredAbility>();
+        private List<StackWrapper> waitingTriggeredAbilities = new List<StackWrapper>();
 
         #region eventHandlers
         private void setupEventHandlers()
@@ -106,7 +122,6 @@ namespace stonekart
             addBaseHandler(GameEventType.UNTOPPLAYER, _untopplayer);
             addBaseHandler(GameEventType.DAMAGEPLAYER, _damageplayer);
             addBaseHandler(GameEventType.DAMAGECREATURE, _damagecreature);
-            addBaseHandler(GameEventType.BURYCREATURE, _burycreature);
             addBaseHandler(GameEventType.GAINLIFE, _gainlife);
             addBaseHandler(GameEventType.SUMMONTOKEN, _summontoken);
             addBaseHandler(GameEventType.MODIFYCARD, _modifycard);
@@ -117,6 +132,11 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _shuffle(GameEvent gevent)
+        {
+            ShuffleDeckEvent e = (ShuffleDeckEvent)gevent;
+            shuffleDeck(e.player);
+        }
         private void _modifycard(GameEvent gevent)
         {
             ModifyCardEvent e = (ModifyCardEvent)gevent;
@@ -191,11 +211,6 @@ namespace stonekart
         {
             DamagePlayerEvent e = (DamagePlayerEvent)gevent;
             e.player.setLifeRelative(-e.damage);
-        }
-        private void _burycreature(GameEvent gevent)
-        {
-            BuryCreatureEvent e = (BuryCreatureEvent)gevent;
-            handleEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
         }
         private void _damagecreature(GameEvent gevent)
         {
@@ -286,6 +301,7 @@ namespace stonekart
             int s;
             if (game.herosTurn)
             {
+                gameInterface.setContext("Choose a mana orb to gain");
                 gameInterface.showAddMana(true);
                 int c;
                 do
@@ -293,12 +309,15 @@ namespace stonekart
                     c = (int)gameInterface.getManaColour();
                 } while (game.hero.getMaxMana(c) == 6);
                 gameInterface.showAddMana(false);
+                gameInterface.clearContext();
                 s = c;
                 gameInterface.sendSelection(c);
             }
             else
             {
+                gameInterface.setContext("Opponent is gaining mana.");
                 s = gameInterface.demandSelection();
+                gameInterface.clearContext();
             }
 
             handleEvent(new GainManaOrbEvent(game.activePlayer, s));
@@ -482,7 +501,7 @@ namespace stonekart
         
         private void checkGameState()
         {
-            List<BuryCreatureEvent> xd = new List<BuryCreatureEvent>();
+            List<MoveCardEvent> xd = new List<MoveCardEvent>();
             do
             {
                 xd.Clear();
@@ -511,7 +530,7 @@ namespace stonekart
                 {
                     if (v.currentToughness <= 0)
                     {
-                        xd.Add(new BuryCreatureEvent(v));
+                        xd.Add(new MoveCardEvent(v, LocationPile.GRAVEYARD));
                     }
                 }
 
@@ -540,13 +559,8 @@ namespace stonekart
             }
             */
 
-            foreach (TriggeredAbility v in waitingTriggeredAbilities)
+            foreach (StackWrapper w in waitingTriggeredAbilities)
             {
-                if (v.targetCount != 0)
-                {
-                    throw new NotImplementedException();
-                }
-                StackWrapper w = new StackWrapper(Card.createDummy(v), v, emptyTargetList);
                 handleEvent(new CastEvent(w));
             }
 
@@ -567,9 +581,9 @@ namespace stonekart
                 {
                     gameInterface.setContext("Your turn to act.", Choice.Pass);
                     action = gainPriority();
-                    gameInterface.sendCastAction(action);
                     gameInterface.clearContext();
                 }
+                gameInterface.sendCastAction(action);
             }
             else
             {
@@ -733,11 +747,14 @@ namespace stonekart
                         {
                             Card c = chosenGameElement.card;
 
-                            if (c.owner == game.hero && !c.canDefend()) { continue; }
+                            if (c.owner == game.hero && !c.canDefend) { continue; }
 
                             if (c.defenderOf == null)
                             {
-                                blocker = c;
+                                if (c.canDefend)
+                                {
+                                    blocker = c;
+                                }
                             }
                             else
                             {
@@ -820,7 +837,7 @@ namespace stonekart
                 //throw new NotImplementedException();
                 game.stack.remove(card);
             }
-            else if (card.getType() == Type.Instant || card.getType() == Type.Sorcery)
+            else if (card.getType() == CardType.Instant || card.getType() == CardType.Sorcery)
             {
                 handleEvent(new MoveCardEvent(card, LocationPile.GRAVEYARD));
             }
@@ -871,21 +888,35 @@ namespace stonekart
             timingListLambda(timingLists[(int)EventTiming.Post]);
         }
 
-        public void raiseTriggeredAbility(TriggeredAbility a)
-        {
-            waitingTriggeredAbilities.Add(a);
-        }
-
         private void timingListLambda(LinkedList<TriggeredAbility> l)
         {
             foreach (TriggeredAbility ability in l)
             {
-                if (ability.card.location.pile != ability.pile) { continue; } 
-                
-                if (ability.targetCount != 0) { throw new Exception("nopers2222"); }
-                
-                raiseTriggeredAbility(ability);
-                
+                if (ability.card.location.pile != ability.pile) { continue; }
+                StackWrapper w;
+                if (ability.targetCount == 0)
+                {
+                    w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
+                }
+                else
+                {
+                    if (ability.card.owner.isHero)
+                    {
+                        CardPanelControl p = gameInterface.showCards(ability.card);
+                        Target[] targets = getTargets(ability);
+                        w = new StackWrapper(Card.createDummy(ability), ability, targets);
+                        gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
+                        p.closeWindow();
+                    }
+                    else
+                    {
+                        var v = gameInterface.demandCastAction();
+                        w = v.getStackWrapper();
+                    }
+                }
+
+                waitingTriggeredAbilities.Add(w);
+
             }
         }
         
@@ -898,7 +929,7 @@ namespace stonekart
             }
             else
             {
-                Console.WriteLine("xddd");
+
             }
 
 

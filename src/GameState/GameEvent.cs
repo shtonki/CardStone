@@ -23,10 +23,10 @@ namespace stonekart
         RESOLVE,
         DAMAGEPLAYER,
         DAMAGECREATURE,
-        BURYCREATURE,
         GAINLIFE,
         SUMMONTOKEN,
         MODIFYCARD,
+        SHUFFLEDECK,
     }
 
     /// <summary>
@@ -194,6 +194,13 @@ namespace stonekart
         
     }
 
+    class ShuffleDeckEvent : PlayerEvent
+    {
+        public ShuffleDeckEvent(Player plr) : base(plr, GameEventType.SHUFFLEDECK)
+        {
+        }
+    }
+
     class GainLifeEvent : PlayerEvent
     {
         public int life { get; private set; }
@@ -217,13 +224,6 @@ namespace stonekart
             damage = dmg;
         }
         
-    }
-
-    class BuryCreatureEvent : CardEvent
-    {
-        public BuryCreatureEvent(Card card) : base(card, GameEventType.BURYCREATURE)
-        {
-        }
     }
     
     class ModifyCardEvent : GameEvent
