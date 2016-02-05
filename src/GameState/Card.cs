@@ -353,7 +353,7 @@ namespace stonekart
 
                 case CardId.GnomishCannoneer:
                 {
-                    redCost = 2;
+                    redCost = 1;
                     cardType = CardType.Creature;
                     race = Race.Gnome;
                     basePower = 2;
@@ -607,7 +607,10 @@ namespace stonekart
         public int getAbilityIndex(Ability a)
         {
             int r = 0;
-            foreach (Ability v in abilities)
+            List<Ability> abs = isDummy ? dummyFor.card.abilities : abilities;
+
+
+            foreach (Ability v in abs)
             {
                 if (a == v)
                 {

@@ -75,19 +75,13 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
+                CardId.GnomishCannoneer,
                 /*
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
                 CardId.AlterTime,
                 CardId.AlterTime,
                 CardId.AlterTime,
@@ -906,17 +900,17 @@ namespace stonekart
                 StackWrapper w;
                 if (ability.targetCount == 0)
                 {
-
                     w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
                 }
                 else
                 {
                     if (ability.card.owner.isHero)
                     {
-                        gameInterface.showCards(ability.card);
+                        CardPanelControl p = gameInterface.showCards(ability.card);
                         Target[] targets = getTargets(ability);
                         w = new StackWrapper(Card.createDummy(ability), ability, targets);
                         gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
+                        p.closeWindow();
                     }
                     else
                     {
