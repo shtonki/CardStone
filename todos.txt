@@ -11,3 +11,30 @@
 * we're leaking memory through observers
 * make damage step and end combat step the same step
 * merge GameInterface and Game and create GameState
+* fix imageloader name for stepimage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------ICUT4SANTA--------------
+*
+*
+*
+*

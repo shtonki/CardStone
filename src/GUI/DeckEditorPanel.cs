@@ -8,7 +8,7 @@ namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
     {
-        Button saveButton;
+        Button saveButton, loadButton;
         CardPanel p;
         CardButton[] cards;
         TextBox tb;
@@ -36,19 +36,17 @@ namespace stonekart
                 };
             }
 
-            Button xdButton = new Button();
-            xdButton.Image = ImageLoader.getStepImage("defenders", new Size(60, 60));
-
-            xdButton.MouseDown += (_, __) =>
+            loadButton = new Button();
+            loadButton.Image = ImageLoader.getStepImage("load", new Size(60, 60));
+            loadButton.Size = loadButton.Image.Size;
+            loadButton.MouseDown += (_, __) =>
             {
                 loadDeckFromFile((s) => loadIntoEditor(loadDeck(s)));
             };
-            Controls.Add(xdButton);
-
+            
             saveButton = new Button();
             saveButton.Image = ImageLoader.getStepImage("save", new Size(60, 60));
             saveButton.Size = saveButton.Image.Size;
-
             saveButton.MouseDown += (_, __) =>
             {
                 saveDeck();
@@ -56,6 +54,7 @@ namespace stonekart
 
             tb = new TextBox();
 
+            Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
             Controls.Add(saveButton);
@@ -78,6 +77,7 @@ namespace stonekart
             deckAsker.Size = new Size(500, 200);
             deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
+            var g = GUI.showWindow(deckAsker);
             foreach (string name in deckNames)
             {
                 var xd = new Button();
@@ -88,10 +88,10 @@ namespace stonekart
                 xd.MouseDown += (_, __) =>
                 {
                     buttonClickedCallBack(name);
+                    g.close();
                 };
                 deckAsker.Controls.Add(xd);
             }
-            GUI.showWindow(deckAsker);
         }
 
         public List<CardId> loadDeck(string deckName)
@@ -133,6 +133,7 @@ namespace stonekart
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
+            loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y+saveButton.Height);
             int x = cards[0].Size.Width;
             for (int i = 0; i < cards.Length; i++)
             {
