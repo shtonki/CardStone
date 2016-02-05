@@ -579,7 +579,9 @@ namespace stonekart
             }
             else
             {
+                gameInterface.setContext("Opponents turn to act");
                 action = gameInterface.demandCastAction();
+                gameInterface.clearContext();
             }
 
             return action;
