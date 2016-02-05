@@ -73,17 +73,16 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
+                CardId.LightningBolt,
             };
         }
 

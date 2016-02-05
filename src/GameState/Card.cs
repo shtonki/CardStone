@@ -179,7 +179,7 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Instant;
-                    fx.Add(new Ping(3));
+                    fx.Add(new Ping(3, TargetLambda.ZAPPABLE));
                     castDescription = "Deal 3 damage to target player or creature.";
                 } break;
 
@@ -187,8 +187,8 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new Ping(1));
-                    fx.Add(new Ping(1));
+                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
+                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
                     castDescription = "Deal 1 damage to 2 target players or creatures.";
                 } break;
 
@@ -247,7 +247,7 @@ namespace stonekart
                 {
                     whiteCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new SummonTokens(2, CardId.Squire));
+                    fx.Add(new SummonTokens(TargetLambda.CONTROLLER, 2, CardId.Squire));
                     castDescription = "Summon two Squires.";
                 } break;
 
@@ -349,6 +349,14 @@ namespace stonekart
                     type = Type.Instant;
                     fx.Add(new MoveTo(LocationPile.HAND, TargetLambda.ZAPPABLECREATURE));
                     castDescription = "Return target creature to its owners hand";
+                } break;
+
+                case CardId.GnomeCannoneer:
+                {
+                    redCost = 2;
+                    type = Type.Creature;
+                        triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " deal 1 damage to target player or creature.", 
+                            LocationPile.FIELD, EventTiming.Post, new Ping(1, TargetLambda.ZAPPABLE) ));
                 } break;
 
                 default:
@@ -694,6 +702,7 @@ namespace stonekart
         IlasGambit,
         YungLich,
         Unmake,
+        GnomeCannoneer,
     }
 
     public enum Type

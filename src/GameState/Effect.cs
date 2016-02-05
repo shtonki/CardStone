@@ -35,11 +35,11 @@ namespace stonekart
             for (int i = 0; i < targetRules.Length; i++)
             {
                 Target t;
-                if (targetRules[i] == TargetLambda.INTERNALCONTROLLER)
+                if (targetRules[i] == TargetLambda.CONTROLLER)
                 {
                     t = new Target(c.controller);
                 }
-                else if (targetRules[i] == TargetLambda.INTERNALSELF)
+                else if (targetRules[i] == TargetLambda.SELF)
                 {
                     t = new Target(c);
                 }
@@ -64,7 +64,7 @@ namespace stonekart
 
         public TargetRule[] getTargetRules()
         {
-            return targetRules.Where((l) => l != TargetLambda.INTERNALCONTROLLER && l != TargetLambda.INTERNALSELF)
+            return targetRules.Where((l) => l != TargetLambda.CONTROLLER && l != TargetLambda.SELF)
                 .Select((l) => new TargetRule(l))
                 .ToArray();
         }
@@ -126,7 +126,7 @@ namespace stonekart
         }
         protected void setSelfPlayer(bool targeted)
         {
-            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.INTERNALCONTROLLER);
+            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.CONTROLLER);
         }
     }
     
@@ -138,7 +138,7 @@ namespace stonekart
         public Timelapse(int n)
         {
             this.n = n;
-            setTargets(TargetLambda.INTERNALCONTROLLER);
+            setTargets(TargetLambda.CONTROLLER);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -188,10 +188,10 @@ namespace stonekart
     {
         private int d;
 
-        public Ping(int damage)
+        public Ping(int damage, TargetLambda l)
         {
             d = damage;
-            setTargets(TargetLambda.INTERNALSELF, TargetLambda.ZAPPABLE);
+            setTargets(TargetLambda.SELF, l);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -220,15 +220,11 @@ namespace stonekart
     public class MoveTo : SubEffect
     {
         private LocationPile pile;
+        
 
-        public MoveTo(LocationPile pile)
+        public MoveTo(LocationPile pile, TargetLambda l)
         {
             this.pile = pile;
-            setTargets(TargetLambda.INTERNALSELF);
-        }
-
-        public MoveTo(LocationPile pile, TargetLambda l) : this(pile)
-        {
             setTargets(l);
         }
 
@@ -263,11 +259,11 @@ namespace stonekart
         public int count { get; private set; }
         public CardId card { get; private set; }
 
-        public SummonTokens(int n, CardId c)
+        public SummonTokens(TargetLambda l, int n, CardId c)
         {
             count = n;
             card = c;
-            setTargets(TargetLambda.INTERNALCONTROLLER);
+            setTargets(l);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -288,14 +284,6 @@ namespace stonekart
         public readonly Modifiable attribute;
         public readonly Clojurex filter;
         public readonly int value;
-
-        public ModifyUntil(Modifiable attribute, Clojurex filter, int value)
-        {
-            this.attribute = attribute;
-            this.filter = filter;
-            this.value = value;
-            setTargets(TargetLambda.INTERNALSELF);
-        }
 
         public ModifyUntil(TargetLambda t, Modifiable attribute, Clojurex filter, int value)
         {
@@ -322,7 +310,7 @@ namespace stonekart
         public Duress(Func<Card, bool> cardFilter)
         {
             this.cardFilter = cardFilter;
-            setTargets(TargetLambda.INTERNALCONTROLLER, TargetLambda.PLAYER);
+            setTargets(TargetLambda.CONTROLLER, TargetLambda.PLAYER);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)

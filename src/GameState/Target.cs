@@ -82,8 +82,8 @@ namespace stonekart
 
     public enum TargetLambda
     {
-        INTERNALSELF,
-        INTERNALCONTROLLER,
+        SELF,
+        CONTROLLER,
 
         ANY,
         PLAYER,
