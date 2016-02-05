@@ -594,9 +594,9 @@ namespace stonekart
                 {
                     gameInterface.setContext("Your turn to act.", Choice.Pass);
                     action = gainPriority();
-                    gameInterface.sendCastAction(action);
                     gameInterface.clearContext();
                 }
+                gameInterface.sendCastAction(action);
             }
             else
             {
