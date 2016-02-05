@@ -98,6 +98,7 @@ namespace stonekart
                 notifyObservers();
             }
         }
+        public bool canDefend => location.pile == LocationPile.FIELD && !topped;
 
         public bool isDummy => dummyFor != null;
         public Ability dummyFor { get; private set; }
@@ -584,10 +585,6 @@ namespace stonekart
             return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
         }
 
-        public bool canDefend()
-        {
-            return location.pile == LocationPile.FIELD;
-        }
 
         public bool has(KeyAbility a)
         {

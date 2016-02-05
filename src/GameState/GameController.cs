@@ -75,13 +75,6 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                CardId.GnomishCannoneer,
-                /*
                 CardId.AlterTime,
                 CardId.AlterTime,
                 CardId.AlterTime,
@@ -103,7 +96,7 @@ namespace stonekart
                 CardId.Unmake,
                 CardId.ForkedLightning,
                 CardId.ForkedLightning,
-                */
+                CardId.ForkedLightning,
             };
         }
 
@@ -754,11 +747,14 @@ namespace stonekart
                         {
                             Card c = chosenGameElement.card;
 
-                            if (c.owner == game.hero && !c.canDefend()) { continue; }
+                            if (c.owner == game.hero && !c.canDefend) { continue; }
 
                             if (c.defenderOf == null)
                             {
-                                blocker = c;
+                                if (c.canDefend)
+                                {
+                                    blocker = c;
+                                }
                             }
                             else
                             {
