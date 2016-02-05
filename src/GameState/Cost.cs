@@ -164,7 +164,7 @@ namespace stonekart
 
                 while (c != CMC)
                 {
-                    gi.changeMessage("Pay " + cz[5]);
+                    gi.changeMessage("Pay " + (CMC - c));
 
                     GameElement element = gi.getNextGameElementPress();
 

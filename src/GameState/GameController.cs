@@ -73,22 +73,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
-                CardId.Haunt,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
             };
         }
 
@@ -627,12 +619,12 @@ namespace stonekart
                         }
 
 
-                        
+                        Target[] targets = getTargets(a);
+                        if (targets == null) { continue; }
+
                         var v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
-                        Target[] targets = getTargets(a); 
-                        if (targets == null) { continue; }
                         
                         var sw = new StackWrapper(c, a, targets);
                         return new CastAction(sw, v);

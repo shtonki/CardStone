@@ -197,7 +197,7 @@ namespace stonekart
                     type = Type.Creature;
                     race = Race.Zombie;
                     basePower = 2;
-                    baseToughness = 2;
+                    baseToughness = 1;
                 } break;
 
                 case CardId.PropheticVision:
@@ -319,13 +319,15 @@ namespace stonekart
                     castDescription = "Target creature gets +3/+0" + untilEOTDescription;
                 } break;
 
-                case CardId.Haunt:
+                case CardId.IlasGambit:
                 {
+                    name = "Ila's Gambit";
                     blackCost = 1;
                     type = Type.Sorcery;
                     fx.Add(new Duress((_) => true));
+                    fx.Add(new GainLife(false, -2));
                     castDescription =
-                        "Look at target players hand and choose 1 card from it. The chosen card is discarded.";
+                        "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
                 } break;
 
                 default:
@@ -638,7 +640,7 @@ namespace stonekart
         AlterFuture,
         EvolveFangs,
         GrizzlyCub,
-        Haunt,
+        IlasGambit,
     }
 
     public enum Type

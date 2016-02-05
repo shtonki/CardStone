@@ -46,7 +46,7 @@ namespace stonekart
 
         public void changeMessage(string s)
         {
-            
+            gamePanel.message = s;
         }
         /*
         public void setMessage(string s)

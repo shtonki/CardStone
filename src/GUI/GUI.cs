@@ -52,15 +52,9 @@ namespace stonekart
             frame.transitionTo(frame.deckEditorPanel);
         }
 
-        /// <summary>
-        /// Creates a GameInterface and binds it to a new GamePanel created
-        /// in the current frame.
-        /// </summary>
-        public static GameInterface createGameUI()
+        public static void addGameWindow(GameInterface g)
         {
-            GameInterface r = new GameInterface();
-            frame.createGamePanel(r);
-            return r;
+            frame.createGamePanel(g);
         }
 
         /*
