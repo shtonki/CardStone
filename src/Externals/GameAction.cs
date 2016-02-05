@@ -178,15 +178,15 @@ namespace stonekart
 
             foreach (var t in sw.targets)
             {
-                if (t.isPlayer())
+                if (t.isPlayer)
                 {
                     ts.Append("p");
-                    ts.Append((int)t.getPlayer().side);
+                    ts.Append((int)t.player.side);
                 }
-                else if (t.isCard())
+                else if (t.isCard)
                 {
                     ts.Append("c");
-                    ts.Append(t.getCard().getId());
+                    ts.Append(t.card.getId());
                 }
                 ts.Append("'");
             }

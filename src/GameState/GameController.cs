@@ -331,7 +331,7 @@ namespace stonekart
             {
                 attackers = chooseMultiple("Choose attackers", c =>
                 {
-                    if (c.owner.side == LocationPlayer.HERO && c.canAttack() && !(c.attacking))
+                    if (c.owner.isHero && c.canAttack() && !(c.attacking))
                     {
                         c.attacking = true;
                         return true;

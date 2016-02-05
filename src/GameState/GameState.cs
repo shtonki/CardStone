@@ -78,11 +78,11 @@ namespace stonekart
                 c.owner = owner;
                 c.controller = owner;
                 cards.Add(i, c);
-                if (owner.side == LocationPlayer.HERO)
+                if (owner.isHero)
                 {
                     hero.Add(c);
                 }
-                else if (owner.side == LocationPlayer.VILLAIN)
+                else if (owner.isHero)
                 {
                     villain.Add(c);
                 }

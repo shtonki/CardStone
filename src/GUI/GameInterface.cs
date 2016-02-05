@@ -105,13 +105,13 @@ namespace stonekart
             foreach (Target t in ts)
             {
                 Observable o;
-                if (t.isCard())
+                if (t.isCard)
                 {
-                    o = t.getCard();
+                    o = t.card;
                 }
-                else if (t.isPlayer())
+                else if (t.isPlayer)
                 {
-                    o = t.getPlayer();
+                    o = t.player;
                 }
                 else
                 {
@@ -294,6 +294,17 @@ namespace stonekart
         public void sendMultiSelection(params Card[] ns)
         {
             sendAction(new MultiSelectAction(ns));
+        }
+
+        public void sendCard(Card c)
+        {
+            sendAction(new SelectAction(c.getId()));
+        }
+
+        public Card demandCard(GameState g)
+        {
+            int i = demandSelection();
+            return g.getCardById(i);
         }
 
         private void sendAction(GameAction a)

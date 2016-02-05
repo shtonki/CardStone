@@ -10,6 +10,7 @@ namespace stonekart
     public class Player : Observable
     {
         public LocationPlayer side { get; private set; }
+        public bool isHero => side == LocationPlayer.HERO;
         public int totalMana => curMana.Sum(@v => v);
 
 

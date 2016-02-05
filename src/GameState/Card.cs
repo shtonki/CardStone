@@ -26,7 +26,6 @@ namespace stonekart
         public Location location { get; set; }
         public Player owner { get; set; }
         public Player controller { get; set; }
-        public bool ownedByMe => owner.side == LocationPlayer.HERO; 
 
         private bool Attacking;
         private Card DefenderOf;
@@ -179,7 +178,7 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Instant;
-                    fx.Add(new PingN(1,3));
+                    fx.Add(new Ping(3));
                     castDescription = "Deal 3 damage to target player or creature.";
                 } break;
 
@@ -187,8 +186,9 @@ namespace stonekart
                 {
                     redCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new PingN(2, 1));
-                    castDescription = "Deal 2 damage to 2 target players or creatures.";
+                    fx.Add(new Ping(1));
+                    fx.Add(new Ping(1));
+                    castDescription = "Deal 1 damage to 2 target players or creatures.";
                 } break;
 
                 case CardId.SolemnAberration:
@@ -204,7 +204,7 @@ namespace stonekart
                 {
                     blueCost = 2;
                     type = Type.Sorcery;
-                    fx.Add(new OwnerDraws(2));
+                    fx.Add(new Draw(false, 2));
                     castDescription = "Draw 2 cards";
                 } break;
 
@@ -230,7 +230,7 @@ namespace stonekart
                     baseTriggeredAbilities.Add(new TriggeredAbility(this, 
                         friendlyETB, 
                         underYourControlETBDescription + "gain 1 life.", 
-                        LocationPile.FIELD, EventTiming.Post, new GainLife(1)));
+                        LocationPile.FIELD, EventTiming.Post, new GainLife(false, 1)));
                 } break;
 
                 case CardId.Rapture:
@@ -238,7 +238,7 @@ namespace stonekart
                     whiteCost = 2;
                     greyCost = 1;
                     type = Type.Instant;
-                    fx.Add(new ExileTarget());
+                    fx.Add(new MoveTo(LocationPile.EXILE, TargetLambda.ZAPPABLECREATURE));
                     castDescription = "Exile target creature";
                 } break;
 
@@ -246,7 +246,7 @@ namespace stonekart
                 {
                     whiteCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new SummonNTokens(2, CardId.Squire));
+                    fx.Add(new SummonTokens(2, CardId.Squire));
                     castDescription = "Summon two Squires.";
                 } break;
 
@@ -272,7 +272,7 @@ namespace stonekart
                         thisETB(this),
                         thisETBDescription + "draw a card.",
                         LocationPile.FIELD, EventTiming.Post,
-                        new OwnerDraws(1)
+                        new Draw(false, 1)
                         ));
                 } break;
 
@@ -298,7 +298,7 @@ namespace stonekart
                     blueCost = 1;
                     type = Type.Sorcery;
                     fx.Add(new Timelapse(3));
-                    fx.Add(new OwnerDraws(1));
+                    fx.Add(new Draw(false, 1));
                     castDescription = "Timelapse 3\nDraw a card.";
                 } break;
 
@@ -315,7 +315,7 @@ namespace stonekart
                 {
                     greenCost = 1;
                     type = Type.Instant;
-                    fx.Add(new SubEffectModifyUntil(new TargetRule(TargetRules.CREATUREONFIELD), Modifiable.Power, untilEndOfTurn, 3));
+                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, untilEndOfTurn, 3));
                     castDescription = "Target creature gets +3/+0" + untilEOTDescription;
                 } break;
 
@@ -323,7 +323,7 @@ namespace stonekart
                 {
                     blackCost = 1;
                     type = Type.Sorcery;
-                    fx.Add(new SubEffectPlayerDiscard(1, true));
+                    fx.Add(new Duress((_) => true));
                     castDescription =
                         "Look at target players hand and choose 1 card from it. The chosen card is discarded.";
                 } break;
