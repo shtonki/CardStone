@@ -147,29 +147,11 @@ namespace stonekart
 
     class StepEvent : GameEvent
     {
-        private int s;
+        public Step step { get; private set; }
 
-        public const int
-            UNTOP = 0,
-            DRAW = 1,
-            MAIN1 = 2,
-            BEGINCOMBAT = 3,
-            ATTACKERS = 4,
-            DEFENDERS = 5,
-            DAMAGE = 6,
-            ENDCOMBAT = 7,
-            MAIN2 = 8,
-            END = 9;
-
-
-        public StepEvent(int step) : base(GameEventType.STEP)
+        public StepEvent(Step step) : base(GameEventType.STEP)
         {
-            s = step;
-        }
-
-        public int getStep()
-        {
-            return s;
+            this.step = step;
         }
     }
 

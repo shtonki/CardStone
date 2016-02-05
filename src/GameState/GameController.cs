@@ -211,70 +211,84 @@ namespace stonekart
             e.creature.damage(e.damage);
         }
         #endregion
-        
+
+        private void doStepStuff(Step step)
+        {
+            switch (step)
+            {
+                case Step.UNTOP:
+                    {
+                        untopStep();
+                    }
+                    break;
+
+                case Step.DRAW:
+                    {
+                        drawStep();
+                    }
+                    break;
+                case Step.MAIN1:
+                    {
+                        mainStep();
+                    }
+                    break;
+                case Step.STARTCOMBAT:
+                    {
+                        startCombatStep();
+                    }
+                    break;
+                case Step.ATTACKERS:
+                    {
+                        attackersStep();
+                    }
+                    break;
+                case Step.DEFENDERS:
+                    {
+                        defendersStep();
+                    }
+                    break;
+                case Step.DAMAGE:
+                    {
+                        damageStep();
+                    }
+                    break;
+                case Step.ENDCOMBAT:
+                    {
+                        endCombatStep();
+                    }
+                    break;
+                case Step.MAIN2:
+                    {
+                        mainStep();
+                    }
+                    break;
+                case Step.END:
+                    {
+                        endStep();
+                    }
+                    break;
+
+                default:
+                    throw new Exception(); //paranoid
+            }
+        }
+
         private void loop()
         {
             while (true)
             {
                 gameInterface.setStep(game.currentStep, game.herosTurn);
-
-                switch (game.currentStep)
-                {
-                    case Step.UNTOP:
-                    {
-                        autoPass = false;
-
-                        untopStep();
-                    } break;
-
-                    case Step.DRAW:
-                    {
-                        drawStep();
-                    } break;
-                    case Step.MAIN1:
-                    {
-                        mainStep(1);
-                    } break;
-                    case Step.STARTCOMBAT:
-                    {
-                        startCombatStep();
-                    } break;
-                    case Step.ATTACKERS:
-                    {
-                        if (!attackersStep()) //no attackers were declared
-                        {
-                            game.advanceStep(); //skip defenders
-                            game.advanceStep(); //skip damage
-                        }
-                    } break;
-                    case Step.DEFENDERS:
-                    {
-                        defendersStep();
-                    } break;
-                    case Step.DAMAGE:
-                    {
-                        damageStep();
-                    } break;
-                    case Step.ENDCOMBAT:
-                    {
-                        endCombatStep();
-                    } break;
-                    case Step.MAIN2:
-                    {
-                        mainStep(2);
-                    } break;
-                    case Step.END:
-                    {
-                        endStep();
-                    } break;
-                }
-
+                doStepStuff(game.currentStep);
+                handleEvent(new StepEvent(game.currentStep));
+                givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
                 game.advanceStep();
             }
         }
 
         private void untopStep()
         {
+            autoPass = false;
+
             handleEvent(new UntopPlayerEvent(game.activePlayer));
 
             int s;
@@ -296,32 +310,24 @@ namespace stonekart
             }
 
             handleEvent(new GainManaOrbEvent(game.activePlayer, s));
-            handleEvent(new StepEvent(StepEvent.UNTOP));
-            givePriority(false);
         }
 
         private void drawStep()
         {
             handleEvent(new DrawEvent(game.activePlayer));
-            handleEvent(new StepEvent(StepEvent.DRAW));
-            givePriority(false);
         }
 
-        private void mainStep(int i)
+        private void mainStep()
         {
-            handleEvent(new StepEvent(i == 1 ?StepEvent.MAIN1 : StepEvent.MAIN2));
-            givePriority(true);
         }
 
         private void startCombatStep()
         {
-            handleEvent(new StepEvent(StepEvent.BEGINCOMBAT));
-            givePriority(false);
         }
 
-        private bool attackersStep()
+        private void attackersStep()
         {
-            if (game.herosTurn && !autoPass)
+            if (game.herosTurn)
             {
                 attackers = chooseMultiple("Choose attackers", c =>
                 {
@@ -350,17 +356,19 @@ namespace stonekart
             if (attackers.Length == 0)
             {
                 attackers = null;
-                return false;
+                game.advanceStep();
+                game.advanceStep();
             }
-
-            foreach (var a in attackers)
+            else
             {
-                handleEvent(new TopEvent(a));
-                //todo attackers event
+                foreach (var a in attackers)
+                {
+                    handleEvent(new TopEvent(a));
+                    //todo attackers event
+                }
             }
             
-            givePriority(false);
-            return true;
+            
         }
 
         private void defendersStep()
@@ -386,7 +394,6 @@ namespace stonekart
                 gameInterface.sendMultiSelection(ls.Item2);
             }
 
-            givePriority(false);
         }
 
         private void damageStep()
@@ -408,7 +415,6 @@ namespace stonekart
                 }
             }
             
-            givePriority(false);
         }
 
         private void endCombatStep()
@@ -431,18 +437,14 @@ namespace stonekart
                 attackers = defenders = null;
             }
 
-            handleEvent(new StepEvent(StepEvent.ENDCOMBAT));
-            givePriority(false);
         }
 
         private void endStep()
         {
-            handleEvent(new StepEvent(StepEvent.END));
-            givePriority(false);
         }
 
 
-        private void givePriority(bool main)
+        private void givePriorityx(bool main)
         {
             //todo(seba) make it check toggleboxes and autopass
             while (true)
