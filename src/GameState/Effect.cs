@@ -147,7 +147,7 @@ namespace stonekart
             Player player = nextPlayer();
             if (player.isHero)
             {
-                CardPanelControl p = ginterface.showCards(player.deck.cards.Take(n).ToArray());
+                CardPanelControl p = ginterface.showCards(player.deck.cards.Reverse().Take(n).ToArray());
                 shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
                 ginterface.sendSelection((int)shuffle);
                 p.closeWindow();

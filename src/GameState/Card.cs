@@ -263,8 +263,8 @@ namespace stonekart
 
                 case CardId.ShimmeringKoi:
                 {
-                    blueCost = 1;
-                    greyCost = 0;
+                    blueCost = 2;
+                    greyCost = 2;
                     cardType = CardType.Creature;
                     race = Race.Fish;
                     basePower = 2;
