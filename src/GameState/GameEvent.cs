@@ -23,7 +23,6 @@ namespace stonekart
         RESOLVE,
         DAMAGEPLAYER,
         DAMAGECREATURE,
-        BURYCREATURE,
         GAINLIFE,
         SUMMONTOKEN,
         MODIFYCARD,
@@ -217,13 +216,6 @@ namespace stonekart
             damage = dmg;
         }
         
-    }
-
-    class BuryCreatureEvent : CardEvent
-    {
-        public BuryCreatureEvent(Card card) : base(card, GameEventType.BURYCREATURE)
-        {
-        }
     }
     
     class ModifyCardEvent : GameEvent

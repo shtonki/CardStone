@@ -77,10 +77,10 @@ namespace stonekart
                 CardId.ForkedLightning,
                 CardId.ForkedLightning,
                 CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
+                CardId.YungLich, 
+                CardId.YungLich, 
+                CardId.YungLich, 
+                CardId.YungLich, 
             };
         }
 
@@ -106,7 +106,6 @@ namespace stonekart
             addBaseHandler(GameEventType.UNTOPPLAYER, _untopplayer);
             addBaseHandler(GameEventType.DAMAGEPLAYER, _damageplayer);
             addBaseHandler(GameEventType.DAMAGECREATURE, _damagecreature);
-            addBaseHandler(GameEventType.BURYCREATURE, _burycreature);
             addBaseHandler(GameEventType.GAINLIFE, _gainlife);
             addBaseHandler(GameEventType.SUMMONTOKEN, _summontoken);
             addBaseHandler(GameEventType.MODIFYCARD, _modifycard);
@@ -191,11 +190,6 @@ namespace stonekart
         {
             DamagePlayerEvent e = (DamagePlayerEvent)gevent;
             e.player.setLifeRelative(-e.damage);
-        }
-        private void _burycreature(GameEvent gevent)
-        {
-            BuryCreatureEvent e = (BuryCreatureEvent)gevent;
-            handleEvent(new MoveCardEvent(e.getCard(), LocationPile.GRAVEYARD));
         }
         private void _damagecreature(GameEvent gevent)
         {
@@ -482,7 +476,7 @@ namespace stonekart
         
         private void checkGameState()
         {
-            List<BuryCreatureEvent> xd = new List<BuryCreatureEvent>();
+            List<MoveCardEvent> xd = new List<MoveCardEvent>();
             do
             {
                 xd.Clear();
@@ -511,7 +505,7 @@ namespace stonekart
                 {
                     if (v.currentToughness <= 0)
                     {
-                        xd.Add(new BuryCreatureEvent(v));
+                        xd.Add(new MoveCardEvent(v, LocationPile.GRAVEYARD));
                     }
                 }
 
@@ -851,7 +845,7 @@ namespace stonekart
             {
                 foreach (TriggeredAbility a in c.triggeredAbilities)
                 {
-                    if (a.filter(e))
+                    if (a.filter(e) && c.location.pile == a.pile)
                     {
                         timingLists[(int)a.timing].AddLast(a);
                     }
@@ -880,7 +874,7 @@ namespace stonekart
         {
             foreach (TriggeredAbility ability in l)
             {
-                if (ability.card.location.pile != ability.pile) { continue; } 
+                //if (ability.card.location.pile != ability.pile) { continue; } 
                 
                 if (ability.targetCount != 0) { throw new Exception("nopers2222"); }
                 

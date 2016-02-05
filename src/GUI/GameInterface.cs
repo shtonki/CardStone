@@ -248,6 +248,11 @@ namespace stonekart
             
         }
 
+        public void setFocusCard(Card b)
+        {
+            gamePanel.showCardInfo(b);
+        }
+
         public CastAction demandCastAction()
         {
             return connection.demandAction(typeof(CastAction)) as CastAction;

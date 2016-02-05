@@ -90,6 +90,16 @@ namespace stonekart
             return myDeck;
         }
 
+        private void loadIntoEditor(List<CardId> deck)
+        {
+            myDeckIsHard.clear();
+            for (int i = 0; i < myDeckIsHard.count; i++)
+            {
+                myDeckIsHard.add(new Card(deck[i]));
+            }
+            
+        }
+
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);

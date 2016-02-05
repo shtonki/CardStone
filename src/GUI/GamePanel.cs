@@ -16,6 +16,7 @@ namespace stonekart
         public CardPanel heroFieldPanel;
         public CardPanel villainFieldPanel;
         private TurnPanel turnPanel;
+        private CardInfoPanel cardInfoPanel;
         private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
 
         public string message { get { return choicePanel.Text; } set { choicePanel.Text = value; } }
@@ -24,40 +25,13 @@ namespace stonekart
         {
             gameInterface = g;
             BackColor = Color.Silver;
-            //Size = new Size(GUI.FRAMEWIDTH, GUI.FRAMEHEIGHT);
-            /*
-            inputBox = new TextBox();
-            inputBox.KeyDown += (sender, args) =>
-            {
-                if (args.KeyCode != Keys.Enter) { return; }
-
-                Console.WriteLine("user typed in chat box: " + inputBox.Text);
-                inputBox.Clear();
-            };
-            inputBox.Size = new Size(200, 40);
-
-            outputBox = new TextBox();
-            outputBox.ReadOnly = true;
-            outputBox.Location = new Point(100, 100);
-            outputBox.AcceptsReturn = true;
-            outputBox.Multiline = true;
-            outputBox.Size = new Size(200, 400);
-            outputBox.ScrollBars = ScrollBars.Vertical;
-
-            FlowLayoutPanel textPanel = new FlowLayoutPanel();
-            textPanel.FlowDirection = FlowDirection.LeftToRight;
-            textPanel.Size = new Size(200, 440);
-            textPanel.Location = new Point(1550, 100);
-
-            textPanel.Controls.Add(outputBox);
-            textPanel.Controls.Add(inputBox);
-            */
 
             Action<CardButton> clickCallBack = (b) => g.gameElementPressed(new GameElement(b.Card));
-            FML f = new FML(clickCallBack, g.addArrows, g.clearArrows);
+            FML f = new FML(clickCallBack, g.addArrows, g.clearArrows, (c) => g.setFocusCard(c.Card));
             handPanel = new CardPanel(()=>new CardButton(f), new LayoutArgs(false, false));
             //handPanel.Location = new Point(400, 660);
 
+            cardInfoPanel = new CardInfoPanel();
 
             choicePanel = new ChoicePanel(g);
             //choicePanel.Location = new Point(20, 370);
@@ -95,6 +69,7 @@ namespace stonekart
             Controls.Add(villainFieldPanel);
             Controls.Add(turnPanel);
             Controls.Add(villainPanel);
+            Controls.Add(cardInfoPanel);
             Visible = false;
         }
         
@@ -135,9 +110,9 @@ namespace stonekart
             turnPanel.Location = new Point(turnPanelX, turnPanelY);
             turnPanel.setHeight(turnPanelH);
 
-            int stackPanelX = (int)(width * 0.16);
+            int stackPanelX = (int)(width * 0.308);
             int stackPanelY = (int)(height * 0);
-            int stackPanelW = (int)(width * 0.10);
+            int stackPanelW = (int)(width * 0.09);
             int stackPanelH = (int)(height * 0.6);
             stackPanel.Location = new Point(stackPanelX, stackPanelY);
             stackPanel.Size = new Size(stackPanelW, stackPanelH);
@@ -157,6 +132,13 @@ namespace stonekart
             int villainPanelY = (int)(height * 0.0);
             villainPanel.Location = new Point(playerPanelX, villainPanelY);
             villainPanel.Size = new Size(playerPanelW, playerPanelH);
+
+            int cardInfoPanelX = (int)(width * 0.152);
+            int cardInfoPanelY = (int)(height * 0);
+            int cardInfoPanelW = (int)(width * 0.154);
+            int cardInfoPanelH = (int)(height * 0.6);
+            cardInfoPanel.Location = new Point(cardInfoPanelX, cardInfoPanelY);
+            cardInfoPanel.Size = new Size(cardInfoPanelW, cardInfoPanelH);
         }
 
 
@@ -177,7 +159,11 @@ namespace stonekart
         {
             turnPanel.setStep(s, a);
         }
-        
+
+        public void showCardInfo(Card c)
+        {
+            cardInfoPanel.showCard(c);
+        }
 
         public void showButtons(Choice[] cs)
         {
@@ -224,5 +210,33 @@ namespace stonekart
         }
 
 
+    }
+
+    class CardInfoPanel : Panel
+    {
+        private CardButton pb;
+
+        public CardInfoPanel()
+        {
+            BackColor = Color.Olive;
+        }
+
+        public void showCard(Card c)
+        {
+            pb.notifyObserver(c, null);
+        }
+
+        protected override void OnResize(EventArgs eventargs)
+        {
+            base.OnResize(eventargs);
+            CardButton b = new CardButton();
+            b.setWidth(Size.Width - 5);
+            if (pb != null)
+            {
+                Controls.Remove(pb);
+            }
+            pb = b;
+            Controls.Add(b);
+        }
     }
 }

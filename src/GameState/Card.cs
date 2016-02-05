@@ -17,6 +17,7 @@ namespace stonekart
         RED,
         GREEN,
         GREY,
+        MULTI,
     }
 
     public class Card : Observable
@@ -256,7 +257,7 @@ namespace stonekart
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
-                    forceColour = Colour.WHITE;
+                    //forceColour = Colour.WHITE;
                     
                     } break;
 
@@ -280,8 +281,7 @@ namespace stonekart
                 {
                     basePower = 3;
                     baseToughness = 2;
-                    whiteCost = 1;
-                    redCost = 1;
+                    whiteCost = 2;
                     greyCost = 1;
                     type = Type.Creature;
                     race = Race.Human;
@@ -330,6 +330,19 @@ namespace stonekart
                         "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
                 } break;
 
+                case CardId.YungLich:
+                {
+                    blackCost = 1;
+                    blueCost = 1;
+                    greyCost = 1;
+                    type = Type.Creature;
+                    race = Race.Zombie;
+                    subType = SubType.Wizard;
+                    basePower = 2;
+                    baseToughness = 2;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + "draw a card.", LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                } break;
+
                 default:
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -359,18 +372,37 @@ namespace stonekart
             }
 
             var vs = castingCost.costsEnumerable;
-            int n = vs.TakeWhile(v => v == 0).Count();  //spooky LINQ that probably breaks at some point 
-            if (n == 6)
+            List<int> n = new List<int>();
+            int ctr = 0;
+            foreach (var v in vs)
+            {
+                if (v != 0)
+                {
+                    n.Add(ctr);
+                }
+                if (++ctr == 5)
+                {
+                    break;
+                }
+            }
+            if (n.Count() == 0)
             {
                 if (!forceColour.HasValue)
                 {
-                    throw new Exception();
+                    colour = Colour.GREY;
                 }
-                colour = forceColour.Value;
+                else
+                {
+                    colour = forceColour.Value;
+                }
+            }
+            else if (n.Count() == 1)
+            {
+                colour = (Colour)n.First();
             }
             else
             {
-                colour = (Colour)n;
+                colour = Colour.MULTI;
             }
         }
 
@@ -410,13 +442,24 @@ namespace stonekart
         private const string thisETBDescription = "Whenever this card enters the battlefield, ";
         private static EventFilter thisETB(Card c)
         {
-            return new EventFilter(@e =>
+            return @e =>
             {
                 if (e.type != GameEventType.MOVECARD) { return false; }
                 MoveCardEvent moveEvent = (MoveCardEvent)e;
 
                 return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card == c;
-            });
+            };
+        }
+        private const string thisDiesDescription = "Whenever this card enters a graveyard from the battlefield, ";
+        private static EventFilter thisDies(Card c)
+        {
+            return @e =>
+            {
+                if (e.type != GameEventType.MOVECARD) { return false; }
+                MoveCardEvent moveEvent = (MoveCardEvent)e;
+
+                return moveEvent.card == c && moveEvent.to.pile == LocationPile.GRAVEYARD && moveEvent.from.pile == LocationPile.FIELD;
+            };
         }
 
         #endregion
@@ -641,6 +684,7 @@ namespace stonekart
         EvolveFangs,
         GrizzlyCub,
         IlasGambit,
+        YungLich,
     }
 
     public enum Type
