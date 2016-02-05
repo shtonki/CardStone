@@ -9,22 +9,20 @@ namespace stonekart
 {
     public class Player : Observable
     {
+        public LocationPlayer side { get; private set; }
+        public int totalMana => curMana.Sum(@v => v);
+
+
         //todo(seba) move all these to props
         private int[] curMana, maxMana;
-        public int totalMana => curMana.Sum(@v => v);
         private int health;
-
-        //private Pile hand, graveyard, exile, field, deck;
-        
         private Pile[] piles;
 
-        private LocationPlayer side;
+        public GameState gameState { get; private set; }
 
-        public Game game { get; private set; }
-
-        public Player(Game g, LocationPlayer l)
+        public Player(GameState g, LocationPlayer l)
         {
-            game = g;
+            gameState = g;
             side = l;
 
             hand = new Pile(new Location(LocationPile.HAND, l));
@@ -52,18 +50,6 @@ namespace stonekart
             curMana[i]++;
             maxMana[i]++;
             notifyObservers();
-        }
-
-        public bool draw(int c = 1)
-        {
-            for (int i = 0; i < c; i++)
-            {
-                if (deck.count == 0) { return false; }
-                game.moveCardTo(deck.peek(), hand); //deck.peek().moveTo(hand);
-            }
-
-            notifyObservers();
-            return true;
         }
         
         public int getCurrentMana(int color)
@@ -125,10 +111,6 @@ namespace stonekart
         }
 
 
-        public LocationPlayer getSide()
-        {
-            return side;
-        }
 
         public void loadDeck(List<Card> deckList)
         {

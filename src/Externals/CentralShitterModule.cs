@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    static class GameController
+    static class CentralShitterModule
     {
         public static void startGame()
         {
@@ -61,10 +61,11 @@ namespace stonekart
         {
             GameConnection c = (GameConnection)o;
             GameInterface gui = GUI.createGameUI();
-            Game g = new Game(c, gui);
+            gui.connection = c;
+            GameController g = new GameController(c, gui);
             gui.setGame(g);
             GUI.transitionToGame(gui);
-            g.start();
+            g.start(c.asHomePlayer());
         }
     }
 }

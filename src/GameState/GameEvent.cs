@@ -136,7 +136,7 @@ namespace stonekart
             from = card.location;
         }
 
-        public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.owner.getSide()))
+        public MoveCardEvent(Card card, LocationPile pile) : this(card, new Location(pile, card.owner.side))
         {
             
         }

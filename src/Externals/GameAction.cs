@@ -25,7 +25,7 @@ namespace stonekart
         /// <param name="s">The string to translate</param>
         /// <param name="g">The game in which to translate it</param>
         /// <returns></returns>
-        public static GameAction fromString(string s, Game g)
+        public static GameAction fromString(string s, GameController g)
         {
             string[] ss = s.Split(',');
 
@@ -181,7 +181,7 @@ namespace stonekart
                 if (t.isPlayer())
                 {
                     ts.Append("p");
-                    ts.Append((int)t.getPlayer().getSide());
+                    ts.Append((int)t.getPlayer().side);
                 }
                 else if (t.isCard())
                 {

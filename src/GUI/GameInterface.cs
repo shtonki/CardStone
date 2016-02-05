@@ -15,10 +15,11 @@ namespace stonekart
     {
         private Choice[] currentButtons;
 
-        public Game game { get; private set; }
+        public GameController game { get; private set; }
         public GamePanel gamePanel { get; private set; }
 
-        
+        public GameConnection connection; //hack
+
 
         private Stack<Tuple<string, Choice[]>> cruft = new Stack<Tuple<string, Choice[]>>();
 
@@ -144,9 +145,9 @@ namespace stonekart
             gamePanel.setObservers(h, v, s);
         }
 
-        public void setStep(TurnTracker t)
+        public void setStep(Step step, bool herosTurn)
         {
-            gamePanel.setStep((int)t.step, t.heroTurn);
+            gamePanel.setStep((int)step, herosTurn);
         }
 
         public void sendMessage(string s)
@@ -209,7 +210,7 @@ namespace stonekart
             }
         }
 
-        public void setGame(Game g)
+        public void setGame(GameController g)
         {
             if (game != null) { throw new RowNotInTableException();}
             game = g;
@@ -245,6 +246,59 @@ namespace stonekart
             CardPanel l = new CardPanel(() => new CardButton(), new LayoutArgs(false, false),p.graveyard);
             GUI.showWindow(l, new WindowedPanelArgs("Graveyard", true, true, false));
             
+        }
+
+        public CastAction demandCastAction()
+        {
+            return connection.demandAction(typeof(CastAction)) as CastAction;
+        }
+
+        public void sendCastAction(CastAction a)
+        {
+            sendAction(a);
+        }
+
+        public int demandSelection()
+        {
+            var v = connection.demandAction(typeof(SelectAction)) as SelectAction;
+            return v.getSelection();
+        }
+
+        public CardId[] demandDeck()
+        {
+            var v = connection.demandAction(typeof(DeclareDeckAction)) as DeclareDeckAction;
+            return v.getIds();
+        }
+
+        public int[] demandMultiSelection()
+        {
+            var v = connection.demandAction(typeof(MultiSelectAction)) as MultiSelectAction;
+            return v.getSelections();
+        }
+
+        public void sendDeck(CardId[] ids)
+        {
+            sendAction(new DeclareDeckAction(ids));
+        }
+
+        public void sendSelection(int i)
+        {
+            sendAction(new SelectAction(i));
+        }
+
+        public void sendMultiSelection(params int[] ns)
+        {
+            sendAction(new MultiSelectAction(ns));
+        }
+
+        public void sendMultiSelection(params Card[] ns)
+        {
+            sendAction(new MultiSelectAction(ns));
+        }
+
+        private void sendAction(GameAction a)
+        {
+            connection.sendGameAction(a);
         }
     }
 

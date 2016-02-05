@@ -26,7 +26,7 @@ namespace stonekart
         public Location location { get; set; }
         public Player owner { get; set; }
         public Player controller { get; set; }
-        public bool ownedByMe => owner.getSide() == LocationPlayer.HERO; 
+        public bool ownedByMe => owner.side == LocationPlayer.HERO; 
 
         private bool Attacking;
         private Card DefenderOf;
@@ -235,7 +235,8 @@ namespace stonekart
 
                 case CardId.Rapture:
                 {
-                    whiteCost = 3;
+                    whiteCost = 2;
+                    greyCost = 1;
                     type = Type.Instant;
                     fx.Add(new ExileTarget());
                     castDescription = "Exile target creature";
@@ -382,7 +383,7 @@ namespace stonekart
 
         private bool untilEndOfTurn()
         {
-            return owner.game.currentStep == Step.END;
+            return owner.gameState.currentStep == Step.END;
         }
         private const string untilEOTDescription = " until end of turn.";
 
