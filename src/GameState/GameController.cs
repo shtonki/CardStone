@@ -56,9 +56,11 @@ namespace stonekart
             }
             else
             {
+                gameInterface.setContext("Get outflipped bwoi");
                 seed = gameInterface.demandSelection();
                 Choice c = (Choice)gameInterface.demandSelection();
                 goingFirst = c == Choice.No;
+                gameInterface.clearContext();
             }
             deckShuffler = new Random(seed);
             shuffleDeck(homePlayer);
@@ -73,6 +75,15 @@ namespace stonekart
         {
             return new[]
             {
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                /*
                 CardId.GnomishCannoneer,
                 CardId.GnomishCannoneer,
                 CardId.GnomishCannoneer,
@@ -96,7 +107,9 @@ namespace stonekart
                 CardId.Unmake,
                 CardId.Unmake,
                 CardId.Unmake,
-                CardId.Unmake,
+                CardId.ForkedLightning,
+                CardId.ForkedLightning,
+                */
             };
         }
 
@@ -301,6 +314,7 @@ namespace stonekart
             int s;
             if (game.herosTurn)
             {
+                gameInterface.setContext("Choose a mana orb to gain");
                 gameInterface.showAddMana(true);
                 int c;
                 do
@@ -308,12 +322,15 @@ namespace stonekart
                     c = (int)gameInterface.getManaColour();
                 } while (game.hero.getMaxMana(c) == 6);
                 gameInterface.showAddMana(false);
+                gameInterface.clearContext();
                 s = c;
                 gameInterface.sendSelection(c);
             }
             else
             {
+                gameInterface.setContext("Opponent is gaining mana.");
                 s = gameInterface.demandSelection();
+                gameInterface.clearContext();
             }
 
             handleEvent(new GainManaOrbEvent(game.activePlayer, s));
