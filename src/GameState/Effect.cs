@@ -9,34 +9,51 @@ namespace stonekart
     public class Effect
     {
         private SubEffect[] subEffects;
-        private TargetRule[] targetRules;
+        private TargetLambda[] targetRules;
+        
 
-        private string Explanation;
-
-        public Effect(params SubEffect[] es)
+        public Effect(params SubEffect[] subEffects)
         {
-            subEffects = es;
+            this.subEffects = subEffects;
 
-            targetRules = new TargetRule[targetCount];
-            int i = 0;
-            foreach (var v in es)
+            var trs = new List<TargetLambda>();
+            foreach (SubEffect subEffect in subEffects)
             {
-                foreach (var x in v.targetRules)
+                foreach (TargetLambda l in subEffect.targets)
                 {
-                    targetRules[i++] = x;
+                    trs.Add(l);
                 }
             }
+            targetRules = trs.ToArray();
         }
 
-        public List<GameEvent> resolve(Card c, Target[] ts)
+        public List<GameEvent> resolve(Card c, Target[] ts, GameInterface ginterface, GameState gameState)
         {
             List<GameEvent> r = new List<GameEvent>();
-            IEnumerator<Target> targetEnumerator = ((IEnumerable<Target>)ts).GetEnumerator();
-            targetEnumerator.MoveNext();
-
+            Target[] targets = new Target[targetRules.Length];
+            int ctr = 0;
+            for (int i = 0; i < targetRules.Length; i++)
+            {
+                Target t;
+                if (targetRules[i] == TargetLambda.INTERNALCONTROLLER)
+                {
+                    t = new Target(c.controller);
+                }
+                else if (targetRules[i] == TargetLambda.INTERNALSELF)
+                {
+                    t = new Target(c);
+                }
+                else
+                {
+                    t = ts[ctr++];
+                }
+                targets[i] = t;
+            }
+            IEnumerator<Target> x = ((IEnumerable<Target>)targets).GetEnumerator();
+            x.MoveNext();
             foreach (SubEffect e in subEffects)
             {
-                foreach (var v in e.resolve(c, targetEnumerator, c.owner.game))
+                foreach (var v in e.resolve(x, ginterface, gameState))
                 {
                     r.Add(v);
                 }
@@ -47,27 +64,70 @@ namespace stonekart
 
         public TargetRule[] getTargetRules()
         {
-            return targetRules;
+            return targetRules.Where((l) => l != TargetLambda.INTERNALCONTROLLER && l != TargetLambda.INTERNALSELF)
+                .Select((l) => new TargetRule(l))
+                .ToArray();
         }
-
-        public int targetCount => subEffects.Sum(v => v.targetCount);
         
-        public string explanation => Explanation;
+        
     }
 
     public abstract class SubEffect
     {
-        public TargetRule[] targetRules => targets;
         public int targetCount => targets.Length;
-        protected TargetRule[] targets;
+        public TargetLambda[] targets { get; protected set; }
+
+        private IEnumerator<Target> tgts;
+        private int targetsEaten;
 
         protected SubEffect()
         {
-            targets = new TargetRule[0];
+
         }
 
-        abstract public GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g);
-        
+        public GameEvent[] resolve(IEnumerator<Target> ts, GameInterface ginterface, GameState game)
+        {
+            tgts = ts;
+            targetsEaten = 0;
+            GameEvent[] r = resolve(ginterface, game);
+            if (targetsEaten != targets.Length) { throw new Exception(); }
+            return r;
+        }
+        abstract protected GameEvent[] resolve(GameInterface ginterface, GameState game);
+        protected void setTargets(params TargetLambda[] ts)
+        {
+            targets = ts;
+        }
+
+        protected Target nextTarget()
+        {
+            var r = tgts.Current;
+            tgts.MoveNext();
+            targetsEaten++;
+            return r;
+        }
+        protected Player nextPlayer()
+        {
+            Target t = nextTarget();
+            if (t.isPlayer)
+            {
+                return t.player;
+            }
+            throw new Exception();
+        }
+        protected Card nextCard()
+        {
+            Target t = nextTarget();
+            if (t.isCard)
+            {
+                return t.card;
+            }
+            throw new Exception();
+        }
+        protected void setSelfPlayer(bool targeted)
+        {
+            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.INTERNALCONTROLLER);
+        }
     }
     
 
@@ -78,104 +138,106 @@ namespace stonekart
         public Timelapse(int n)
         {
             this.n = n;
+            setTargets(TargetLambda.INTERNALCONTROLLER);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
             Choice shuffle;
-            if (c.owner.getSide() == LocationPlayer.HERO)
+            Player player = nextPlayer();
+            if (player.isHero)
             {
-                CardPanelControl p = g.gameInterface.showCards(c.owner.deck.cards.Take(n).ToArray());
-                shuffle = g.gameInterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
-                g.sendSelection((int)shuffle);
+                CardPanelControl p = ginterface.showCards(player.deck.cards.Take(n).ToArray());
+                shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
+                ginterface.sendSelection((int)shuffle);
                 p.closeWindow();
             }
             else
             {
-                shuffle = (Choice)g.demandSelection();
+                shuffle = (Choice)ginterface.demandSelection();
             }
             
             if (shuffle == Choice.Yes)
             {
-                g.shuffleDeck(c.owner);
+                throw new NotImplementedException();
+                //g.shuffleDeck(c.owner);
             }
-            g.gameInterface.showCards(c.owner.deck.cards.Take(2).ToArray());
             return new GameEvent[]{};
         }
     }
 
-    public class OwnerDraws : SubEffect
+    public class Draw : SubEffect
     {
         private int i;
 
-        public OwnerDraws(int cards)
+        public Draw(bool targeted, int cards)
         {
             i = cards;
+            setSelfPlayer(targeted);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> _, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
-            GameEvent e = new DrawEvent(c.controller, i);
+            Player p = nextPlayer();
+            GameEvent e = new DrawEvent(p, i);
             return new[] {e};
         }
         
     }
 
-    public class PingN : SubEffect
+    public class Ping : SubEffect
     {
         private int d;
 
-        public PingN(int targets, int damage)
+        public Ping(int damage)
         {
-            this.targets = new TargetRule[targets];
-
-            for (int i = 0; i < targets; i++)
-            {
-                this.targets[i] = new TargetRule(TargetRules.ZAPPABLE); 
-            }
             d = damage;
+            setTargets(TargetLambda.INTERNALSELF, TargetLambda.ZAPPABLE);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
 
-            GameEvent[] r = new GameEvent[targets.Length];
+            GameEvent g;
 
-            for (int i = 0; i < r.Length; i++)
+            Card source = nextCard();
+            Target t = nextTarget();
+
+            if (t.isPlayer)
             {
-                Target t = ts.Current;
-                ts.MoveNext();
-
-                if (t.isPlayer())
-                {
-                    r[i] = new DamagePlayerEvent(t.getPlayer(), c, d);
-                }
-                else
-                {
-                    r[i] = new DamageCreatureEvent(t.getCard(), c, d);
-                }
+                g = new DamagePlayerEvent(t.player, source, d);
             }
+            else
+            {
+                g = new DamageCreatureEvent(t.card, source, d);
+            }
+            
 
-            return r;
+            return new []{g};
         }
         
     }
 
-    public class ExileTarget : SubEffect
+    public class MoveTo : SubEffect
     {
-        public ExileTarget()
+        private LocationPile pile;
+
+        public MoveTo(LocationPile pile)
         {
-            targets = new TargetRule[1];
-            targets[0] = new TargetRule(TargetRules.CREATUREONFIELD);
+            this.pile = pile;
+            setTargets(TargetLambda.INTERNALSELF);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        public MoveTo(LocationPile pile, TargetLambda l) : this(pile)
         {
-            GameEvent[] r = new GameEvent[1];
-            Target v = ts.Current;
-            ts.MoveNext();
-            r[0] = new MoveCardEvent(v.getCard(), LocationPile.EXILE);
-            return r;
+            setTargets(l);
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
+        {
+            Card card = nextCard();
+            var r  = new MoveCardEvent(card, pile);
+            return new[] {r};
         }
     }
 
@@ -183,128 +245,107 @@ namespace stonekart
     {
         private int life;
 
-        public GainLife(int n)
+        public GainLife(bool targetable, int n)
         {
             life = n;
+            setSelfPlayer(targetable);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
-            GameEvent[] l = {new GainLifeEvent(c.controller, life)};
-            return l;
+            Player p = nextPlayer();
+            return new[]{new GainLifeEvent(p, life)};
         }
         
     }
 
-    public class SummonNTokens : SubEffect
+    public class SummonTokens : SubEffect
     {
         public int count { get; private set; }
         public CardId card { get; private set; }
-        public SummonNTokens(int n, CardId c)
+
+        public SummonTokens(int n, CardId c)
         {
             count = n;
             card = c;
-            
+            setTargets(TargetLambda.INTERNALCONTROLLER);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
             GameEvent[] r = new GameEvent[count];
-
+            Player p = nextPlayer();
             for (int i = 0; i < count; i++)
             {
-                r[i] = new SummonTokenEvent(c.controller, card);
+                r[i] = new SummonTokenEvent(p, card);
             }
 
             return r;
         }
     }
 
-    public class SubEffectModifyUntil : SubEffect
+    public class ModifyUntil : SubEffect
     {
-        public readonly Card card;
         public readonly Modifiable attribute;
         public readonly Clojurex filter;
         public readonly int value;
 
-        public SubEffectModifyUntil(Card card, Modifiable attribute, Clojurex filter, int value)
+        public ModifyUntil(Modifiable attribute, Clojurex filter, int value)
         {
-            this.card = card;
             this.attribute = attribute;
             this.filter = filter;
             this.value = value;
+            setTargets(TargetLambda.INTERNALSELF);
         }
 
-        public SubEffectModifyUntil(TargetRule t, Modifiable attribute, Clojurex filter, int value)
+        public ModifyUntil(TargetLambda t, Modifiable attribute, Clojurex filter, int value)
         {
-            targets = new []{t};
             this.attribute = attribute;
             this.filter = filter;
             this.value = value;
+            setTargets(t);
         }
 
         
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
-            Card t;
-            if (card == null)
-            {
-                var r = ts.Current;
-                ts.MoveNext();
-                t = r.getCard();
-            }
-            else
-            {
-                t = card;
-            }
-            return new GameEvent[]
-            {
-                new ModifyCardEvent(t, attribute, filter, value)
-            };
+            Card card = nextCard();
+            ModifyCardEvent r = new ModifyCardEvent(card, attribute, filter, value);
+            return new[] {r};
         }
     }
 
-    public class SubEffectPlayerDiscard : SubEffect
+    public class Duress : SubEffect
     {
-        private int cards;
-        private bool castersChoice;
+        private Func<Card, bool> cardFilter;
 
-        public SubEffectPlayerDiscard(int cards, bool castersChoice)
+        public Duress(Func<Card, bool> cardFilter)
         {
-            this.cards = cards;
-            this.castersChoice = castersChoice;
-            targets = new TargetRule[] {new TargetRule(TargetRules.PLAYER), };
+            this.cardFilter = cardFilter;
+            setTargets(TargetLambda.INTERNALCONTROLLER, TargetLambda.PLAYER);
         }
 
-        public override GameEvent[] resolve(Card c, IEnumerator<Target> ts, Game g)
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
-            if (cards != 1)
+            Player caster = nextPlayer();
+            Player victim = nextPlayer();
+            Card discard;
+            if (caster.isHero)
             {
-                throw new NotImplementedException();
-            }
-
-            Card[] r;
-            Player victim = ts.Current.getPlayer();
-            ts.MoveNext();
-            if (castersChoice == c.ownedByMe)
-            {
-                r = new Card[cards];
-                CardPanelControl p = g.gameInterface.showCards(victim.hand.cards.ToArray());
-                g.gameInterface.setContext("Pick a card");
-                for (int i = 0; i < cards; i++)
-                {
-                    r[i] = p.waitForCard();
-                }
-                g.gameInterface.clearContext();
+                CardPanelControl p = ginterface.showCards(victim.hand.cards.ToArray());
+                ginterface.setContext("Pick a card");
+                discard = p.waitForCard();
+                ginterface.clearContext();
                 p.closeWindow();
-                g.sendMultiSelection(r);
+                ginterface.sendCard(discard);
             }
             else
             {
-                r = g.demandMultiSelectionAsCards();
+                discard = ginterface.demandCard(game);
             }
-            return r.Select(crd => new MoveCardEvent(crd, LocationPile.GRAVEYARD)).ToArray();
+            var r = new MoveCardEvent(discard, LocationPile.GRAVEYARD);
+            return new[] {r};
 
         }
     }

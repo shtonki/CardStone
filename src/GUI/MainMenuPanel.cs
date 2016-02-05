@@ -74,7 +74,7 @@ namespace stonekart
             startGamePanel.Controls.Add(botGameButton);
             botGameButton.Click += (a, aa) =>
             {
-                GameController.newGame(new DummyConnection());
+                CentralShitterModule.newGame(new DummyConnection());
             };
 
             Button deckEditorButton = new Button();
