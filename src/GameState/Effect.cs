@@ -77,7 +77,7 @@ namespace stonekart
 
         public TargetRule[] getTargetRules()
         {
-            return targetRules.Where((l) => l != TargetLambda.CONTROLLER && l != TargetLambda.SELF)
+            return targetRules.Where((l) => l >= TargetLambda.ANY)
                 .Select((l) => new TargetRule(l))
                 .ToArray();
         }
