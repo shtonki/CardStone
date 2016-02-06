@@ -202,7 +202,7 @@ namespace stonekart
         {
         }
     }
-
+    
     class GainLifeEvent : PlayerEvent
     {
         public int life { get; private set; }

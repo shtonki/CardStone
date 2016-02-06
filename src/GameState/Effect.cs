@@ -10,10 +10,12 @@ namespace stonekart
     {
         private SubEffect[] subEffects;
         private TargetLambda[] targetRules;
+        private Func<bool> preResolveCheck;
         
 
         public Effect(params SubEffect[] subEffects)
         {
+            preResolveCheck = () => true;
             this.subEffects = subEffects;
 
             var trs = new List<TargetLambda>();
@@ -27,9 +29,16 @@ namespace stonekart
             targetRules = trs.ToArray();
         }
 
+        public Effect(SubEffect[] subEffects, Func<bool> preResolveCheck) : this(subEffects)
+        {
+            this.subEffects = subEffects;
+            this.preResolveCheck = preResolveCheck;
+        }
+
         public List<GameEvent> resolve(Card c, Target[] ts, GameInterface ginterface, GameState gameState)
         {
             List<GameEvent> r = new List<GameEvent>();
+            if (!preResolveCheck()) { return r; }
             Target[] targets = new Target[targetRules.Length];
             int ctr = 0;
             for (int i = 0; i < targetRules.Length; i++)
@@ -147,7 +156,7 @@ namespace stonekart
             Player player = nextPlayer();
             if (player.isHero)
             {
-                CardPanelControl p = ginterface.showCards(player.deck.cards.Take(n).ToArray());
+                CardPanelControl p = ginterface.showCards(player.deck.cards.Reverse().Take(n).ToArray());
                 shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
                 ginterface.sendSelection((int)shuffle);
                 p.closeWindow();
@@ -337,5 +346,21 @@ namespace stonekart
         }
     }
 
-    
+    public class Mill : SubEffect
+    {
+        private int cards;
+
+        public Mill(bool targeted, int cards)
+        {
+            this.cards = cards;
+            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.CONTROLLER);
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
+        {
+            Player p = nextPlayer();
+            GameEvent[] r = p.hand.cards.Take(cards).Select((c) => new MoveCardEvent(c, LocationPile.GRAVEYARD)).ToArray();
+            return r;
+        }
+    }
 }

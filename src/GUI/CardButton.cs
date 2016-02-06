@@ -30,6 +30,14 @@ namespace stonekart
             this.clearArrows = clearArrows;
             this.mouseEnters = mouseEnters;
         }
+
+        public FML(Action<CardButton> clickCallBack, Action<CardButton> mouseEnters)
+        {
+            this.clickCallBack = clickCallBack;
+            this.addArrows = (_, __) => { };
+            this.clearArrows = () => { };
+            this.mouseEnters = mouseEnters;
+        }
     }
 
     public class CardButton : Panel, GameUIElement, Observer

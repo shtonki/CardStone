@@ -119,12 +119,12 @@ namespace stonekart
             file.Close();
         }
 
-        public void loadDeckFromFile(Action<string> buttonClickedCallBack)
+        public static void loadDeckFromFile(Action<string> buttonClickedCallBack)
         {
             var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
             Panel deckAsker = new Panel();
             deckAsker.Size = new Size(500, 200);
-            deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
+            //deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
             var g = GUI.showWindow(deckAsker);
             foreach (string name in deckNames)
@@ -134,16 +134,28 @@ namespace stonekart
                 xd.Location = new Point(0, Y);
                 Y += xd.Height;
 
+                var name1 = name;
                 xd.MouseDown += (_, __) =>
                 {
-                    buttonClickedCallBack(name);
+                    buttonClickedCallBack(name1);
                     g.close();
                 };
-                deckAsker.Controls.Add(xd);
+
+                if (deckAsker.InvokeRequired)
+                {
+                    deckAsker.Invoke(new Action(() =>
+                    {
+                        deckAsker.Controls.Add(xd);
+                    }));
+                }
+                else
+                {
+                    deckAsker.Controls.Add(xd);
+                }
             }
         }
 
-        private List<CardId> loadDeck(string deckName)
+        public static List<CardId> loadDeck(string deckName)
         {
             List<CardId> myDeck = new List<CardId>();
             try

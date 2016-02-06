@@ -82,13 +82,9 @@ namespace stonekart
                 {
                     hero.Add(c);
                 }
-                else if (owner.isHero)
-                {
-                    villain.Add(c);
-                }
                 else
                 {
-                    throw new Exception();
+                    villain.Add(c);
                 }
 
                 return c;

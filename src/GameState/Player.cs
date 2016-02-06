@@ -12,7 +12,7 @@ namespace stonekart
         public LocationPlayer side { get; private set; }
         public bool isHero => side == LocationPlayer.HERO;
         public int totalMana => curMana.Sum(@v => v);
-
+        public Player opponent => isHero ? gameState.villain : gameState.hero;
 
         //todo(seba) move all these to props
         private int[] curMana, maxMana;
@@ -63,7 +63,7 @@ namespace stonekart
             return maxMana[color];
         }
 
-        public int getHealth()
+        public int getLife()
         {
             return health;
         }

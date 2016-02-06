@@ -90,10 +90,19 @@ namespace stonekart
 
 
                     string[] cs = puddns[3].Split('\'');
-                    int[][] csts = new int[cs.Length][];
+
+                    int[][] csts;
+                    if (cs[0].Length == 0)
+                    {
+                        csts = new int[0][];
+                    }
+                    else
+                    {
+                         csts = new int[cs.Length][];
+                    }
 
 
-                    for (int i = 0; i < cs.Length; i++)
+                    for (int i = 0; i < csts.Length; i++)
                     {
                         string[] xds = cs[i].Split('*');
                         int[] xx = new int[xds.Length];
@@ -202,7 +211,7 @@ namespace stonekart
                 cs.Length--;
                 cs.Append("'");
             }
-            cs.Length--;
+            if (cs.Length > 0) { cs.Length--; }
             return "cast," + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
         }
     }

@@ -56,31 +56,85 @@ namespace stonekart
             }
             else
             {
+                gameInterface.setContext("Get outflipped bwoi");
                 seed = gameInterface.demandSelection();
                 Choice c = (Choice)gameInterface.demandSelection();
                 goingFirst = c == Choice.No;
+                gameInterface.clearContext();
             }
             deckShuffler = new Random(seed);
             shuffleDeck(homePlayer);
             shuffleDeck(awayPlayer);
             game.setHeroStarting(goingFirst);
-            handleEvent(new DrawEvent(game.hero, 4));
-            handleEvent(new DrawEvent(game.villain, 4));
+            mulligan(game.activePlayer, 4);
+            mulligan(game.inactivePlayer, 5);
             loop();
+        }
+
+        private void mulligan(Player p, int handSize)
+        {
+            Choice c;
+            int life = 2;
+            while (p.getLife() < 40)
+            {
+                while (p.hand.count > 0)
+                {
+                    moveCardTo(p.hand.peek(), p.deck);
+                }
+                shuffleDeck(p);
+                for (int i = 0; i < handSize; i++)
+                {
+                    moveCardTo(p.deck.peek(), p.hand);
+                }
+
+                if (p.isHero)
+                {
+                    c = gameInterface.getChoice("Do you want to mulligan?", Choice.Yes, Choice.No);
+                    gameInterface.sendSelection((int)c);
+                }
+                else
+                {
+                    gameInterface.setContext("Opponent is mulliganing.");
+                    c = (Choice)gameInterface.demandSelection();
+                }
+                if (c != Choice.Yes)
+                {
+                    break;
+                }
+                p.opponent.setLifeRelative(life++);
+            }
         }
 
         private CardId[] loadDeck()
         {
+            WaitFor<string> w = new WaitFor<string>();
+            DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
+            return DeckEditorPanel.loadDeck(w.wait()).ToArray();
+            //return (CardId[])Enum.GetValues(typeof (CardId));
             return new[]
             {
-                CardId.Jew,
-                CardId.Jew,
-                CardId.Jew,
-                CardId.Jew,
-                CardId.Jew,
-                CardId.Jew,
-                CardId.Jew,
-
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.Unmake          ,
+                CardId.Unmake          ,
+                CardId.Unmake          ,
+                CardId.AlterTime       ,
+                CardId.AlterTime       ,
+                CardId.AlterTime       ,
+                CardId.PropheticVision ,
+                CardId.PropheticVision ,
+                CardId.ShimmeringKoi   ,
+                CardId.ShimmeringKoi   ,
             };
         }
 
@@ -285,6 +339,7 @@ namespace stonekart
             int s;
             if (game.herosTurn)
             {
+                gameInterface.setContext("Choose a mana orb to gain");
                 gameInterface.showAddMana(true);
                 int c;
                 do
@@ -292,12 +347,15 @@ namespace stonekart
                     c = (int)gameInterface.getManaColour();
                 } while (game.hero.getMaxMana(c) == 6);
                 gameInterface.showAddMana(false);
+                gameInterface.clearContext();
                 s = c;
                 gameInterface.sendSelection(c);
             }
             else
             {
+                gameInterface.setContext("Opponent is gaining mana.");
                 s = gameInterface.demandSelection();
+                gameInterface.clearContext();
             }
 
             handleEvent(new GainManaOrbEvent(game.activePlayer, s));
@@ -561,9 +619,9 @@ namespace stonekart
                 {
                     gameInterface.setContext("Your turn to act.", Choice.Pass);
                     action = gainPriority();
-                    gameInterface.sendCastAction(action);
                     gameInterface.clearContext();
                 }
+                gameInterface.sendCastAction(action);
             }
             else
             {
@@ -612,15 +670,23 @@ namespace stonekart
                             throw new Exception("we don't support these things yet");
                         }
 
-
-                        Target[] targets = getTargets(a);
-                        if (targets == null) { continue; }
-
-                        var v = a.getCost().check(c, gameInterface);
+                        int[][] v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
-                        
-                        var sw = new StackWrapper(c, a, targets);
+                        Target[] targets = getTargets(a, true);
+                        if (targets == null) { continue; }
+
+                        Card onStack;
+                        if (a != c.castAbility)
+                        {
+                            onStack = Card.createDummy(a);
+                        }
+                        else
+                        {
+                            onStack = c;
+                        }
+
+                        var sw = new StackWrapper(onStack, a, targets);
                         return new CastAction(sw, v);
                     }
                 }
@@ -632,9 +698,9 @@ namespace stonekart
             return false;
         }
 
-        private Target[] getTargets(Ability a)
+        private Target[] getTargets(Ability a, bool cancelable)
         {
-            gameInterface.setContext("Select target(s)", Choice.Cancel);
+            gameInterface.setContext("Select target(s)", cancelable ? Choice.Cancel : Choice.PADDING);
             Target[] targets = new Target[a.targetCount];
             TargetRule[] rules = a.targetRules;
 
@@ -727,11 +793,14 @@ namespace stonekart
                         {
                             Card c = chosenGameElement.card;
 
-                            if (c.owner == game.hero && !c.canDefend()) { continue; }
+                            if (c.owner == game.hero && !c.canDefend) { continue; }
 
                             if (c.defenderOf == null)
                             {
-                                blocker = c;
+                                if (c.canDefend)
+                                {
+                                    blocker = c;
+                                }
                             }
                             else
                             {
@@ -873,17 +942,17 @@ namespace stonekart
                 StackWrapper w;
                 if (ability.targetCount == 0)
                 {
-
                     w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
                 }
                 else
                 {
                     if (ability.card.owner.isHero)
                     {
-                        gameInterface.showCards(ability.card);
-                        Target[] targets = getTargets(ability);
+                        CardPanelControl p = gameInterface.showCards(ability.card);
+                        Target[] targets = getTargets(ability, false);
                         w = new StackWrapper(Card.createDummy(ability), ability, targets);
                         gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
+                        p.closeWindow();
                     }
                     else
                     {

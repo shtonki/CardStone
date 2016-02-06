@@ -237,13 +237,14 @@ namespace stonekart
         public CardPanelControl showCards(params Card[] cs)
         {
             Pile pl = new Pile(cs);
-            CardPanelControl c = new CardPanelControl(pl);
+            CardPanelControl c = new CardPanelControl(pl, (s) => setFocusCard(s.Card));
             return c;
         }
         
         public void showGraveyard(Player p)
         {
-            CardPanel l = new CardPanel(() => new CardButton(), new LayoutArgs(false, false),p.graveyard);
+            FML f = new FML((a) => { }, (a, b) => { }, () => { }, (c) => setFocusCard(c.Card));
+            CardPanel l = new CardPanel(() => new CardButton(f), new LayoutArgs(false, false),p.graveyard);
             GUI.showWindow(l, new WindowedPanelArgs("Graveyard", true, true, false));
             
         }
@@ -327,11 +328,11 @@ namespace stonekart
         private WaitFor<Card> waiter = new WaitFor<Card>();
         private WindowedPanel window;
 
-        public CardPanelControl(Pile p)
+        public CardPanelControl(Pile p, Action<CardButton> f)
         {
             panel = new CardPanel(() => 
             {
-                var b = new CardButton(new FML(clickedCallback));
+                var b = new CardButton(new FML(clickedCallback, f));
                 b.setHeight(150);
                 return b;
             }, new LayoutArgs(false, false));
@@ -350,6 +351,7 @@ namespace stonekart
         public void closeWindow()
         {
             //todo(seba) something needs to be released here
+            panel.close();
             window.close();
         }
 
