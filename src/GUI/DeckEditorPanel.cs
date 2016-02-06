@@ -10,22 +10,25 @@ namespace stonekart
     class DeckEditorPanel : DisplayPanel
     {
         Button saveButton, loadButton;
+        Button[] sortButtons;
         CardPanel p;
         CardButton[] cards;
         TextBox tb;
+        Card[] ids;
         Pile myDeckIsHard;
         const int paddingX = 8;
         const int paddingY = 8;
         const int CARDS_PER_ROW = 6;
-
+        Colour currentSortingColor;
         public DeckEditorPanel()
         {
+            currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
             myDeckIsHard = new Pile(new Card[] { });
             p = new CardPanel(new Func<CardButton>(() => new CardButton()), new LayoutArgs(true, true));
             myDeckIsHard.addObserver(p);
-            Card[] ids =
+            ids =
                 ((CardId[])Enum.GetValues(typeof (CardId))).Select(id => new Card(id))
                     .OrderBy(card => card.colour)
                     .ToArray();
@@ -57,6 +60,26 @@ namespace stonekart
                 saveDeck();
             };
 
+            sortButtons = new Button[5];
+            //todo use images or something, instead of solid colors
+            Color[] colors = new Color[5] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green};
+            for(int i = 0; i < sortButtons.Count(); i++)
+            {
+                //todo ask seba why i0 is needed
+                
+                int i0 = i;
+                sortButtons[i] = new Button();
+                sortButtons[i].Tag = (Colour)i;
+                sortButtons[i].BackColor = colors[i];
+                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i, 50);
+                sortButtons[i].Size = new Size(50, 50); 
+                sortButtons[i].MouseDown += (_, __) =>
+                {
+                    sortAfterColor((Colour)sortButtons[i0].Tag);
+                };
+                Controls.Add(sortButtons[i]);
+            }
+
             tb = new TextBox();
 
             Controls.Add(loadButton);
@@ -65,6 +88,25 @@ namespace stonekart
             Controls.Add(saveButton);
         }
 
+        private void sortAfterColor(Colour colour)
+        {
+            if (currentSortingColor == colour) currentSortingColor = Colour.GREY;
+            else currentSortingColor = colour;
+            //List <CardButton> newButtonsToDraw = new List<CardButton>();
+            for (int i = 0; i < ids.Count(); i++)
+            {
+                if(ids[i].colour != currentSortingColor && currentSortingColor != Colour.GREY)
+                {
+                    cards[i].Hide();
+                }
+                else
+                {
+                    //newButtonsToDraw.Add(cards[i]);
+                    cards[i].Show();
+                }
+            }
+            //drawTheseButtons(newButtonsToDraw.ToArray());
+        }
         private void saveDeck()
         {
             StreamWriter file = new StreamWriter(tb.Text + ".jas");
@@ -124,9 +166,20 @@ namespace stonekart
         private void loadIntoEditor(List<CardId> deck)
         {
             myDeckIsHard.clear();
-            for (int i = 0; i < myDeckIsHard.count; i++)
+            for (int i = 0; i < deck.Count; i++)
+            //for (int i = 0; i < myDeckIsHard.count; i++)
             {
                 myDeckIsHard.add(new Card(deck[i]));
+                //todo: remove cards from pile by pressing pile cards
+                /*
+                var pileButton = new CardButton(deck[i]);
+                pileButton.Location = new Point(750, 250);
+                pileButton.Size = new Size(400,400);
+                Controls.Add(pileButton);
+                pileButton.MouseDown += (_, __) =>
+                {
+                    Console.WriteLine("xD");
+                };*/
             }
             
         }
@@ -139,6 +192,25 @@ namespace stonekart
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
             loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y+saveButton.Height);
+            for(int i = 0; i < sortButtons.Count(); i++)
+            {
+                //ishigity
+                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 35, Size.Height / 20);
+            }
+
+
+            drawTheseButtons(cards);
+            /*for (int i = 0; i < cards.Length; i++)
+            {
+                x += cards[i].Width;
+                if (i % CARDS_PER_ROW == 0) x = cards[0].Size.Width * 2;
+                cards[i].setWidth(Size.Width / cards.Length);
+                cards[i].Location = new Point(x + (i % CARDS_PER_ROW) * paddingX, cards[i].Size.Height + cards[i].Size.Height * (i / CARDS_PER_ROW));
+            }*/
+        }
+
+        private void drawTheseButtons(CardButton[] cards)
+        {
             int x = cards[0].Size.Width;
             for (int i = 0; i < cards.Length; i++)
             {

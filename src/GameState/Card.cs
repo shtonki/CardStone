@@ -374,7 +374,7 @@ namespace stonekart
 
                 case CardId.Jew:
                 {
-                    blueCost = 1;
+                    blueCost = 4;
                     cardType = CardType.Creature;
                     basePower = 2;
                     baseToughness = 2;
@@ -387,6 +387,8 @@ namespace stonekart
                         triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
                 } break;
+
+                
 
                 default:
                 {
@@ -530,15 +532,11 @@ namespace stonekart
             return castingCost;
         }
 
-
         public void setLocationRaw(Location l)
         {
             location = l;
         }
         
-
-
-
         public CardType getType()
         {
             return cardType;
@@ -567,14 +565,17 @@ namespace stonekart
             */
         }
 
-        
-        
+        public bool getFrame(CardId id)
+        {
+            
+            return true;
+        }
+
         public void damage(int d)
         {
             modify(Modifiable.Toughness, -d, never);
         }
         
-
         public bool isTopped()
         {
             return topped;
@@ -605,6 +606,8 @@ namespace stonekart
         {
             return location.pile == LocationPile.FIELD;
         }
+
+        
 
         public bool has(KeyAbility a)
         {
