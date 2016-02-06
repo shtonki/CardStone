@@ -237,7 +237,7 @@ namespace stonekart
         public CardPanelControl showCards(params Card[] cs)
         {
             Pile pl = new Pile(cs);
-            CardPanelControl c = new CardPanelControl(pl);
+            CardPanelControl c = new CardPanelControl(pl, (s) => setFocusCard(s.Card));
             return c;
         }
         
@@ -328,11 +328,11 @@ namespace stonekart
         private WaitFor<Card> waiter = new WaitFor<Card>();
         private WindowedPanel window;
 
-        public CardPanelControl(Pile p)
+        public CardPanelControl(Pile p, Action<CardButton> f)
         {
             panel = new CardPanel(() => 
             {
-                var b = new CardButton(new FML(clickedCallback));
+                var b = new CardButton(new FML(clickedCallback, f));
                 b.setHeight(150);
                 return b;
             }, new LayoutArgs(false, false));

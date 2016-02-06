@@ -410,7 +410,12 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
                 } break;
 
-                
+                case CardId.Xd:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new Mill(false, 2));
+                } break;
 
                 default:
                 {
@@ -763,6 +768,7 @@ namespace stonekart
         SteamBolt,
         IlasGravekeeper,
         Jew,
+        Xd,
     }
 
     public enum CardType

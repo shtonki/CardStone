@@ -22,6 +22,7 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
+            BackColor = Color.Navy;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
@@ -117,12 +118,12 @@ namespace stonekart
             file.Close();
         }
 
-        public void loadDeckFromFile(Action<string> buttonClickedCallBack)
+        public static void loadDeckFromFile(Action<string> buttonClickedCallBack)
         {
             var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
             Panel deckAsker = new Panel();
             deckAsker.Size = new Size(500, 200);
-            deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
+            //deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
             var g = GUI.showWindow(deckAsker);
             foreach (string name in deckNames)

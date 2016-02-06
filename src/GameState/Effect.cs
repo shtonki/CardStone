@@ -346,5 +346,21 @@ namespace stonekart
         }
     }
 
-    
+    public class Mill : SubEffect
+    {
+        private int cards;
+
+        public Mill(bool targeted, int cards)
+        {
+            this.cards = cards;
+            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.CONTROLLER);
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
+        {
+            Player p = nextPlayer();
+            GameEvent[] r = p.hand.cards.Take(cards).Select((c) => new MoveCardEvent(c, LocationPile.GRAVEYARD)).ToArray();
+            return r;
+        }
+    }
 }

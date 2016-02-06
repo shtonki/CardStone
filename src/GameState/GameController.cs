@@ -73,16 +73,19 @@ namespace stonekart
 
         private CardId[] loadDeck()
         {
+            DeckEditorPanel.loadDeckFromFile(Console.WriteLine);
+            //return (CardId[])Enum.GetValues(typeof (CardId));
             return new[]
             {
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
-                CardId.CallToArms,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
+                CardId.Xd,
             };
         }
 
