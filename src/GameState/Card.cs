@@ -106,6 +106,7 @@ namespace stonekart
         //private List<Ability> abilities;
         private readonly List<ActivatedAbility> baseActivatedAbilities;
         private readonly List<TriggeredAbility> baseTriggeredAbilities;
+        public readonly ActivatedAbility castAbility;
         public ManaCost castingCost { get; private set; }
         private List<KeyAbility> keyAbilities;
 
@@ -164,7 +165,12 @@ namespace stonekart
                     baseToughness = 3;
                     cardType = CardType.Creature;
                     race = Race.Salamander;
-                } break;
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new ManaCost(0, 2, 0, 0, 0, 2)),
+                        new Effect(new Draw(true, 1)),
+                        LocationPile.FIELD, 
+                        "2BB: Target player draws a card."));
+                    } break;
 
                 case CardId.GrizzlyBear:
                 {
@@ -210,10 +216,11 @@ namespace stonekart
                     castDescription = "Draw 2 cards";
                 } break;
 
-                case CardId.FrothingGnome:
+                case CardId.DragonHatchling:
                 {
                     redCost = 1;
                     cardType = CardType.Creature;
+                    race = Race.Dragon;
                     basePower = 1;
                     baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
@@ -300,7 +307,7 @@ namespace stonekart
                     cardType = CardType.Sorcery;
                     fx.Add(new Timelapse(2));
                     fx.Add(new Draw(false, 1));
-                    castDescription = "Timelapse 2\nDraw a card.";
+                    castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
                 } break;
 
                 case CardId.GrizzlyCub:
@@ -316,8 +323,8 @@ namespace stonekart
                 {
                     greenCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, untilEndOfTurn, 3));
-                    castDescription = "Target creature gets +3/+0" + untilEOTDescription;
+                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, never, 2));
+                    castDescription = "Target creature gets +2/+0.";
                 } break;
 
                 case CardId.IlasGambit:
@@ -352,15 +359,17 @@ namespace stonekart
                     castDescription = "Return target creature to its owners hand";
                 } break;
 
-                case CardId.GnomishCannoneer:
+                case CardId.EnragedDragon:
                 {
-                    redCost = 1;
+                    redCost = 2;
                     cardType = CardType.Creature;
-                    race = Race.Gnome;
-                    basePower = 2;
+                    race = Race.Dragon;
+                    basePower = 3;
                     baseToughness = 2;
                         triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " deal 1 damage to target player or creature.", 
-                            LocationPile.FIELD, EventTiming.Post, new Ping(1, TargetLambda.ZAPPABLE) ));
+                            LocationPile.FIELD, EventTiming.Post,
+                            () => true, 
+                            new Ping(1, TargetLambda.ZAPPABLE)));
                 } break;
 
                 case CardId.SteamBolt:
@@ -372,6 +381,18 @@ namespace stonekart
                     fx.Add(new Draw(false, 1));
                     castDescription = "Deal 1 damage to target creature or player.\nDraw a card.";
                 } break;
+
+                case CardId.IlasGravekeeper:
+                {
+                    name = "Ila's Gravekeeper";
+                    blackCost = 3;
+                    basePower = 0;
+                    baseToughness = 4;
+                    cardType = CardType.Creature;
+                    race = Race.Zombie;
+                    auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
+                } break;
+                    
 
                 default:
                 {
@@ -391,9 +412,8 @@ namespace stonekart
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
             Cost cc = new Cost(castingCost);
-            ActivatedAbility castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND, castDescription);
+            castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND, castDescription);
             castAbility.setInstant(cardType == CardType.Instant);
-
             baseActivatedAbilities.Add(castAbility);
 
             if ((basePower == null) != (baseToughness == null))
@@ -451,14 +471,14 @@ namespace stonekart
         }
         private const string untilEOTDescription = " until end of turn.";
 
-        private static bool vanillaETB(GameEvent e)
+        private bool vanillaETB(GameEvent e)
         {
             if (e.type != GameEventType.MOVECARD) { return false; }
             MoveCardEvent moveEvent = (MoveCardEvent)e;
 
             return moveEvent.to.pile == LocationPile.FIELD;
         }
-
+        
         private const string underYourControlETBDescription =
             "Whenever a creature enters the battlefield under your control ";
         private bool friendlyETB(GameEvent e)
@@ -491,6 +511,11 @@ namespace stonekart
                 return moveEvent.card == c && moveEvent.to.pile == LocationPile.GRAVEYARD && moveEvent.from.pile == LocationPile.FIELD;
             };
         }
+
+        private const string timelapseReminder1 = "(Look at the top card of your deck, you may shuffle your deck)";
+        private const string timelapseReminder2 = "(Look at the top two cards of your deck, you may shuffle your deck)";
+        private const string timelapseReminder3 = "(Look at the top three cards of your deck, you may shuffle your deck)";
+        private const string timelapseReminder4 = "(Look at the top four cards of your deck, you may shuffle your deck)";
 
         #endregion
 
@@ -696,13 +721,12 @@ namespace stonekart
     public enum CardId
     {
         Kappa,
-        //FrenziedPiranha,
         GrizzlyBear,
         LightningBolt,
         SolemnAberration,
         PropheticVision,
         ForkedLightning,
-        FrothingGnome,
+        DragonHatchling,
         TempleHealer,
         Rapture,
         Squire,
@@ -715,8 +739,9 @@ namespace stonekart
         IlasGambit,
         YungLich,
         Unmake,
-        GnomishCannoneer,
+        EnragedDragon,
         SteamBolt,
+        IlasGravekeeper,
     }
 
     public enum CardType
@@ -736,7 +761,7 @@ namespace stonekart
         Fish,
         Bear,
         Zombie,
-        Gnome,
+        Dragon,
     }
 
     public enum SubType
@@ -758,12 +783,13 @@ namespace stonekart
 
     }
 
-    public struct Aura
+    public class Aura
     {
-        public readonly Func<Card, bool> filter;
-        public readonly Modifiable attribute;
-        public readonly int value;
-        public readonly string description;
+        public Func<Card, bool> filter { get; private set; }
+        public Modifiable attribute { get; private set; }
+        public virtual int value { get; private set; }
+        public string description { get; private set; }
+        
 
         public Aura(Func<Card, bool> filter, Modifiable attribute, int value, string description)
         {
@@ -771,6 +797,18 @@ namespace stonekart
             this.attribute = attribute;
             this.value = value;
             this.description = description;
+        }
+    }
+
+    public class DynamicAura : Aura
+    {
+        public override int value => function();
+
+        private Func<int> function;
+
+        public DynamicAura(Func<Card, bool> filter, Modifiable attribute, Func<int> function, string description) : base(filter, attribute, 0, description)
+        {
+            this.function = function;
         }
     }
 }

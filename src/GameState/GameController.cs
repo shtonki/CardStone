@@ -75,28 +75,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.AlterTime,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.FrothingGnome,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.LightningBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.SteamBolt,
-                CardId.Unmake,
-                CardId.Unmake,
-                CardId.Unmake,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
-                CardId.ForkedLightning,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
             };
         }
 
@@ -286,7 +272,7 @@ namespace stonekart
             {
                 gameInterface.setStep(game.currentStep, game.herosTurn);
                 doStepStuff(game.currentStep);
-                handleEvent(new StepEvent(game.currentStep));
+                handleEvent(new StepEvent(game.currentStep, game.activePlayer));
                 givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
                 game.advanceStep();
             }
@@ -632,15 +618,23 @@ namespace stonekart
                             throw new Exception("we don't support these things yet");
                         }
 
-
-                        Target[] targets = getTargets(a);
-                        if (targets == null) { continue; }
-
-                        var v = a.getCost().check(c, gameInterface);
+                        int[][] v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
-                        
-                        var sw = new StackWrapper(c, a, targets);
+                        Target[] targets = getTargets(a, true);
+                        if (targets == null) { continue; }
+
+                        Card onStack;
+                        if (a != c.castAbility)
+                        {
+                            onStack = Card.createDummy(a);
+                        }
+                        else
+                        {
+                            onStack = c;
+                        }
+
+                        var sw = new StackWrapper(onStack, a, targets);
                         return new CastAction(sw, v);
                     }
                 }
@@ -652,9 +646,9 @@ namespace stonekart
             return false;
         }
 
-        private Target[] getTargets(Ability a)
+        private Target[] getTargets(Ability a, bool cancelable)
         {
-            gameInterface.setContext("Select target(s)", Choice.Cancel);
+            gameInterface.setContext("Select target(s)", cancelable ? Choice.Cancel : Choice.PADDING);
             Target[] targets = new Target[a.targetCount];
             TargetRule[] rules = a.targetRules;
 
@@ -903,7 +897,7 @@ namespace stonekart
                     if (ability.card.owner.isHero)
                     {
                         CardPanelControl p = gameInterface.showCards(ability.card);
-                        Target[] targets = getTargets(ability);
+                        Target[] targets = getTargets(ability, false);
                         w = new StackWrapper(Card.createDummy(ability), ability, targets);
                         gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
                         p.closeWindow();

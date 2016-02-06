@@ -1,13 +1,6 @@
-* allow resizing of the game window
 * have the mana buttons be six actual buttons then an 'add button' to the right
 * pretty sure we're leaking memory through brushes
-* make the stack of displaypanel information in GameInterface an actual stack
 * fix Observer/Observable and all the classes that implement them
-* implement showWindow in GUI
-* implement showCards in GameInterface
 * stop being OOgodx in GameEvent
-* fix GameInterface
-* shared rng
 * we're leaking memory through observers
 * make damage step and end combat step the same step
-* merge GameInterface and Game and create GameState

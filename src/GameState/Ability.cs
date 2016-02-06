@@ -90,6 +90,11 @@ namespace stonekart
         {
             
         }
+
+        public TriggeredAbility(Card c, EventFilter f, string desc, LocationPile p, EventTiming t, Func<bool> preResolveCheck, params SubEffect[] es)
+            : this(c, f, desc, p, t, new Effect(es, preResolveCheck))
+        {
+        }
     }
     
 }

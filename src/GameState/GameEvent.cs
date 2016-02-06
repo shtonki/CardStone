@@ -148,10 +148,12 @@ namespace stonekart
     class StepEvent : GameEvent
     {
         public Step step { get; private set; }
+        public Player activePlayer { get; private set; }
 
-        public StepEvent(Step step) : base(GameEventType.STEP)
+        public StepEvent(Step step, Player activePlayer) : base(GameEventType.STEP)
         {
             this.step = step;
+            this.activePlayer = activePlayer;
         }
     }
 
