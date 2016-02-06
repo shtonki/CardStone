@@ -167,7 +167,7 @@ namespace stonekart
                     race = Race.Salamander;
                     activatedAbilities.Add(new ActivatedAbility(this,
                         new Cost(new ManaCost(0, 2, 0, 0, 0, 2)),
-                        new Effect(new Draw(true, 1)),
+                        new Effect(new Draw(TargetLambda.CONTROLLER, 1)),
                         LocationPile.FIELD, 
                         "2BB: Target player draws a card."));
                     } break;
@@ -186,7 +186,7 @@ namespace stonekart
                 {
                     redCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new Ping(3, TargetLambda.ZAPPABLE));
+                    fx.Add(new Ping(TargetLambda.ZAPPABLE, 3));
                     castDescription = "Deal 3 damage to target player or creature.";
                 } break;
 
@@ -194,8 +194,8 @@ namespace stonekart
                 {
                     redCost = 1;
                     cardType = CardType.Sorcery;
-                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
-                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
+                    fx.Add(new Ping(TargetLambda.ZAPPABLE, 1));
+                    fx.Add(new Ping(TargetLambda.ZAPPABLE, 1));
                     castDescription = "Deal 1 damage to 2 target players or creatures.";
                 } break;
 
@@ -212,7 +212,7 @@ namespace stonekart
                 {
                     blueCost = 2;
                     cardType = CardType.Sorcery;
-                    fx.Add(new Draw(false, 2));
+                    fx.Add(new Draw(TargetLambda.CONTROLLER, 2));
                     castDescription = "Draw 2 cards";
                 } break;
 
@@ -239,7 +239,7 @@ namespace stonekart
                     baseTriggeredAbilities.Add(new TriggeredAbility(this, 
                         friendlyETB, 
                         underYourControlETBDescription + "gain 1 life.", 
-                        LocationPile.FIELD, EventTiming.Post, new GainLife(false, 1)));
+                        LocationPile.FIELD, EventTiming.Post, new GainLife(TargetLambda.CONTROLLER, 1)));
                 } break;
 
                 case CardId.Rapture:
@@ -247,7 +247,7 @@ namespace stonekart
                     whiteCost = 2;
                     greyCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new MoveTo(LocationPile.EXILE, TargetLambda.ZAPPABLECREATURE));
+                    fx.Add(new MoveTo(TargetLambda.ZAPPABLECREATURE, LocationPile.EXILE));
                     castDescription = "Exile target creature";
                 } break;
 
@@ -281,7 +281,7 @@ namespace stonekart
                         thisETB(this),
                         thisETBDescription + "draw a card.",
                         LocationPile.FIELD, EventTiming.Post,
-                        new Draw(false, 1)
+                        new Draw(TargetLambda.CONTROLLER, 1)
                         ));
                 } break;
 
@@ -306,7 +306,7 @@ namespace stonekart
                     blueCost = 1;
                     cardType = CardType.Instant;
                     fx.Add(new Timelapse(2));
-                    fx.Add(new Draw(false, 1));
+                    fx.Add(new Draw(TargetLambda.CONTROLLER, 1));
                     castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
                 } break;
 
@@ -333,7 +333,7 @@ namespace stonekart
                     blackCost = 1;
                     cardType = CardType.Sorcery;
                     fx.Add(new Duress((_) => true));
-                    fx.Add(new GainLife(false, -2));
+                    fx.Add(new GainLife(TargetLambda.CONTROLLER, -2));
                     castDescription =
                         "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
                 } break;
@@ -348,14 +348,17 @@ namespace stonekart
                     subType = SubType.Wizard;
                     basePower = 2;
                     baseToughness = 2;
-                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + "draw a card.", LocationPile.GRAVEYARD, EventTiming.Post, new Draw(false, 1)));
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), 
+                        thisDiesDescription + "draw a card.", 
+                        LocationPile.GRAVEYARD, EventTiming.Post, 
+                        new Draw(TargetLambda.CONTROLLER, 1)));
                 } break;
 
                 case CardId.Unmake:
                 {
                     blueCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new MoveTo(LocationPile.HAND, TargetLambda.ZAPPABLECREATURE));
+                    fx.Add(new MoveTo(TargetLambda.ZAPPABLECREATURE, LocationPile.HAND));
                     castDescription = "Return target creature to its owners hand";
                 } break;
 
@@ -369,7 +372,7 @@ namespace stonekart
                         triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " deal 1 damage to target player or creature.", 
                             LocationPile.FIELD, EventTiming.Post,
                             () => true, 
-                            new Ping(1, TargetLambda.ZAPPABLE)));
+                            new Ping(TargetLambda.ZAPPABLE, 1)));
                 } break;
 
                 case CardId.SteamBolt:
@@ -377,8 +380,8 @@ namespace stonekart
                     redCost = 1;
                     blueCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
-                    fx.Add(new Draw(false, 1));
+                    fx.Add(new Ping(TargetLambda.ZAPPABLE, 1));
+                    fx.Add(new Draw(TargetLambda.CONTROLLER, 1));
                     castDescription = "Deal 1 damage to target creature or player.\nDraw a card.";
                 } break;
 
@@ -407,7 +410,7 @@ namespace stonekart
                             return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
                         };
                         triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
-                        LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                        LocationPile.FIELD, EventTiming.Post, new Draw(TargetLambda.CONTROLLER, 1)));
                 } break;
                     
 
