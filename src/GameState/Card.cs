@@ -266,8 +266,7 @@ namespace stonekart
                     baseToughness = 1;
                     basePower = 1;
                     forceColour = Colour.WHITE;
-                    
-                    } break;
+                } break;
 
                 case CardId.ShimmeringKoi:
                 {
@@ -393,24 +392,41 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
                     
-
                 case CardId.Jew:
                 {
                     blueCost = 4;
                     cardType = CardType.Creature;
                     basePower = 2;
                     baseToughness = 2;
-                        EventFilter f = (gameEvent) =>
-                        {
-                            if (gameEvent.type != GameEventType.STEP) return false;
-                            StepEvent stepevent = (StepEvent)gameEvent;
-                            return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
-                        LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                    EventFilter f = (gameEvent) =>
+                    {
+                        if (gameEvent.type != GameEventType.STEP) return false;
+                        StepEvent stepevent = (StepEvent)gameEvent;
+                        return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
+                    LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
                 } break;
-                    
 
+                /*
+                case CardId.EvolveFangs:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, never, 2));
+                    castDescription = "Target creature gets +2/+0.";
+                } break;
+                */
+                case CardId.VikingMushrooms:
+                {
+                    redCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
+                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, never, 2));
+                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
+                    //fx.Add(new A
+                    } break;
+                
                 default:
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -495,7 +511,9 @@ namespace stonekart
 
             return moveEvent.to.pile == LocationPile.FIELD;
         }
-        
+
+        private const string fervorReminderText = "(Creatures with fervor are unaffected by memes)"; //watchamacallit
+
         private const string underYourControlETBDescription =
             "Whenever a creature enters the battlefield under your control ";
         private bool friendlyETB(GameEvent e)
@@ -762,6 +780,7 @@ namespace stonekart
         SteamBolt,
         IlasGravekeeper,
         Jew,
+        VikingMushrooms,
     }
 
     public enum CardType
