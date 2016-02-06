@@ -133,16 +133,28 @@ namespace stonekart
                 xd.Location = new Point(0, Y);
                 Y += xd.Height;
 
+                var name1 = name;
                 xd.MouseDown += (_, __) =>
                 {
-                    buttonClickedCallBack(name);
+                    buttonClickedCallBack(name1);
                     g.close();
                 };
-                deckAsker.Controls.Add(xd);
+
+                if (deckAsker.InvokeRequired)
+                {
+                    deckAsker.Invoke(new Action(() =>
+                    {
+                        deckAsker.Controls.Add(xd);
+                    }));
+                }
+                else
+                {
+                    deckAsker.Controls.Add(xd);
+                }
             }
         }
 
-        public List<CardId> loadDeck(string deckName)
+        public static List<CardId> loadDeck(string deckName)
         {
             List<CardId> myDeck = new List<CardId>();
             try

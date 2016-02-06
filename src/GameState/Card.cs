@@ -304,7 +304,7 @@ namespace stonekart
                 case CardId.AlterTime:
                 {
                     blueCost = 1;
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Instant;
                     fx.Add(new Timelapse(2));
                     fx.Add(new Draw(false, 1));
                     castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
@@ -409,13 +409,7 @@ namespace stonekart
                         triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
                 } break;
-
-                case CardId.Xd:
-                {
-                    blueCost = 1;
-                    cardType = CardType.Instant;
-                    fx.Add(new Mill(false, 2));
-                } break;
+                    
 
                 default:
                 {
@@ -768,7 +762,6 @@ namespace stonekart
         SteamBolt,
         IlasGravekeeper,
         Jew,
-        Xd,
     }
 
     public enum CardType

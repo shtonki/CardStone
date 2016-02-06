@@ -66,26 +66,75 @@ namespace stonekart
             shuffleDeck(homePlayer);
             shuffleDeck(awayPlayer);
             game.setHeroStarting(goingFirst);
-            handleEvent(new DrawEvent(game.hero, 4));
-            handleEvent(new DrawEvent(game.villain, 4));
+            mulligan(game.activePlayer, 4);
+            mulligan(game.inactivePlayer, 5);
             loop();
+        }
+
+        private void mulligan(Player p, int handSize)
+        {
+            Choice c;
+            int life = 2;
+            while (p.getLife() < 40)
+            {
+                while (p.hand.count > 0)
+                {
+                    moveCardTo(p.hand.peek(), p.deck);
+                }
+                shuffleDeck(p);
+                for (int i = 0; i < handSize; i++)
+                {
+                    moveCardTo(p.deck.peek(), p.hand);
+                }
+
+                if (p.isHero)
+                {
+                    c = gameInterface.getChoice("Do you want to mulligan?", Choice.Yes, Choice.No);
+                    gameInterface.sendSelection((int)c);
+                }
+                else
+                {
+                    gameInterface.setContext("Opponent is mulliganing.");
+                    c = (Choice)gameInterface.demandSelection();
+                }
+                if (c != Choice.Yes)
+                {
+                    break;
+                }
+                p.opponent.setLifeRelative(life++);
+            }
         }
 
         private CardId[] loadDeck()
         {
-            DeckEditorPanel.loadDeckFromFile(Console.WriteLine);
+            WaitFor<string> w = new WaitFor<string>();
+            DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
+            return DeckEditorPanel.loadDeck(w.wait()).ToArray();
             //return (CardId[])Enum.GetValues(typeof (CardId));
             return new[]
             {
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
-                CardId.Xd,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.SolemnAberration,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGambit      ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.IlasGravekeeper ,
+                CardId.Unmake          ,
+                CardId.Unmake          ,
+                CardId.Unmake          ,
+                CardId.AlterTime       ,
+                CardId.AlterTime       ,
+                CardId.AlterTime       ,
+                CardId.PropheticVision ,
+                CardId.PropheticVision ,
+                CardId.ShimmeringKoi   ,
+                CardId.ShimmeringKoi   ,
             };
         }
 
