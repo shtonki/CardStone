@@ -216,10 +216,11 @@ namespace stonekart
                     castDescription = "Draw 2 cards";
                 } break;
 
-                case CardId.FrothingGnome:
+                case CardId.DragonHatchling:
                 {
                     redCost = 1;
                     cardType = CardType.Creature;
+                    race = Race.Dragon;
                     basePower = 1;
                     baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
@@ -358,12 +359,12 @@ namespace stonekart
                     castDescription = "Return target creature to its owners hand";
                 } break;
 
-                case CardId.GnomishCannoneer:
+                case CardId.EnragedDragon:
                 {
-                    redCost = 1;
+                    redCost = 2;
                     cardType = CardType.Creature;
-                    race = Race.Gnome;
-                    basePower = 2;
+                    race = Race.Dragon;
+                    basePower = 3;
                     baseToughness = 2;
                         triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " deal 1 damage to target player or creature.", 
                             LocationPile.FIELD, EventTiming.Post,
@@ -391,14 +392,7 @@ namespace stonekart
                     race = Race.Zombie;
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
-
-                case CardId.Xd:
-                {
-                    blueCost = 1;
-                    baseToughness = 1;
-                    basePower = 1;
-                    cardType = CardType.Creature;
-                } break;
+                    
 
                 default:
                 {
@@ -732,7 +726,7 @@ namespace stonekart
         SolemnAberration,
         PropheticVision,
         ForkedLightning,
-        FrothingGnome,
+        DragonHatchling,
         TempleHealer,
         Rapture,
         Squire,
@@ -745,10 +739,9 @@ namespace stonekart
         IlasGambit,
         YungLich,
         Unmake,
-        GnomishCannoneer,
+        EnragedDragon,
         SteamBolt,
         IlasGravekeeper,
-        Xd,
     }
 
     public enum CardType
@@ -768,7 +761,7 @@ namespace stonekart
         Fish,
         Bear,
         Zombie,
-        Gnome,
+        Dragon,
     }
 
     public enum SubType

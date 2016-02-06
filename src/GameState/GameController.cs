@@ -75,14 +75,14 @@ namespace stonekart
         {
             return new[]
             {
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
-                CardId.Xd, 
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
+                CardId.CallToArms,
             };
         }
 
