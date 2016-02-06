@@ -408,7 +408,7 @@ namespace stonekart
                         return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
                     };
                     triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
-                    LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                    LocationPile.FIELD, EventTiming.Post, new Draw(TargetLambda.CONTROLLER, 1)));
                 } break;
 
                 /*
@@ -426,7 +426,7 @@ namespace stonekart
                     cardType = CardType.Sorcery;
                     castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
                     fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, never, 2));
-                    fx.Add(new Ping(1, TargetLambda.ZAPPABLE));
+                    fx.Add(new Ping(TargetLambda.LAST, 1));
                     //fx.Add(new A
                     } break;
                 
