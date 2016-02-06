@@ -9,6 +9,7 @@ namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
     {
+        
         Button saveButton, loadButton;
         Button[] sortButtons;
         CardPanel p;
@@ -22,6 +23,7 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
+            BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
@@ -141,7 +143,7 @@ namespace stonekart
             }
         }
 
-        public List<CardId> loadDeck(string deckName)
+        private List<CardId> loadDeck(string deckName)
         {
             List<CardId> myDeck = new List<CardId>();
             try
