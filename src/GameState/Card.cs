@@ -394,6 +394,24 @@ namespace stonekart
                 } break;
                     
 
+                case CardId.Jew:
+                {
+                    blueCost = 4;
+                    cardType = CardType.Creature;
+                    basePower = 2;
+                    baseToughness = 2;
+                        EventFilter f = (gameEvent) =>
+                        {
+                            if (gameEvent.type != GameEventType.STEP) return false;
+                            StepEvent stepevent = (StepEvent)gameEvent;
+                            return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
+                        };
+                        triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
+                        LocationPile.FIELD, EventTiming.Post, new Draw(false, 1)));
+                } break;
+
+                
+
                 default:
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -500,6 +518,7 @@ namespace stonekart
                 return moveEvent.to.pile == LocationPile.FIELD && moveEvent.card == c;
             };
         }
+
         private const string thisDiesDescription = "Whenever this card enters a graveyard from the battlefield, ";
         private static EventFilter thisDies(Card c)
         {
@@ -539,15 +558,11 @@ namespace stonekart
             return castingCost;
         }
 
-
         public void setLocationRaw(Location l)
         {
             location = l;
         }
         
-
-
-
         public CardType getType()
         {
             return cardType;
@@ -576,14 +591,17 @@ namespace stonekart
             */
         }
 
-        
-        
+        public bool getFrame(CardId id)
+        {
+            
+            return true;
+        }
+
         public void damage(int d)
         {
             modify(Modifiable.Toughness, -d, never);
         }
         
-
         public bool isTopped()
         {
             return topped;
@@ -610,6 +628,8 @@ namespace stonekart
             return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
         }
 
+
+        
 
         public bool has(KeyAbility a)
         {
@@ -742,6 +762,7 @@ namespace stonekart
         EnragedDragon,
         SteamBolt,
         IlasGravekeeper,
+        Jew,
     }
 
     public enum CardType
