@@ -412,7 +412,15 @@ namespace stonekart
                         triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(TargetLambda.CONTROLLER, 1)));
                 } break;
-                    
+
+                case CardId.Xd:
+                {
+                    redCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
+                    fx.Add(new ModifyUntil(TargetLambda.ZAPPABLECREATURE, Modifiable.Power, never, 2));
+                    fx.Add(new Ping(TargetLambda.LAST, 1));
+                } break;
 
                 default:
                 {
@@ -765,6 +773,7 @@ namespace stonekart
         SteamBolt,
         IlasGravekeeper,
         Jew,
+        Xd,
     }
 
     public enum CardType

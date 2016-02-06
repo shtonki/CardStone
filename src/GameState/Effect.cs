@@ -54,7 +54,7 @@ namespace stonekart
                 }
                 else if (targetRules[i] == TargetLambda.LAST)
                 {
-                    t = targets[i - 1];
+                    t = ts[ctr - 1];
                 }
                 else
                 {
