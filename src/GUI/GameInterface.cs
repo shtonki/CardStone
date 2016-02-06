@@ -351,6 +351,7 @@ namespace stonekart
         public void closeWindow()
         {
             //todo(seba) something needs to be released here
+            panel.close();
             window.close();
         }
 
