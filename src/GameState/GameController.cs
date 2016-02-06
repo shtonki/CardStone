@@ -286,7 +286,7 @@ namespace stonekart
             {
                 gameInterface.setStep(game.currentStep, game.herosTurn);
                 doStepStuff(game.currentStep);
-                handleEvent(new StepEvent(game.currentStep));
+                handleEvent(new StepEvent(game.currentStep, game.activePlayer));
                 givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
                 game.advanceStep();
             }

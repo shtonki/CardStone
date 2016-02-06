@@ -354,7 +354,7 @@ namespace stonekart
 
                 case CardId.GnomishCannoneer:
                 {
-                    redCost = 1;
+                    redCost = 2;
                     cardType = CardType.Creature;
                     race = Race.Gnome;
                     basePower = 2;
