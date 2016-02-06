@@ -75,7 +75,7 @@ namespace stonekart
         {
             Choice c;
             int life = 2;
-            while (p.getLife() < 40)
+            while (p.opponent.getLife() < 40)
             {
                 while (p.hand.count > 0)
                 {
