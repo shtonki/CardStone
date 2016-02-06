@@ -52,6 +52,10 @@ namespace stonekart
                 {
                     t = new Target(c);
                 }
+                else if (targetRules[i] == TargetLambda.LAST)
+                {
+                    t = targets[i - 1];
+                }
                 else
                 {
                     t = ts[ctr++];

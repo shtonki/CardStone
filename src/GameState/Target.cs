@@ -84,6 +84,7 @@ namespace stonekart
     {
         SELF,
         CONTROLLER,
+        LAST,
 
         ANY,
         PLAYER,

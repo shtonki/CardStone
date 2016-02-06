@@ -800,7 +800,6 @@ namespace stonekart
     {
         Power,
         Toughness,
-
     }
 
     public class Aura
