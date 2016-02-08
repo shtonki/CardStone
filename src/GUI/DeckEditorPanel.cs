@@ -14,6 +14,7 @@ namespace stonekart
         Button[] sortButtons;
         CardPanel p;
         CardButton[] cards;
+        Label noDeckName;
         TextBox tb;
         Card[] ids;
         Pile myDeckIsHard;
@@ -23,6 +24,7 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
+            
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
@@ -45,7 +47,11 @@ namespace stonekart
                     else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
                 };
             }
-
+            noDeckName = new Label();
+            noDeckName.Text = "Every deck needs a name.";
+            noDeckName.Visible = false;
+            noDeckName.Size = new Size(250, 25);
+            noDeckName.BackColor = Color.Red;
             loadButton = new Button();
             loadButton.Image = ImageLoader.getStepImage("load", new Size(60, 60));
             loadButton.Size = loadButton.Image.Size;
@@ -59,7 +65,12 @@ namespace stonekart
             saveButton.Size = saveButton.Image.Size;
             saveButton.MouseDown += (_, __) =>
             {
-                saveDeck();
+                if (tb.Text != "")
+                    saveDeck();
+                else
+                {
+                    noDeckName.Visible = true;
+                }
             };
 
             sortButtons = new Button[5];
@@ -83,7 +94,7 @@ namespace stonekart
             }
 
             tb = new TextBox();
-
+            Controls.Add(noDeckName);
             Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
@@ -212,7 +223,8 @@ namespace stonekart
                 sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 35, Size.Height / 20);
             }
 
-
+            noDeckName.Location = new Point(tb.Location.X, tb.Location.Y-20);
+            noDeckName.Size = tb.Size;
             drawTheseButtons(cards);
             /*for (int i = 0; i < cards.Length; i++)
             {
