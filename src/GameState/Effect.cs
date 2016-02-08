@@ -52,6 +52,10 @@ namespace stonekart
                 {
                     t = new Target(c);
                 }
+                else if (targetRules[i] == TargetLambda.LAST)
+                {
+                    t = ts[ctr - 1];
+                }
                 else
                 {
                     t = ts[ctr++];
@@ -73,7 +77,7 @@ namespace stonekart
 
         public TargetRule[] getTargetRules()
         {
-            return targetRules.Where((l) => l != TargetLambda.CONTROLLER && l != TargetLambda.SELF)
+            return targetRules.Where((l) => l >= TargetLambda.ANY)
                 .Select((l) => new TargetRule(l))
                 .ToArray();
         }
@@ -178,10 +182,10 @@ namespace stonekart
     {
         private int i;
 
-        public Draw(bool targeted, int cards)
+        public Draw(TargetLambda target, int cards)
         {
             i = cards;
-            setSelfPlayer(targeted);
+            setTargets(target);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -197,7 +201,7 @@ namespace stonekart
     {
         private int d;
 
-        public Ping(int damage, TargetLambda l)
+        public Ping(TargetLambda l, int damage)
         {
             d = damage;
             setTargets(TargetLambda.SELF, l);
@@ -231,7 +235,7 @@ namespace stonekart
         private LocationPile pile;
         
 
-        public MoveTo(LocationPile pile, TargetLambda l)
+        public MoveTo(TargetLambda l, LocationPile pile)
         {
             this.pile = pile;
             setTargets(l);
@@ -249,10 +253,10 @@ namespace stonekart
     {
         private int life;
 
-        public GainLife(bool targetable, int n)
+        public GainLife(TargetLambda target, int n)
         {
             life = n;
-            setSelfPlayer(targetable);
+            setTargets(target);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -302,8 +306,6 @@ namespace stonekart
             setTargets(t);
         }
 
-        
-
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
         {
             Card card = nextCard();
@@ -350,10 +352,10 @@ namespace stonekart
     {
         private int cards;
 
-        public Mill(bool targeted, int cards)
+        public Mill(TargetLambda target, int cards)
         {
             this.cards = cards;
-            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.CONTROLLER);
+            setTargets(target);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
