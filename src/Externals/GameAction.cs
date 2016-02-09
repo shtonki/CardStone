@@ -114,7 +114,7 @@ namespace stonekart
 
                         csts[i] = xx;
                     }
-
+                    a.setCastTargets(targets.ToArray());
                     var sw = new StackWrapper(c, a, targets.ToArray());
                     r = new CastAction(sw, csts);
 

@@ -673,9 +673,8 @@ namespace stonekart
                         int[][] v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
-                        a.effect.aquireTargets(gameInterface, game);
 
-                        Target[] targets = getTargets(a, true);
+                        Target[] targets = a.aquireTargets(gameInterface, game);
                         if (targets == null) { continue; }
 
                         Card onStack;
@@ -909,16 +908,10 @@ namespace stonekart
             {
                 if (ability.card.location.pile != ability.pile) { continue; }
                 StackWrapper w;
-                if (ability.targetCount == 0)
-                {
-                    w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
-                }
-                else
-                {
                     if (ability.card.owner.isHero)
                     {
                         CardPanelControl p = gameInterface.showCards(ability.card);
-                        Target[] targets = getTargets(ability, false);
+                        Target[] targets = ability.aquireTargets(gameInterface, game);
                         w = new StackWrapper(Card.createDummy(ability), ability, targets);
                         gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
                         p.closeWindow();
@@ -928,7 +921,6 @@ namespace stonekart
                         var v = gameInterface.demandCastAction();
                         w = v.getStackWrapper();
                     }
-                }
 
                 waitingTriggeredAbilities.Add(w);
 

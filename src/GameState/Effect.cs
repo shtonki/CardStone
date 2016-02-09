@@ -24,12 +24,21 @@ namespace stonekart
             this.preResolveCheck = preResolveCheck;
         }
 
-        public void aquireTargets(GameInterface ginterface, GameState gstate)
+        public Target[] aquireTargets(GameInterface ginterface, GameState gstate)
         {
+            List<Target> l = new List<Target>();
             foreach (SubEffect e in subEffects)
             {
-                e.resolveCastTargets(ginterface, gstate);
+                Target[] ts = e.resolveCastTargets(ginterface, gstate);
+                if (ts == null) return null;
+                l.AddRange(ts);
             }
+            return l.ToArray();
+        }
+
+        public void setTargets(Target[] ts)
+        {
+            subEffects[0].forceCastTargets(ts);
         }
 
         public List<GameEvent> resolve(Card c, Target[] ts, GameInterface ginterface, GameState gameState)
@@ -57,6 +66,7 @@ namespace stonekart
 
     public abstract class SubEffect
     {
+        public Target[] targets => targetRule.getTargets();
         private TargetRule targetRule;
 
         protected SubEffect(TargetRule t)
@@ -81,7 +91,7 @@ namespace stonekart
             }
             return r.ToArray();
         }
-        public bool resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
             return targetRule.resolveCastTargets(ginterface, gstate);
         }
@@ -89,8 +99,11 @@ namespace stonekart
         {
             targetRule.resolveResolveTargets(gi, resolving, last);
         }
-        public Target[] targets => targetRule.getTargets();
 
+        public void forceCastTargets(Target[] ts)
+        {
+            (targetRule as FilterTargetRule)?.forceTargets(ts);
+        }
 
         abstract protected GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard);
     }

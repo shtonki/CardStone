@@ -29,8 +29,12 @@ namespace stonekart
 
     abstract public class TargetRule
     {
-        public abstract Target[] getTargets();
-        public abstract bool resolveCastTargets(GameInterface ginterface, GameState gstate);
+        protected Target[] targets;
+        public Target[] getTargets()
+        {
+            return targets;
+        }
+        public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate);
         public abstract void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last);
         public abstract bool check(Target[] ts);
     }
@@ -39,12 +43,11 @@ namespace stonekart
     {
         private int targetCount;
         private List<Func<Target, bool>> checks = new List<Func<Target, bool>>();
-        private Target[] targets;
 
         public FilterTargetRule(int targetCount, params FilterLambda[] ls)
         {
             targets = new Target[targetCount];
-
+            checks = new List<Func<Target, bool>>(ls.Length);
             this.targetCount = targetCount;
 
             foreach (FilterLambda l in ls)
@@ -82,9 +85,10 @@ namespace stonekart
 
         }
 
-        public override bool resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
             int i = 0;
+            ginterface.setContext("choose targetx");
             while (i < targetCount)
             {
                 GameElement ge = ginterface.getNextGameElementPress();
@@ -107,18 +111,16 @@ namespace stonekart
                 }
                 if (ge.choice != null && ge.choice.Value == Choice.Cancel)
                 {
-                    return false;
+                    targets = null;
+                    break;
                 }
             }
-            return true;
+            ginterface.clearContext();
+            return targets;
         }
         public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
         {
             
-        }
-        public override Target[] getTargets()
-        {
-            return targets;
         }
         public override bool check(Target[] ts)
         {
@@ -129,45 +131,44 @@ namespace stonekart
         {
             return checks.All(v => v(t));
         }
-        
+
+        public void forceTargets(Target[] ts)
+        {
+            targets = ts;
+        }
     }
 
     public class ResolveTargetRule : TargetRule
     {
-        private Target[] targets;
-        private wwwdotrickandmortydotcom www;
+        private ResolveTarget www;
 
-        public ResolveTargetRule(wwwdotrickandmortydotcom www)
+        public ResolveTargetRule(ResolveTarget www)
         {
             this.www = www;
             targets = new Target[1];
         }
 
-        public override Target[] getTargets()
-        {
-            return targets;
-        }
 
-        public override bool resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
-            return true;
+            return new Target[] {};
         }
 
         public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
         {
             switch (www)
             {
-                case wwwdotrickandmortydotcom.CONTROLLER:
+                case ResolveTarget.CONTROLLER:
                 {
                     targets[1] = new Target(resolving.owner);
                 } break;
 
-                case wwwdotrickandmortydotcom.SELF:
+                case ResolveTarget.SELF:
                 {
                     targets[1] = new Target(resolving);
                 } break;
 
-                case wwwdotrickandmortydotcom.LAST:
+                case ResolveTarget.LAST:
                 {
                     targets = last;
                 } break;
@@ -187,7 +188,6 @@ namespace stonekart
 
     public class SelectFromTargetRule : TargetRule
     {
-        private Target[] targets;
         private Func<Card[]> cards;
 
         public SelectFromTargetRule(Func<Card[]> cards, int count)
@@ -196,14 +196,10 @@ namespace stonekart
             targets = new Target[count];
         }
 
-        public override Target[] getTargets()
-        {
-            return targets;
-        }
 
-        public override bool resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
-            return true;
+            return new Target[] { };
         }
 
         public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
@@ -233,7 +229,7 @@ namespace stonekart
         //ZAPPABLECREATURE, 
     }
 
-    public enum wwwdotrickandmortydotcom
+    public enum ResolveTarget
     {
         SELF,
         CONTROLLER,

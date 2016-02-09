@@ -9,7 +9,7 @@ namespace stonekart
     public abstract class Ability
     {
         public Card card { get; protected set; }
-        public Effect effect { get; protected set; }
+        protected Effect effect;
         public List<GameEvent> resolve(Card c, Target[] ts, GameInterface ginterface, GameState gameState)
         {
             return effect.resolve(c, ts, ginterface, gameState);
@@ -18,6 +18,16 @@ namespace stonekart
         protected Ability(Card c)
         {
             card = c;
+        }
+
+        public Target[] aquireTargets(GameInterface gi, GameState gs)
+        {
+            return effect.aquireTargets(gi, gs);
+        }
+
+        public void setCastTargets(Target[] ts)
+        {
+            effect.setTargets(ts);
         }
     }
 
