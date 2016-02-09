@@ -9,7 +9,7 @@ namespace stonekart
     public class Effect
     {
         private SubEffect[] subEffects;
-        private TargetLambda[] targetRules;
+        public TargetRule[] targetRules { get; private set; }
         private Func<bool> preResolveCheck;
         
 
@@ -18,10 +18,10 @@ namespace stonekart
             preResolveCheck = () => true;
             this.subEffects = subEffects;
 
-            var trs = new List<TargetLambda>();
+            var trs = new List<TargetRule>();
             foreach (SubEffect subEffect in subEffects)
             {
-                foreach (TargetLambda l in subEffect.targets)
+                foreach (TargetRule l in subEffect.targets)
                 {
                     trs.Add(l);
                 }
@@ -39,30 +39,7 @@ namespace stonekart
         {
             List<GameEvent> r = new List<GameEvent>();
             if (!preResolveCheck()) { return r; }
-            Target[] targets = new Target[targetRules.Length];
-            int ctr = 0;
-            for (int i = 0; i < targetRules.Length; i++)
-            {
-                Target t;
-                if (targetRules[i] == TargetLambda.CONTROLLER)
-                {
-                    t = new Target(c.controller);
-                }
-                else if (targetRules[i] == TargetLambda.SELF)
-                {
-                    t = new Target(c);
-                }
-                else if (targetRules[i] == TargetLambda.LAST)
-                {
-                    t = ts[ctr - 1];
-                }
-                else
-                {
-                    t = ts[ctr++];
-                }
-                targets[i] = t;
-            }
-            IEnumerator<Target> x = ((IEnumerable<Target>)targets).GetEnumerator();
+            IEnumerator<Target> x = ((IEnumerable<Target>)ts).GetEnumerator();
             x.MoveNext();
             foreach (SubEffect e in subEffects)
             {
@@ -74,43 +51,43 @@ namespace stonekart
             
             return r;
         }
-
-        public TargetRule[] getTargetRules()
-        {
-            return targetRules.Where((l) => l >= TargetLambda.ANY)
-                .Select((l) => new TargetRule(l))
-                .ToArray();
-        }
+        
         
         
     }
 
     public abstract class SubEffect
     {
-        public int targetCount => targets.Length;
-        public TargetLambda[] targets { get; protected set; }
-
-        private IEnumerator<Target> tgts;
+        private TargetRule targetRule;
         private int targetsEaten;
+        private Target[] targets;
 
-        protected SubEffect()
+        protected SubEffect(TargetRule t)
         {
 
         }
 
-        public GameEvent[] resolve(IEnumerator<Target> ts, GameInterface ginterface, GameState game)
+        public GameEvent[] resolveEffect(GameInterface ginterface, GameState game)
         {
-            tgts = ts;
             targetsEaten = 0;
             GameEvent[] r = resolve(ginterface, game);
             if (targetsEaten != targets.Length) { throw new Exception(); }
             return r;
         }
-        abstract protected GameEvent[] resolve(GameInterface ginterface, GameState game);
-        protected void setTargets(params TargetLambda[] ts)
+
+        public void resolveCastTargets(GameInterface ginterface, Card c)
         {
-            targets = ts;
+            
         }
+
+        public void resolveResolveTimeTargets(GameInterface ginterface, Card c)
+        {
+            
+        }
+
+
+        abstract protected GameEvent[] resolve(GameInterface ginterface, GameState game);
+        
 
         protected Target nextTarget()
         {
@@ -235,7 +212,7 @@ namespace stonekart
         private LocationPile pile;
         
 
-        public MoveTo(TargetLambda l, LocationPile pile)
+        public MoveTo( l, LocationPile pile)
         {
             this.pile = pile;
             setTargets(l);

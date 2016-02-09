@@ -24,60 +24,10 @@ namespace stonekart
         {
             this.card = card;
         }
-
     }
 
-    public class TargetRule
+    abstract public class TargetRule
     {
-        private List<Func<Target, bool>> checks; 
-
-        public TargetRule(TargetLambda r) : this(howDoIInlineFunctionsxd(r).ToArray())
-        {
-            
-        }
-
-        private TargetRule(params Func<Target, bool>[] fs)
-        {
-            checks = new List<Func<Target, bool>>(fs);
-        }
-
-        public bool check(Target t)
-        {
-            return checks.All(v => v(t));
-        }
-
-        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetLambda r)
-        {
-            List<Func<Target, bool>> rt = new List<Func<Target, bool>>();
-
-            switch (r)
-            {
-                case TargetLambda.ANY:
-                {
-                    rt.Add(@t => true);
-                } break;
-
-                case TargetLambda.PLAYER:
-                {
-                    rt.Add(@t => t.isPlayer);
-                } break;
-
-                case TargetLambda.ZAPPABLE:
-                {
-                    rt.Add(@t => t.isPlayer ||
-                                 t.card.location.pile == LocationPile.FIELD);
-                } break;
-                case TargetLambda.ZAPPABLECREATURE:
-                {
-                    rt.Add(@t => t.isCard && t.card.location.pile == LocationPile.FIELD);
-                } break;
-
-                default:
-                    throw new Exception();
-            }
-
-            return rt;
-        }
     }
 
     public enum TargetLambda
@@ -88,7 +38,8 @@ namespace stonekart
 
         ANY,
         PLAYER,
+        CREATURE,
         ZAPPABLE,
-        ZAPPABLECREATURE,
+        //ZAPPABLECREATURE, 
     }
 }

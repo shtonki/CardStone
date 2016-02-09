@@ -413,7 +413,7 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, new Draw(TargetLambda.CONTROLLER, 1)));
                 } break;
 
-                case CardId.Xd:
+                case CardId.VikingMushroom:
                 {
                     redCost = 1;
                     cardType = CardType.Sorcery;
@@ -490,6 +490,8 @@ namespace stonekart
 
         private static Modifiable<int>.Operator add = (a, b) => a + b;
         private static Modifiable<int>.Operator sub = (a, b) => a - b;
+        private static Modifiable<bool>.Operator addb = (a, b) => b;
+        private static Modifiable<bool>.Operator subb = (a, b) => a;
 
         private static Clojurex never = () => false;
 
@@ -772,8 +774,10 @@ namespace stonekart
         EnragedDragon,
         SteamBolt,
         IlasGravekeeper,
+
+
         Jew,
-        Xd,
+        VikingMushroom,
     }
 
     public enum CardType

@@ -12,14 +12,14 @@ namespace stonekart
         
         public Effect effect { get; protected set; }
 
-        public int targetCount => effect.getTargetRules().Length;
+        public int targetCount => effect.targetRules.Length;
 
         public List<GameEvent> resolve(Card c, Target[] ts, GameInterface ginterface, GameState gameState)
         {
             return effect.resolve(c, ts, ginterface, gameState);
         }
 
-        public TargetRule[] targetRules => effect.getTargetRules();
+        public TargetRule[] targetRules => effect.targetRules;
 
         public string description { get; protected set; }
 
