@@ -673,6 +673,8 @@ namespace stonekart
                         int[][] v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
+                        a.effect.aquireTargets(gameInterface, game);
+
                         Target[] targets = getTargets(a, true);
                         if (targets == null) { continue; }
 
@@ -698,39 +700,6 @@ namespace stonekart
             return false;
         }
 
-        private Target[] getTargets(Ability a, bool cancelable)
-        {
-            gameInterface.setContext("Select target(s)", cancelable ? Choice.Cancel : Choice.PADDING);
-            Target[] targets = new Target[a.targetCount];
-            TargetRule[] rules = a.targetRules;
-
-            int i = 0;
-            while (i < targets.Length)
-            {
-                Target t = null;
-                GameElement chosenGameElement = gameInterface.getNextGameElementPress();
-                if (chosenGameElement.player != null)
-                {
-                    t = new Target(chosenGameElement.player);
-                }
-                else if (chosenGameElement.card != null)
-                {
-                    t = new Target(chosenGameElement.card);
-                }
-                else if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.Cancel)
-                {
-                    targets = null;
-                    break;
-                }
-
-                if (t != null && rules[i].check(t))
-                {
-                    targets[i++] = t;
-                }
-            }
-            gameInterface.clearContext();
-            return targets;
-        }
         
         private Card[] chooseMultiple(string message, Func<Card, bool> xd)
         {

@@ -305,7 +305,7 @@ namespace stonekart
                 {
                     blueCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new Timelapse(2));
+                    fx.Add(new ShuffleOption(2));
                     fx.Add(new Draw(FilterLambda.CONTROLLER, 1));
                     castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
                 } break;
