@@ -116,7 +116,7 @@ namespace stonekart
         }
         protected void setSelfPlayer(bool targeted)
         {
-            setTargets(targeted ? TargetLambda.PLAYER : TargetLambda.CONTROLLER);
+            setTargets(targeted ? FilterLambda.PLAYER : FilterLambda.CONTROLLER);
         }
     }
     
@@ -128,7 +128,7 @@ namespace stonekart
         public Timelapse(int n)
         {
             this.n = n;
-            setTargets(TargetLambda.CONTROLLER);
+            setTargets(FilterLambda.CONTROLLER);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -159,10 +159,10 @@ namespace stonekart
     {
         private int i;
 
-        public Draw(TargetLambda target, int cards)
+        public Draw(FilterLambda filter, int cards)
         {
             i = cards;
-            setTargets(target);
+            setTargets(filter);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -178,10 +178,10 @@ namespace stonekart
     {
         private int d;
 
-        public Ping(TargetLambda l, int damage)
+        public Ping(FilterLambda l, int damage)
         {
             d = damage;
-            setTargets(TargetLambda.SELF, l);
+            setTargets(FilterLambda.SELF, l);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -230,10 +230,10 @@ namespace stonekart
     {
         private int life;
 
-        public GainLife(TargetLambda target, int n)
+        public GainLife(FilterLambda filter, int n)
         {
             life = n;
-            setTargets(target);
+            setTargets(filter);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -249,7 +249,7 @@ namespace stonekart
         public int count { get; private set; }
         public CardId card { get; private set; }
 
-        public SummonTokens(TargetLambda l, int n, CardId c)
+        public SummonTokens(FilterLambda l, int n, CardId c)
         {
             count = n;
             card = c;
@@ -275,7 +275,7 @@ namespace stonekart
         public readonly Clojurex filter;
         public readonly int value;
 
-        public ModifyUntil(TargetLambda t, Modifiable attribute, Clojurex filter, int value)
+        public ModifyUntil(FilterLambda t, Modifiable attribute, Clojurex filter, int value)
         {
             this.attribute = attribute;
             this.filter = filter;
@@ -298,7 +298,7 @@ namespace stonekart
         public Duress(Func<Card, bool> cardFilter)
         {
             this.cardFilter = cardFilter;
-            setTargets(TargetLambda.CONTROLLER, TargetLambda.PLAYER);
+            setTargets(FilterLambda.CONTROLLER, FilterLambda.PLAYER);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
@@ -329,10 +329,10 @@ namespace stonekart
     {
         private int cards;
 
-        public Mill(TargetLambda target, int cards)
+        public Mill(FilterLambda filter, int cards)
         {
             this.cards = cards;
-            setTargets(target);
+            setTargets(filter);
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, GameState game)

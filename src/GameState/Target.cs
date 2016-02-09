@@ -28,9 +28,60 @@ namespace stonekart
 
     abstract public class TargetRule
     {
+        public abstract Target[] getTargets();
+        public abstract void resolveCastTargets(GameInterface ginterface, GameState gstate);
+        public abstract void resolveResolveTargets(Card resolving, Target[] last);
+        public abstract bool check(Target[] ts);
     }
 
-    public enum TargetLambda
+    public class FilterTargetRule : TargetRule
+    {
+        private List<Func<Target, bool>> checks = new List<Func<Target, bool>>();
+
+        public FilterTargetRule(params FilterLambda[] ls)
+        {
+            foreach (FilterLambda l in ls)
+            {
+                switch (l)
+                {
+                    case FilterLambda.ANY:
+                        {
+                            checks.Add(@t => true);
+                        }
+                        break;
+
+                    case FilterLambda.PLAYER:
+                        {
+                            checks.Add(@t => t.isPlayer);
+                        }
+                        break;
+
+                    case FilterLambda.ZAPPABLE:
+                        {
+                            checks.Add(@t => t.isPlayer ||
+                                         t.card.location.pile == LocationPile.FIELD);
+                        }
+                        break;
+                    case FilterLambda.CREATURE:
+                        {
+                            checks.Add(@t => t.isCard && t.card.getType() == CardType.Creature);
+                        }
+                        break;
+
+                    default:
+                        throw new Exception();
+                }
+            }
+
+        }
+        
+        public bool check(Target t)
+        {
+            return checks.All(v => v(t));
+        }
+    }
+
+    public enum FilterLambda
     {
         SELF,
         CONTROLLER,
