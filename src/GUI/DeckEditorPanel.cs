@@ -24,7 +24,6 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
-            
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
