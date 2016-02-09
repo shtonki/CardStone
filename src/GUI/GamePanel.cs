@@ -219,6 +219,8 @@ namespace stonekart
         public CardInfoPanel()
         {
             BackColor = Color.Olive;
+            pb = new CardButton();
+            Controls.Add(pb);
         }
 
         public void showCard(Card c)
@@ -229,14 +231,7 @@ namespace stonekart
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            CardButton b = new CardButton();
-            b.setWidth(Size.Width - 5);
-            if (pb != null)
-            {
-                Controls.Remove(pb);
-            }
-            pb = b;
-            Controls.Add(b);
+            pb.setWidth(Size.Width - 5);
         }
     }
 }
