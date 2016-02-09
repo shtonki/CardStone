@@ -9,7 +9,7 @@ namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
     {
-        
+        CardInfoPanel cardInfo;
         Button saveButton, loadButton;
         Button[] sortButtons;
         CardPanel p;
@@ -26,6 +26,7 @@ namespace stonekart
         {
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
+            
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
             myDeckIsHard = new Pile(new Card[] { });
@@ -35,6 +36,10 @@ namespace stonekart
                 ((CardId[])Enum.GetValues(typeof (CardId))).Select(id => new Card(id))
                     .OrderBy(card => card.colour)
                     .ToArray();
+            cardInfo = new CardInfoPanel();
+            cardInfo.BackColor = Color.Fuchsia;
+            Controls.Add(cardInfo);
+
             for (int i = 0; i < nrOfCards; i++)
             {
                 int i0 = i;
@@ -45,12 +50,19 @@ namespace stonekart
                     if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
                     else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
                 };
+                cards[i].MouseHover += (_, __) =>
+                {
+                    cardInfo.showCard(cards[i0].Card);
+                };
             }
+
+         
             noDeckName = new Label();
             noDeckName.Text = "Every deck needs a name.";
             noDeckName.Visible = false;
             noDeckName.Size = new Size(250, 25);
             noDeckName.BackColor = Color.Red;
+
             loadButton = new Button();
             loadButton.Image = ImageLoader.getStepImage("load", new Size(60, 60));
             loadButton.Size = loadButton.Image.Size;
@@ -191,19 +203,8 @@ namespace stonekart
         {
             myDeckIsHard.clear();
             for (int i = 0; i < deck.Count; i++)
-            //for (int i = 0; i < myDeckIsHard.count; i++)
             {
                 myDeckIsHard.add(new Card(deck[i]));
-                //todo: remove cards from pile by pressing pile cards
-                /*
-                var pileButton = new CardButton(deck[i]);
-                pileButton.Location = new Point(750, 250);
-                pileButton.Size = new Size(400,400);
-                Controls.Add(pileButton);
-                pileButton.MouseDown += (_, __) =>
-                {
-                    Console.WriteLine("xD");
-                };*/
             }
             
         }
@@ -215,23 +216,19 @@ namespace stonekart
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
-            loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y+saveButton.Height);
-            for(int i = 0; i < sortButtons.Count(); i++)
+            loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y + saveButton.Height);
+            for (int i = 0; i < sortButtons.Count(); i++)
             {
                 //ishigity
                 sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 35, Size.Height / 20);
             }
 
-            noDeckName.Location = new Point(tb.Location.X, tb.Location.Y-20);
+            noDeckName.Location = new Point(tb.Location.X, tb.Location.Y - 20);
             noDeckName.Size = tb.Size;
             drawTheseButtons(cards);
-            /*for (int i = 0; i < cards.Length; i++)
-            {
-                x += cards[i].Width;
-                if (i % CARDS_PER_ROW == 0) x = cards[0].Size.Width * 2;
-                cards[i].setWidth(Size.Width / cards.Length);
-                cards[i].Location = new Point(x + (i % CARDS_PER_ROW) * paddingX, cards[i].Size.Height + cards[i].Size.Height * (i / CARDS_PER_ROW));
-            }*/
+
+            cardInfo.Size = new Size(p.Size.Width*2, 2*cards[0].Height+300);
+            cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
         }
 
         private void drawTheseButtons(CardButton[] cards)
@@ -241,8 +238,8 @@ namespace stonekart
             {
                 x += cards[i].Width;
                 if (i % CARDS_PER_ROW == 0) x = cards[0].Size.Width * 2;
-                cards[i].setWidth(Size.Width / cards.Length);
-                cards[i].Location = new Point(x + (i % CARDS_PER_ROW) * paddingX, cards[i].Size.Height + cards[i].Size.Height * (i / CARDS_PER_ROW));
+                cards[i].setWidth(Size.Width / (cards.Length/2));
+                cards[i].Location = new Point(x + (i % CARDS_PER_ROW) * paddingX, cards[i].Size.Height/3 + cards[i].Size.Height * (i / CARDS_PER_ROW));
             }
         }
 
