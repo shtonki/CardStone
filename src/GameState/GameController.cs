@@ -872,7 +872,7 @@ namespace stonekart
                 new LinkedList<TriggeredAbility>(),
                 new LinkedList<TriggeredAbility>(),
             };
-
+            //THIS NEEDS TO GO
             foreach (var l in timingLists)
             {
                 l.Clear();
@@ -920,6 +920,8 @@ namespace stonekart
                     {
                         var v = gameInterface.demandCastAction();
                         w = v.getStackWrapper();
+                        Card c = Card.createDummy(w.ability);
+                        w.card = c;
                     }
 
                 waitingTriggeredAbilities.Add(w);

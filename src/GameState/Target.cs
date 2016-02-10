@@ -160,12 +160,12 @@ namespace stonekart
             {
                 case ResolveTarget.CONTROLLER:
                 {
-                    targets[1] = new Target(resolving.owner);
+                    targets[0] = new Target(resolving.owner);
                 } break;
 
                 case ResolveTarget.SELF:
                 {
-                    targets[1] = new Target(resolving);
+                    targets[0] = new Target(resolving);
                 } break;
 
                 case ResolveTarget.LAST:

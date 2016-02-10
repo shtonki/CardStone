@@ -38,6 +38,7 @@ namespace stonekart
 
         public void setTargets(Target[] ts)
         {
+            if (subEffects.Length == 0) return;
             subEffects[0].forceCastTargets(ts);
         }
 
