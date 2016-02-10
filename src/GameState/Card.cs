@@ -641,9 +641,6 @@ namespace stonekart
             return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
         }
 
-
-        
-
         public bool has(KeyAbility a)
         {
             return keyAbilities.Contains(a);
