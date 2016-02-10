@@ -111,31 +111,6 @@ namespace stonekart
             DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
             return DeckEditorPanel.loadDeck(w.wait()).ToArray();
             //return (CardId[])Enum.GetValues(typeof (CardId));
-            return new[]
-            {
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
-                CardId.SolemnAberration,
-                CardId.IlasGambit      ,
-                CardId.IlasGambit      ,
-                CardId.IlasGambit      ,
-                CardId.IlasGambit      ,
-                CardId.IlasGravekeeper ,
-                CardId.IlasGravekeeper ,
-                CardId.IlasGravekeeper ,
-                CardId.IlasGravekeeper ,
-                CardId.Unmake          ,
-                CardId.Unmake          ,
-                CardId.Unmake          ,
-                CardId.AlterTime       ,
-                CardId.AlterTime       ,
-                CardId.AlterTime       ,
-                CardId.PropheticVision ,
-                CardId.PropheticVision ,
-                CardId.ShimmeringKoi   ,
-                CardId.ShimmeringKoi   ,
-            };
         }
 
         public void winGame(bool wonnered)

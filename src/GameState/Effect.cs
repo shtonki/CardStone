@@ -46,16 +46,15 @@ namespace stonekart
         {
             List<GameEvent> r = new List<GameEvent>();
             if (!preResolveCheck()) { return r; }
-            Card baseCard = c.isDummy ? c.dummyFor.card : c;
             Target[] pts = null;
             for (int i = 0; i < subEffects.Length; i++)
             {
-                subEffects[i].resolveResolveTargets(ginterface, baseCard, pts);
+                subEffects[i].resolveResolveTargets(ginterface, gameState, c, pts);
                 pts = subEffects[i].targets;
             }
             foreach (SubEffect e in subEffects)
             {
-                foreach (GameEvent ge in e.resolveEffect(ginterface, gameState, baseCard))
+                foreach (GameEvent ge in e.resolveEffect(ginterface, gameState, c))
                 {
                     r.Add(ge);
                 }
@@ -75,7 +74,7 @@ namespace stonekart
             targetRule = t;
         }
 
-        public GameEvent[] resolveEffect(GameInterface ginterface, GameState game, Card baseCard)
+        public GameEvent[] resolveEffect(GameInterface ginterface, GameState game, Card resolvingCard)
         {
             List<GameEvent> r = new List<GameEvent>();
 
@@ -85,7 +84,7 @@ namespace stonekart
             }
             foreach (Target t in targetRule.getTargets())
             {
-                foreach (GameEvent e in resolve(ginterface, t, baseCard))
+                foreach (GameEvent e in resolve(ginterface, t, resolvingCard))
                 {
                     r.Add(e);
                 }
@@ -96,35 +95,38 @@ namespace stonekart
         {
             return targetRule.resolveCastTargets(ginterface, gstate);
         }
-        public void resolveResolveTargets(GameInterface gi, Card resolving, Target[] last)
+        public void resolveResolveTargets(GameInterface gi, GameState gstate, Card resolving, Target[] last)
         {
-            targetRule.resolveResolveTargets(gi, resolving, last);
+            targetRule.resolveResolveTargets(gi, gstate, resolving, last);
         }
 
         public void forceCastTargets(Target[] ts)
         {
-            (targetRule as FilterTargetRule)?.forceTargets(ts);
+            (targetRule as Forcable)?.forceTargets(ts);
         }
 
-        abstract protected GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard);
+        abstract protected GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard);
     }
     
 
-    public class ShuffleOption : SubEffect
+    public class Timelapse : SubEffect
     {
-        public ShuffleOption(TargetRule t) : base(t)
+        private int cardCount;
+        public Timelapse(int cardCount) : base(new ResolveTargetRule(ResolveTarget.CONTROLLER))
         {
-
+            this.cardCount = cardCount;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Choice shuffle;
             Player player = t.player;
             if (player.isHero)
             {
+                var p = ginterface.showCards(player.deck.cards.Take(cardCount).ToArray());
                 shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
                 ginterface.sendSelection((int)shuffle);
+                p.closeWindow();
             }
             else
             {
@@ -148,7 +150,7 @@ namespace stonekart
             cardCount = cards;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Player p = t.player;
             GameEvent e = new DrawEvent(p, cardCount);
@@ -166,12 +168,12 @@ namespace stonekart
             this.damage = damage;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
 
             GameEvent g;
 
-            Card source = baseCard;
+            Card source = resolvingCard;
 
             if (t.isPlayer)
             {
@@ -198,7 +200,7 @@ namespace stonekart
             this.pile = pile;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Card card = t.card;
             var r  = new MoveCardEvent(card, pile);
@@ -215,7 +217,7 @@ namespace stonekart
             life = n;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Player p = t.player;
             return new[]{new GainLifeEvent(p, life)};
@@ -232,7 +234,7 @@ namespace stonekart
             this.cards = cards;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             GameEvent[] r = new GameEvent[cards.Length];
             Player p = t.player;
@@ -257,7 +259,7 @@ namespace stonekart
             this.value = value;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Card card = t.card;
             ModifyCardEvent r = new ModifyCardEvent(card, attribute, filter, value);
@@ -310,7 +312,7 @@ namespace stonekart
             this.cards = cards;
         }
 
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card baseCard)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Player p = t.player;
             GameEvent[] r = p.hand.cards.Take(cards).Select((c) => new MoveCardEvent(c, LocationPile.GRAVEYARD)).ToArray();
