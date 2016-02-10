@@ -409,7 +409,7 @@ namespace stonekart
                     cardType = CardType.Instant;
                     castDescription = "Deal 2 damage to all non-white units";
                     //fx.Add(new Ping(new FilterTargetRule(owner.field.cards.Concat(owner.opponent.field.cards).Count(), FilterLambda.CREATURE), 2));
-                   // fx.Add(new Ping(new FilterTargetRule(owner.field.cards.Concat(owner.opponent.field.cards).Count(), FilterLambda.ONFIELD), 2));
+                    //fx.Add(new Ping(new FilterTargetRule(owner.field.cards.Concat(owner.opponent.field.cards).Count(), FilterLambda.ONFIELD), 2));
                 } break;
 
                 case CardId.InstaGibb:
