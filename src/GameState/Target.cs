@@ -24,21 +24,110 @@ namespace stonekart
         {
             this.card = card;
         }
-
     }
 
-    public class TargetRule
-    {
-        private List<Func<Target, bool>> checks; 
 
-        public TargetRule(TargetLambda r) : this(howDoIInlineFunctionsxd(r).ToArray())
+    abstract public class TargetRule
+    {
+        protected Target[] targets;
+        public Target[] getTargets()
+        {
+            return targets;
+        }
+        public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate);
+        public abstract void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last);
+        public abstract bool check(Target[] ts);
+    }
+
+    public class FilterTargetRule : TargetRule
+    {
+        private int targetCount;
+        private List<Func<Target, bool>> checks = new List<Func<Target, bool>>();
+
+        public FilterTargetRule(int targetCount, params FilterLambda[] ls)
+        {
+            targets = new Target[targetCount];
+            checks = new List<Func<Target, bool>>(ls.Length);
+            this.targetCount = targetCount;
+
+            foreach (FilterLambda l in ls)
+            {
+                switch (l)
+                {
+                    case FilterLambda.ANY:
+                        {
+                            checks.Add(@t => true);
+                        }
+                        break;
+
+                    case FilterLambda.PLAYER:
+                        {
+                            checks.Add(@t => t.isPlayer);
+                        }
+                        break;
+
+                    case FilterLambda.ZAPPABLE:
+                        {
+                            checks.Add(@t => t.isPlayer ||
+                                         t.card.location.pile == LocationPile.FIELD);
+                        }
+                        break;
+                    case FilterLambda.CREATURE:
+                        {
+                            checks.Add(@t => t.isCard && t.card.getType() == CardType.Creature);
+                        }
+                        break;
+                    case FilterLambda.ONFIELD:
+                        {
+                            checks.Add(@t => t.isCard && !t.isPlayer && t.card.location.pile == LocationPile.FIELD);
+                        } break;
+                    default:
+                        throw new Exception();
+                }
+            }
+
+        }
+
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        {
+            int i = 0;
+            ginterface.setContext("choose targetx");
+            while (i < targetCount)
+            {
+                GameElement ge = ginterface.getNextGameElementPress();
+
+                if (ge.player != null)
+                {
+                    Target t = new Target(ge.player);
+                    if (checks.All(f => f(t)))
+                    {
+                        targets[i++] = t;
+                    }
+                }
+                if (ge.card != null)
+                {
+                    Target t = new Target(ge.card);
+                    if (checks.All(f => f(t)))
+                    {
+                        targets[i++] = t;
+                    }
+                }
+                if (ge.choice != null && ge.choice.Value == Choice.Cancel)
+                {
+                    targets = null;
+                    break;
+                }
+            }
+            ginterface.clearContext();
+            return targets;
+        }
+        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
         {
             
         }
-
-        private TargetRule(params Func<Target, bool>[] fs)
+        public override bool check(Target[] ts)
         {
-            checks = new List<Func<Target, bool>>(fs);
+            return targets.All(t => checks.All(f => f(t)));
         }
 
         public bool check(Target t)
@@ -46,49 +135,108 @@ namespace stonekart
             return checks.All(v => v(t));
         }
 
-        private static List<Func<Target, bool>> howDoIInlineFunctionsxd(TargetLambda r)
+        public void forceTargets(Target[] ts)
         {
-            List<Func<Target, bool>> rt = new List<Func<Target, bool>>();
-
-            switch (r)
-            {
-                case TargetLambda.ANY:
-                {
-                    rt.Add(@t => true);
-                } break;
-
-                case TargetLambda.PLAYER:
-                {
-                    rt.Add(@t => t.isPlayer);
-                } break;
-
-                case TargetLambda.ZAPPABLE:
-                {
-                    rt.Add(@t => t.isPlayer ||
-                                 t.card.location.pile == LocationPile.FIELD);
-                } break;
-                case TargetLambda.ZAPPABLECREATURE:
-                {
-                    rt.Add(@t => t.isCard && t.card.location.pile == LocationPile.FIELD);
-                } break;
-
-                default:
-                    throw new Exception();
-            }
-
-            return rt;
+            targets = ts;
         }
     }
 
-    public enum TargetLambda
+    public class ResolveTargetRule : TargetRule
+    {
+        private ResolveTarget www;
+
+        public ResolveTargetRule(ResolveTarget www)
+        {
+            this.www = www;
+            targets = new Target[1];
+        }
+
+
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        {
+            return new Target[] {};
+        }
+
+        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
+        {
+            switch (www)
+            {
+                case ResolveTarget.CONTROLLER:
+                {
+                    targets[0] = new Target(resolving.owner);
+                } break;
+
+                case ResolveTarget.SELF:
+                {
+                    targets[0] = new Target(resolving);
+                } break;
+
+                case ResolveTarget.LAST:
+                {
+                    targets = last;
+                } break;
+
+                default:
+                {
+                    throw new Exception("xd");
+                } break;
+            }
+        }
+
+        public override bool check(Target[] ts)
+        {
+            return true;
+        }
+    }
+
+    public class SelectFromTargetRule : TargetRule
+    {
+        private Func<Card[]> cards;
+
+        public SelectFromTargetRule(Func<Card[]> cards, int count)
+        {
+            this.cards = cards;
+            targets = new Target[count];
+        }
+
+
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        {
+            return new Target[] { };
+        }
+
+        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
+        {
+            CardPanelControl p = ginterface.showCards(cards());
+
+            int i = 0;
+            while (i < targets.Length)
+            {
+                targets[i++] = new Target(p.waitForCard());
+            }
+            p.closeWindow();
+        }
+
+        public override bool check(Target[] ts)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public enum FilterLambda
+    {
+        ANY,
+        PLAYER,
+        CREATURE,
+        ZAPPABLE,
+        ONFIELD,
+        //ZAPPABLECREATURE, 
+    }
+
+    public enum ResolveTarget
     {
         SELF,
         CONTROLLER,
         LAST,
-
-        ANY,
-        PLAYER,
-        ZAPPABLE,
-        ZAPPABLECREATURE,
     }
 }

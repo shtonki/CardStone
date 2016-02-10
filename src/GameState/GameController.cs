@@ -673,7 +673,8 @@ namespace stonekart
                         int[][] v = a.getCost().check(c, gameInterface);
                         if (v == null) { continue; }
 
-                        Target[] targets = getTargets(a, true);
+
+                        Target[] targets = a.aquireTargets(gameInterface, game);
                         if (targets == null) { continue; }
 
                         Card onStack;
@@ -698,39 +699,6 @@ namespace stonekart
             return false;
         }
 
-        private Target[] getTargets(Ability a, bool cancelable)
-        {
-            gameInterface.setContext("Select target(s)", cancelable ? Choice.Cancel : Choice.PADDING);
-            Target[] targets = new Target[a.targetCount];
-            TargetRule[] rules = a.targetRules;
-
-            int i = 0;
-            while (i < targets.Length)
-            {
-                Target t = null;
-                GameElement chosenGameElement = gameInterface.getNextGameElementPress();
-                if (chosenGameElement.player != null)
-                {
-                    t = new Target(chosenGameElement.player);
-                }
-                else if (chosenGameElement.card != null)
-                {
-                    t = new Target(chosenGameElement.card);
-                }
-                else if (chosenGameElement.choice != null && chosenGameElement.choice.Value == Choice.Cancel)
-                {
-                    targets = null;
-                    break;
-                }
-
-                if (t != null && rules[i].check(t))
-                {
-                    targets[i++] = t;
-                }
-            }
-            gameInterface.clearContext();
-            return targets;
-        }
         
         private Card[] chooseMultiple(string message, Func<Card, bool> xd)
         {
@@ -904,7 +872,7 @@ namespace stonekart
                 new LinkedList<TriggeredAbility>(),
                 new LinkedList<TriggeredAbility>(),
             };
-
+            //THIS NEEDS TO GO
             foreach (var l in timingLists)
             {
                 l.Clear();
@@ -940,16 +908,10 @@ namespace stonekart
             {
                 if (ability.card.location.pile != ability.pile) { continue; }
                 StackWrapper w;
-                if (ability.targetCount == 0)
-                {
-                    w = new StackWrapper(Card.createDummy(ability), ability, new Target[] {});
-                }
-                else
-                {
                     if (ability.card.owner.isHero)
                     {
                         CardPanelControl p = gameInterface.showCards(ability.card);
-                        Target[] targets = getTargets(ability, false);
+                        Target[] targets = ability.aquireTargets(gameInterface, game);
                         w = new StackWrapper(Card.createDummy(ability), ability, targets);
                         gameInterface.sendCastAction(new CastAction(w, new int[][] {}));
                         p.closeWindow();
@@ -958,8 +920,9 @@ namespace stonekart
                     {
                         var v = gameInterface.demandCastAction();
                         w = v.getStackWrapper();
+                        Card c = Card.createDummy(w.ability);
+                        w.card = c;
                     }
-                }
 
                 waitingTriggeredAbilities.Add(w);
 
