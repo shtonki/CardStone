@@ -272,8 +272,8 @@ namespace stonekart
 
                 case CardId.ShimmeringKoi:
                 {
-                    blueCost = 1;
-                    greyCost = 0;
+                    blueCost = 2;
+                    greyCost = 2;
                     cardType = CardType.Creature;
                     race = Race.Fish;
                     basePower = 2;
@@ -288,10 +288,10 @@ namespace stonekart
 
                 case CardId.Belwas:
                 {
-                    basePower = 3;
-                    baseToughness = 2;
                     whiteCost = 2;
                     greyCost = 1;
+                    basePower = 3;
+                    baseToughness = 2;
                     cardType = CardType.Creature;
                     race = Race.Human;
                     Aura a = new Aura(
@@ -339,7 +339,6 @@ namespace stonekart
                             new FilterTargetRule(1, FilterLambda.PLAYER), 
                             p => p.hand.cards.ToArray()),
                         LocationPile.GRAVEYARD) );
-                    //throw new Exception();
                     fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), -2));
                     castDescription =
                         "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
@@ -371,7 +370,7 @@ namespace stonekart
 
                 case CardId.EnragedDragon:
                 {
-                    redCost = 1;
+                    redCost = 2;
                     cardType = CardType.Creature;
                     race = Race.Dragon;
                     basePower = 3;
