@@ -371,7 +371,7 @@ namespace stonekart
 
                 case CardId.EnragedDragon:
                 {
-                    redCost = 2;
+                    redCost = 1;
                     cardType = CardType.Creature;
                     race = Race.Dragon;
                     basePower = 3;
@@ -630,6 +630,11 @@ namespace stonekart
         {
             
             return true;
+        }
+
+        public bool isCast(Ability a)
+        {
+            return a == castAbility;
         }
 
         public void damage(int d)
