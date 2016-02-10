@@ -62,6 +62,7 @@ namespace stonekart
 
                     Card c = g.getCardById(Int32.Parse(puddns[0]));
                     Ability a = c.getAbilityByIndex(Int32.Parse(puddns[1]));
+                    c = c.isCast(a) ? c : Card.createDummy(a);
 
                     string[] ts = puddns[2].Split('\'');
 
@@ -74,7 +75,7 @@ namespace stonekart
                         int x = Int32.Parse(t.Substring(1));
                         if (t[0] == 'p')
                         {
-                            ta = new Target(g.getPlayerById(x));
+                            ta = new Target(g.getPlayerById((LocationPlayer)x));
                         }
                         else if (t[0] == 'c')
                         {
@@ -181,16 +182,16 @@ namespace stonekart
         public override string toString()
         {
             if (sw == null) { return "pass"; }
-
-
+            
+            Card c = sw.card.isDummy ? sw.ability.card : sw.card;
+            StackWrapper wrapper = new StackWrapper(c, sw.ability, sw.targets);
             StringBuilder ts = new StringBuilder(), cs = new StringBuilder();
-
-            foreach (var t in sw.targets)
+            foreach (var t in wrapper.targets)
             {
                 if (t.isPlayer)
                 {
                     ts.Append("p");
-                    ts.Append((int)t.player.side);
+                    ts.Append(1-(int)t.player.side); //hack dangerouze
                 }
                 else if (t.isCard)
                 {
@@ -212,7 +213,7 @@ namespace stonekart
                 cs.Append("'");
             }
             if (cs.Length > 0) { cs.Length--; }
-            return "cast," + sw.card.getId() + ';' + sw.card.getAbilityIndex(sw.ability) + ';' + ts + ';' + cs;
+            return "cast," + wrapper.card.getId() + ';' + wrapper.card.getAbilityIndex(wrapper.ability) + ';' + ts + ';' + cs;
         }
     }
     /*

@@ -945,11 +945,13 @@ namespace stonekart
 
         /*todo 0 - home 1 - away; meaning one has to flip it when getting a 
          * message from the other player which is anything but practical */
-        public Player getPlayerById(int i)
+        public Player getPlayerById(LocationPlayer side)
         {
-            return i == 0 ? homePlayer : awayPlayer;
+            if (side == LocationPlayer.HERO) return game.hero;
+            else if (side == LocationPlayer.VILLAIN) return game.villain;
+            throw new Exception();
         }
-        
+
         /*
         private int getManaColor()
         {
