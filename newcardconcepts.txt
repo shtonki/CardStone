@@ -2,4 +2,65 @@
 BBB
 Relic
 All creatures have -1/-1
+equal damage to all defenders ability
+
+//guchi
+Double bind: Your opponent must chose a card from own board which he/she shuffles back into the deck
+ila's magic lamp: pick a card from your deck and put it in your hand
+Old Seer: look at opponents top three cards //meh
+Public Execution: sacrifice friendly unit, opposing creatures get -1/0 until end of turn or whenever
+Overkill: deal 2 damage to target creature. If target dies, deal 2 damage to FACE
+blood magic: sacrifice friendly creature and return a creature from graveyard with 1 health
+grave looter: when grave looter enters the battlefield return target creature from your graveyard to your hand
+dark confidant: at the begining of your replenish step reveal the top card of your deck, put it in to your hand and lose equal to its total mana cost
+Ilatian whine merchant: Discard a card: Gain life equal to its total cost.
+Final will: Target creature gains "When this creature dies deal its attack damage to target creature or player"
+
+//revision
+Cask of Ale: give target unit +3/0, exhaust unit next turn
+mama bear: spawn two bear cubs. if mama dies cubs die. if a cub dies give +2/0 to mama
+
+freezeeffekter  
+twisting nether && twisting nether + relics //Call of the Void?
+both player sacrifice creature
+wormhole: shuffle both players ENTIRE BOARD into their own deck
+
+blight (artifact): deal 1 damage each turn to all non-black creatures at the start of every turn //maybe heal each turn also?
+full disclosure: each player shows his/her opponent their hand
+Magic Carpet: make target creature flying
+Decimate: //todo belwas
+Necromancer: summon 2x 2-2 skeltal
+NS2C: each player draws cards equal to the blue mana they have
+
+**the four horsemen of apocalypse**
+Horseman of Death: destroy target unit 
+Horseman of Famin: target player discards a card
+Horseman of Pestilence: when etb deal 1 damage to all other creatures on board
+Horseman of War: //todo seba
+
+//wait for it to mature like a fine wine
+Drums of Ilatia: all opponent creatures are unable to attack for one turn
+Resolve: target creature cant drop below one health this turn
+Cost of War: Sacrifice X mana, deal X to all enemy creatures
+Martyrdom/dark sacrifice/: discard a card from your hand and deal its total mana cost to all enemy creatures
+
+//jasin done did it, so it might need some revision from seba
+instagibb: destroy target unit
+fury of the righteousX: deal 2 damage to all non-white creatures
+Meteor rain: deal 3 damage to all creatures on board and face
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
