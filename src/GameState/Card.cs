@@ -306,7 +306,7 @@ namespace stonekart
                 {
                     blueCost = 1;
                     cardType = CardType.Instant;
-                    fx.Add(new ShuffleOption(new ResolveTargetRule(ResolveTarget.CONTROLLER)));
+                    fx.Add(new Timelapse(2));
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1));
                     castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
                 } break;
@@ -333,7 +333,12 @@ namespace stonekart
                     name = "Ila's Gambit";
                     blackCost = 1;
                     cardType = CardType.Sorcery;
-                    //hack fx.Add(new Duress((_) => true));
+                    fx.Add(
+                        new MoveTo(new SelectFromTargetRule(
+                            new ResolveTargetRule(ResolveTarget.CONTROLLER), 
+                            new FilterTargetRule(1, FilterLambda.PLAYER), 
+                            p => p.hand.cards.ToArray()),
+                        LocationPile.GRAVEYARD) );
                     //throw new Exception();
                     fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), -2));
                     castDescription =

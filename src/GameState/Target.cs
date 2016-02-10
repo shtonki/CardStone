@@ -35,11 +35,16 @@ namespace stonekart
             return targets;
         }
         public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate);
-        public abstract void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last);
+        public abstract void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last);
         public abstract bool check(Target[] ts);
     }
 
-    public class FilterTargetRule : TargetRule
+    interface Forcable
+    {
+        void forceTargets(Target[] ts);
+    }
+
+    public class FilterTargetRule : TargetRule, Forcable
     {
         private int targetCount;
         private List<Func<Target, bool>> checks = new List<Func<Target, bool>>();
@@ -121,7 +126,7 @@ namespace stonekart
             ginterface.clearContext();
             return targets;
         }
-        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
+        public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
         {
             
         }
@@ -157,7 +162,7 @@ namespace stonekart
             return new Target[] {};
         }
 
-        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
+        public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
         {
             switch (www)
             {
@@ -176,6 +181,11 @@ namespace stonekart
                     targets = last;
                 } break;
 
+                case ResolveTarget.OPPONENT:
+                {
+                    targets[0] = new Target(resolving.owner.opponent);
+                } break;
+
                 default:
                 {
                     throw new Exception("xd");
@@ -189,37 +199,69 @@ namespace stonekart
         }
     }
 
-    public class SelectFromTargetRule : TargetRule
+    public class SelectFromTargetRule : TargetRule, Forcable
     {
-        private Func<Card[]> cards;
+        private TargetRule showCardsTo;
+        private TargetRule takePileFrom;
+        private Func<Player, Card[]> selectCards;
+        private int cardCount;
 
-        public SelectFromTargetRule(Func<Card[]> cards, int count)
+        public SelectFromTargetRule(TargetRule showCardsTo, TargetRule takePileFrom, Func<Player, Card[]> selectCards, int cardCount = 1)
         {
-            this.cards = cards;
-            targets = new Target[count];
+            this.showCardsTo = showCardsTo;
+            this.takePileFrom = takePileFrom;
+            this.selectCards = selectCards;
+            this.cardCount = cardCount;
+            if (showCardsTo is Forcable) throw new Exception();
         }
 
+        public void forceTargets(Target[] ts)
+        {
+            (takePileFrom as Forcable)?.forceTargets(ts);
+        }
 
         public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
-            return new Target[] { };
+            return takePileFrom.resolveCastTargets(ginterface, gstate);
         }
 
-        public override void resolveResolveTargets(GameInterface ginterface, Card resolving, Target[] last)
+        public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
         {
-            CardPanelControl p = ginterface.showCards(cards());
+            targets = new Target[cardCount];
+            showCardsTo.resolveResolveTargets(ginterface, gstate, resolving, last);
+            takePileFrom.resolveResolveTargets(ginterface, gstate, resolving, last);
+            Target[] showPlayerx = showCardsTo.getTargets();
+            Target[] takePlayerx = takePileFrom.getTargets();
 
-            int i = 0;
-            while (i < targets.Length)
+            if (showPlayerx.Length != 1 || !showPlayerx[0].isPlayer ||
+                takePlayerx.Length != 1 || !takePlayerx[0].isPlayer) throw new Exception();
+            Player showTo = showPlayerx[0].player;
+            Card[] cards = selectCards(takePlayerx[0].player);
+
+            if (showTo.isHero)
             {
-                targets[i++] = new Target(p.waitForCard());
+                CardPanelControl p = ginterface.showCards(cards);
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    Card c = p.waitForCard();
+                    ginterface.sendCard(c);
+                    targets[i] = new Target(c);
+                }
+                p.closeWindow();
             }
-            p.closeWindow();
+            else
+            {
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    Card c = ginterface.demandCard(gstate);
+                    targets[i] = new Target(c);
+                }
+            }
         }
 
         public override bool check(Target[] ts)
         {
-            throw new NotImplementedException();
+            return takePileFrom.check(ts);
         }
     }
 
@@ -238,5 +280,6 @@ namespace stonekart
         SELF,
         CONTROLLER,
         LAST,
+        OPPONENT,
     }
 }
