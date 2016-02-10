@@ -73,9 +73,10 @@ namespace stonekart
 
         private void mulligan(Player p, int handSize)
         {
+            p.setLife(25);
             Choice c;
-            int life = 2;
-            while (p.opponent.getLife() < 40)
+            int life = 1;
+            while (p.getLife() > 15)
             {
                 while (p.hand.count > 0)
                 {
@@ -101,7 +102,7 @@ namespace stonekart
                 {
                     break;
                 }
-                p.opponent.setLifeRelative(life++);
+                p.setLifeRelative(-life++);
             }
         }
 

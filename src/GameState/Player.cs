@@ -68,6 +68,11 @@ namespace stonekart
             return health;
         }
 
+        public void setLife(int i)
+        {
+            health = i;
+            notifyObservers();
+        }
 
         public void setLifeRelative(int i)
         {
