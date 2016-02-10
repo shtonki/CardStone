@@ -76,6 +76,7 @@ namespace stonekart
                 images = new Dictionary<string, Image>();
                 imageMap.Add(s.Value, images);
             }
+
             if (!images.ContainsKey(i))
             {
                 images[i] = resizeImage(getImage(null, i), s.Value.Width, s.Value.Height);

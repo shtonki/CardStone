@@ -108,8 +108,8 @@ namespace stonekart
         private readonly List<TriggeredAbility> baseTriggeredAbilities;
         public readonly ActivatedAbility castAbility;
         public ManaCost castingCost { get; private set; }
-        private List<KeyAbility> keyAbilities;
-
+        //private List<KeyAbility> keyAbilities;
+        public List<KeyAbility> keyAbilities { get; private set; }
         public List<Ability> abilities => ((IEnumerable<Ability>)activatedAbilities).Concat(triggeredAbilities).ToList();
         public List<ActivatedAbility> activatedAbilities => baseActivatedAbilities;
         public List<TriggeredAbility> triggeredAbilities => baseTriggeredAbilities;
@@ -223,7 +223,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
-                } break;
+                    } break;
 
                 case CardId.TempleHealer:
                 {
@@ -266,7 +266,7 @@ namespace stonekart
                     basePower = 1;
                     forceColour = Colour.WHITE;
                     
-                    } break;
+                } break;
 
                 case CardId.ShimmeringKoi:
                 {
@@ -399,10 +399,57 @@ namespace stonekart
                     race = Race.Zombie;
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
-                    
 
-                case CardId.Jew:
+                case CardId.HorsemanOfDeath: //todo seba: review, also change name to the proper thing and description thing and stuff
                 {
+                    blackCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 5;
+                    baseToughness = 2;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " target a creature and kill it instantly.",
+                        LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
+                } break;
+
+                case CardId.IlatianWineMerchant: //name subject to change since its a name of person but acts like sorecschery
+                {
+                    blueCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Discard a card: Gain life equal to its total cost.";
+                    fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
+                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
+                } break;
+
+                case CardId.MeteorRain: //todo: seba review
+                {
+                    redCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Deal 3 damage to everything on board and face";
+                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
+                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
+                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.OPPONENT), -3));
+                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), -3));
+                } break;
+
+                case CardId.FuryOfTheRighteous: //todo: seba review
+                {
+                    name = "Fury of the Righteous";
+                    whiteCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Deal 2 damage to all non-white units";
+                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
+                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
+                } break;
+
+                case CardId.InstaGibb: //todo: seba review
+                    {
+                    blackCost = 1;
+                    cardType = CardType.Instant;
+                    castDescription = "Be gone!";
+                    fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
+                } break;
+
+                case CardId.Jew: //todo: seba review
+                    {
                     blueCost = 4;
                     cardType = CardType.Creature;
                     basePower = 2;
@@ -417,8 +464,8 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
 
-                case CardId.VikingMushroom:
-                {
+                case CardId.VikingMushroom: //todo: seba review
+                    {
                     redCost = 1;
                     cardType = CardType.Sorcery;
                     castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
@@ -426,7 +473,7 @@ namespace stonekart
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                 } break;
 
-                default:
+                default: 
                 {
                     throw new Exception("pls no" + c.ToString());
                 }
@@ -649,9 +696,6 @@ namespace stonekart
             return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
         }
 
-
-        
-
         public bool has(KeyAbility a)
         {
             return keyAbilities.Contains(a);
@@ -783,8 +827,12 @@ namespace stonekart
         EnragedDragon,
         SteamBolt,
         IlasGravekeeper,
+        FuryOfTheRighteous,
+        MeteorRain,
+        IlatianWineMerchant,
+        HorsemanOfDeath, 
 
-
+        InstaGibb,
         Jew,
         VikingMushroom,
     }

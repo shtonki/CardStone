@@ -82,7 +82,14 @@ namespace stonekart
                             checks.Add(@t => t.isCard && t.card.getType() == CardType.Creature);
                         }
                         break;
-
+                    case FilterLambda.ONFIELD:
+                        {
+                            checks.Add(@t => t.isCard && !t.isPlayer && t.card.location.pile == LocationPile.FIELD);
+                        } break;
+                    case FilterLambda.INHAND:
+                        {
+                            checks.Add(@t => t.isCard && t.card.location.pile == LocationPile.HAND && t.card.controller.isHero);
+                        } break;
                     default:
                         throw new Exception();
                 }
@@ -268,6 +275,8 @@ namespace stonekart
         PLAYER,
         CREATURE,
         ZAPPABLE,
+        ONFIELD,
+        INHAND,
         //ZAPPABLECREATURE, 
     }
 

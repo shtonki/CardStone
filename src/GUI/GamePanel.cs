@@ -215,16 +215,46 @@ namespace stonekart
     class CardInfoPanel : Panel
     {
         private CardButton pb;
+        private Label[] labelList;
+        private const int MAX_SPECIAL_ABILITIES = 5;
+        private const int BOX_HEIGHT = 50;
+        private static string[] KeyAbilityDescription;
+
+        static CardInfoPanel()
+        {
+            KeyAbilityDescription = new string[Enum.GetNames(typeof(KeyAbility)).Length];
+            KeyAbilityDescription[(int)KeyAbility.Fervor] = ": creature can attack same turn it is played.";
+        }
 
         public CardInfoPanel()
         {
             BackColor = Color.Olive;
             pb = new CardButton();
+            labelList = new Label[MAX_SPECIAL_ABILITIES];
             Controls.Add(pb);
+            for(int i = 0; i < MAX_SPECIAL_ABILITIES; i++)
+            {
+                labelList[i] = new Label();
+                Controls.Add(labelList[i]);
+            }
         }
 
         public void showCard(Card c)
         {
+            for(int i = 0; i < MAX_SPECIAL_ABILITIES; i++)
+            {
+                if(i < c.keyAbilities.Count) //if the ability even exists
+                {
+                    labelList[i].Visible = true;
+                    labelList[i].Text = c.keyAbilities[i].ToString() + KeyAbilityDescription[(int)c.keyAbilities[i]];
+                    labelList[i].BackColor = Color.Black;
+                    labelList[i].ForeColor = Color.Beige;
+                }
+                else
+                {
+                    labelList[i].Visible = false;
+                }
+            }
             pb.notifyObserver(c, null);
         }
 
@@ -232,6 +262,11 @@ namespace stonekart
         {
             base.OnResize(eventargs);
             pb.setWidth(Size.Width - 5);
+            for(int i = 0; i < MAX_SPECIAL_ABILITIES; i++)
+            {
+                labelList[i].Size = new Size(Size.Width-5, BOX_HEIGHT);
+                labelList[i].Location = new Point(0, Location.Y + pb.Height + BOX_HEIGHT * i);
+            }
         }
     }
 }
