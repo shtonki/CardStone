@@ -142,18 +142,19 @@ namespace stonekart
             }
 
             tb = new TextBox();
+            Controls.Add(saveButton);
             Controls.Add(noDeckName);
             Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
-            Controls.Add(saveButton);
+            
         }
 
         private void sortAfterColor(Colour colour)
         {
             if (currentSortingColor == colour) currentSortingColor = Colour.GREY;
             else currentSortingColor = colour;
-            //List <CardButton> newButtonsToDraw = new List<CardButton>();
+
             foreach (Card id in ids)
             {
                 if (id.colour != currentSortingColor && currentSortingColor != Colour.GREY)
@@ -178,9 +179,10 @@ namespace stonekart
             {
                 file.WriteLine(id.cardId);
             }
+
             file.Close();
         }
-
+        
         public static void loadDeckFromFile(Action<string> buttonClickedCallBack)
         {
             var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
