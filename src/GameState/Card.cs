@@ -402,6 +402,7 @@ namespace stonekart
 
                 case CardId.HorsemanOfDeath: //todo seba: review, also change name to the proper thing and description thing and stuff
                 {
+                    name = "Horseman of Death";
                     blackCost = 1;
                     cardType = CardType.Creature;
                     basePower = 5;

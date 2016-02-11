@@ -12,11 +12,14 @@ namespace stonekart
         CardInfoPanel cardInfo;
         Button saveButton, loadButton;
         Button[] sortButtons;
+        Button scrollLeftButton, scrollRightButton;
+        CardButton[] cardSlot;
         CardPanel p;
         CardButton[] cards;
         Label noDeckName;
         TextBox tb;
         Card[] ids;
+        List<Card> sortedIds;
         Pile myDeckIsHard;
         const int paddingX = 8;
         const int paddingY = 8;
@@ -24,11 +27,12 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
+            
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
-            
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             cards = new CardButton[nrOfCards];
+            sortedIds = new List<Card>();
             myDeckIsHard = new Pile(new Card[] { });
             p = new CardPanel(new Func<CardButton>(() => new CardButton()), new LayoutArgs(true, true));
             myDeckIsHard.addObserver(p);
@@ -39,13 +43,15 @@ namespace stonekart
             cardInfo = new CardInfoPanel();
             cardInfo.BackColor = Color.Fuchsia;
             Controls.Add(cardInfo);
+            cardSlot = new CardButton[8];
 
             for (int i = 0; i < nrOfCards; i++)
             {
-                int i0 = i;
+                //int i0 = i;
                 cards[i] = new CardButton(ids[i].cardId);
-                Controls.Add(cards[i]);
-                cards[i].MouseDown += (_, __) =>
+                sortedIds.Add(ids[i]);
+                //Controls.Add(cards[i]);
+                /*cards[i].MouseDown += (_, __) =>
                 {
                     if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
                     else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
@@ -53,10 +59,41 @@ namespace stonekart
                 cards[i].MouseHover += (_, __) =>
                 {
                     cardInfo.showCard(cards[i0].Card);
+                };*/
+            }
+            
+            for (int i = 0; i < 8; i++)
+            {
+                int i0 = i;
+                cardSlot[i] = cards[i];
+                cardSlot[i].Size = new Size(200,300);
+                Controls.Add(cardSlot[i]);
+                cardSlot[i].MouseDown += (_, __) =>
+                {
+                    if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
+                    else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
+                };
+                cardSlot[i].MouseHover += (_, __) =>
+                {
+                    cardInfo.showCard(cardSlot[i0].Card);
                 };
             }
 
-         
+            scrollLeftButton = new Button();
+            scrollRightButton = new Button();
+            scrollLeftButton.Image = ImageLoader.getStepImage("arrowLeft", new Size(60, 60));
+            scrollRightButton.Image = ImageLoader.getStepImage("arrowRight", new Size(60, 60));
+            scrollLeftButton.MouseDown += (_, __) =>
+            {
+                
+            };
+            scrollRightButton.MouseDown += (_, __) =>
+            {
+                
+            };
+            Controls.Add(scrollLeftButton);
+            Controls.Add(scrollRightButton);
+
             noDeckName = new Label();
             noDeckName.Text = "Every deck needs a name.";
             noDeckName.Visible = false;
@@ -117,17 +154,20 @@ namespace stonekart
             if (currentSortingColor == colour) currentSortingColor = Colour.GREY;
             else currentSortingColor = colour;
             //List <CardButton> newButtonsToDraw = new List<CardButton>();
-            for (int i = 0; i < ids.Count(); i++)
+            foreach (Card id in ids)
             {
-                if(ids[i].colour != currentSortingColor && currentSortingColor != Colour.GREY)
+                if (id.colour != currentSortingColor && currentSortingColor != Colour.GREY)
                 {
-                    cards[i].Hide();
+                    sortedIds.Remove(id);
                 }
-                else
+                else if(!sortedIds.Contains(id))
                 {
-                    //newButtonsToDraw.Add(cards[i]);
-                    cards[i].Show();
+                    sortedIds.Add(id);
                 }
+            }
+            for (int i = 0; i < sortedIds.Count % 8; i++)
+            {
+                cardSlot[i] = new CardButton(sortedIds[i].cardId);
             }
             //drawTheseButtons(newButtonsToDraw.ToArray());
         }
@@ -212,6 +252,30 @@ namespace stonekart
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
+            scrollLeftButton.Location = new Point(250, Size.Height/8);
+            scrollRightButton.Location = new Point(Size.Width-250, Size.Height/8);
+
+            //todo jasin: fix 8 to something else, so we can change it easier MAYBE? coach??
+            int currentXPosition = cardSlot[0].Width*2;
+            int currentYPosition = Size.Height/3;
+            
+            for (int i = 0; i < 8; i++)
+            {
+                //location
+                cardSlot[i].Location = new Point(currentXPosition, currentYPosition);
+                if (i == 3)
+                {
+                    currentXPosition = cardSlot[i].Width*2;
+                    currentYPosition += cardSlot[i].Height;
+                }
+                else currentXPosition += cardSlot[i].Width;
+
+                //size wutifak 
+                //cardSlot[i].Width = Size.Width/3;
+               // cardSlot[i].Height = Size.Height/2;
+            }
+            
+
             tb.Size = new Size(Size.Width / 10, Size.Height / 30);
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
@@ -225,9 +289,10 @@ namespace stonekart
 
             noDeckName.Location = new Point(tb.Location.X, tb.Location.Y - 20);
             noDeckName.Size = tb.Size;
-            drawTheseButtons(cards);
+            //drawTheseButtons(cards);
 
-            cardInfo.Size = new Size(p.Size.Width*2, 2*cards[0].Height+300);
+            //todo jasin: fix size
+            cardInfo.Size = new Size(cardSlot[0].Width*2, cardSlot[0].Height*2 + 250);
             cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
         }
 

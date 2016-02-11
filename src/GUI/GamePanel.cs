@@ -265,7 +265,7 @@ namespace stonekart
             for(int i = 0; i < MAX_SPECIAL_ABILITIES; i++)
             {
                 labelList[i].Size = new Size(Size.Width-5, BOX_HEIGHT);
-                labelList[i].Location = new Point(0, Location.Y + pb.Height + BOX_HEIGHT * i);
+                labelList[i].Location = new Point(0, /*Location.Y*/0 + pb.Height + BOX_HEIGHT * i);
             }
         }
     }

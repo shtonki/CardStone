@@ -7,7 +7,6 @@ equal damage to all defenders ability
 //guchi
 Double bind: Your opponent must chose a card from own board which he/she shuffles back into the deck
 ila's magic lamp: pick a card from your deck and put it in your hand
-Old Seer: look at opponents top three cards //meh
 Public Execution: sacrifice friendly unit, opposing creatures get -1/0 until end of turn or whenever
 Overkill: deal 2 damage to target creature. If target dies, deal 2 damage to FACE
 blood magic: sacrifice friendly creature and return a creature from graveyard with 1 health
@@ -20,6 +19,7 @@ Final will: Target creature gains "When this creature dies deal its attack damag
 Cask of Ale: give target unit +3/0, exhaust unit next turn
 mama bear: spawn two bear cubs. if mama dies cubs die. if a cub dies give +2/0 to mama
 
+//other
 freezeeffekter  
 twisting nether && twisting nether + relics //Call of the Void?
 both player sacrifice creature
@@ -31,18 +31,28 @@ Magic Carpet: make target creature flying
 Decimate: //todo belwas
 Necromancer: summon 2x 2-2 skeltal
 NS2C: each player draws cards equal to the blue mana they have
+heavy rain: players dont draw a card on the card drawing step for three turns
+Scorched Earth: opponant player doesnt draw a card on his/hers draw step turn for three turns
+starvation: both players must put their two weakest cards in their hands in the graveyard
+Honor Incitement(artifact?):every time opponent draws a card, you draw a card.
+dont know man(artifact?):you can use opponents unused mana crystals
+
 
 **the four horsemen of apocalypse**
 Horseman of Death: destroy target unit 
 Horseman of Famin: target player discards a card
 Horseman of Pestilence: when etb deal 1 damage to all other creatures on board
-Horseman of War: //todo seba
+Horseman of War: //todo seba //aura +2/+2?
 
 //wait for it to mature like a fine wine
 Drums of Ilatia: all opponent creatures are unable to attack for one turn
 Resolve: target creature cant drop below one health this turn
 Cost of War: Sacrifice X mana, deal X to all enemy creatures
 Martyrdom/dark sacrifice/: discard a card from your hand and deal its total mana cost to all enemy creatures
+Old Seer: look at opponents top three cards //meh
+Catapult?: exhausted for two turns. (8/4)?
+Scouts?(artifact/sorechery/enchantment?): everytime opponent draws a card: show it to the other player. When a creature is drawn: put it in graveyard.  
+
 
 //jasin done did it, so it might need some revision from seba
 instagibb: destroy target unit
