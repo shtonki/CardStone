@@ -27,10 +27,11 @@ namespace stonekart
         Colour currentSortingColor;
         public DeckEditorPanel()
         {
-            
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
+            int currentPage = 0;
+            int cardsPerPage = 8;
             cards = new CardButton[nrOfCards];
             sortedIds = new List<Card>();
             myDeckIsHard = new Pile(new Card[] { });
@@ -62,7 +63,7 @@ namespace stonekart
                 };*/
             }
             
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < cardsPerPage; i++)
             {
                 int i0 = i;
                 cardSlot[i] = cards[i];
@@ -83,14 +84,65 @@ namespace stonekart
             scrollRightButton = new Button();
             scrollLeftButton.Image = ImageLoader.getStepImage("arrowLeft", new Size(60, 60));
             scrollRightButton.Image = ImageLoader.getStepImage("arrowRight", new Size(60, 60));
+
+            //todo: you need to double press if you scroll one way then the other. 
             scrollLeftButton.MouseDown += (_, __) =>
             {
-                
+                int cardSlotNr = cardsPerPage-1;
+                for (int i = currentPage*cardsPerPage+cardsPerPage-1; i > currentPage*cardsPerPage-1; i--)
+                {
+                    Console.WriteLine(i);
+                    cardSlot[cardSlotNr].Visible = true;
+                    cardSlot[cardSlotNr].notifyObserver(new Card(sortedIds[i].cardId), null);
+                    cardSlotNr--;
+                }
+                if (currentPage > 0) currentPage--;
+                Console.WriteLine("\n");
             };
             scrollRightButton.MouseDown += (_, __) =>
             {
-                
+                int cardSlotNr = 0;
+                for (int i = currentPage * cardsPerPage; i < currentPage * cardsPerPage + cardsPerPage; i++)
+                {
+                    Console.WriteLine(i);
+                    if (i < sortedIds.Count - cardsPerPage)
+                    {
+                        cardSlot[cardSlotNr].Visible = true;
+                        cardSlot[cardSlotNr].notifyObserver(new Card(sortedIds[i + cardsPerPage].cardId), null);
+                    }
+                    else cardSlot[cardSlotNr].Visible = false;
+                    cardSlotNr++;
+                }
+                if (currentPage * cardsPerPage < sortedIds.Count - cardsPerPage*2) currentPage++;
             };
+            /* all borked up
+            scrollLeftButton.MouseDown += (_, __) =>
+            {
+                for (int i = 8*currentPage+8; i > 8*currentPage; i--)
+                {
+                    if (i - 8 > 0)
+                    {
+                        cardSlot[i % 8].Visible = true;
+                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i - 8].cardId), null);
+                    }
+                    else cardSlot[i % 8].Visible = false;
+                }
+                if (currentPage > 1) currentPage = currentPage - 1;
+            };
+            scrollRightButton.MouseDown += (_, __) =>
+            {
+                for (int i = 8*currentPage; i < 8*currentPage+8; i++)
+                {
+                    if (i + 8 < sortedIds.Count)
+                    {
+                        cardSlot[i % 8].Visible = true;
+                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i + 8].cardId), null);
+                    }
+                    else cardSlot[i%8].Visible = false;
+                }
+                currentPage = currentPage < (sortedIds.Count / 8)-1 ? currentPage + 1 : currentPage;
+            };
+            */
             Controls.Add(scrollLeftButton);
             Controls.Add(scrollRightButton);
 
@@ -166,11 +218,12 @@ namespace stonekart
                     sortedIds.Add(id);
                 }
             }
+            
             for (int i = 0; i < sortedIds.Count % 8; i++)
             {
-                cardSlot[i] = new CardButton(sortedIds[i].cardId);
+                cardSlot[i].notifyObserver(new Card(sortedIds[i].cardId), null);
             }
-            //drawTheseButtons(newButtonsToDraw.ToArray());
+            //drawTheseButtons(cardSlot.ToArray());
         }
         private void saveDeck()
         {

@@ -64,13 +64,11 @@ namespace stonekart
                             checks.Add(@t => true);
                         }
                         break;
-
                     case FilterLambda.PLAYER:
                         {
                             checks.Add(@t => t.isPlayer);
                         }
                         break;
-
                     case FilterLambda.ZAPPABLE:
                         {
                             checks.Add(@t => t.isPlayer ||

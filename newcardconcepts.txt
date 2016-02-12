@@ -32,10 +32,10 @@ Decimate: //todo belwas
 Necromancer: summon 2x 2-2 skeltal
 NS2C: each player draws cards equal to the blue mana they have
 heavy rain: players dont draw a card on the card drawing step for three turns
-Scorched Earth: opponant player doesnt draw a card on his/hers draw step turn for three turns
-starvation: both players must put their two weakest cards in their hands in the graveyard
-Honor Incitement(artifact?):every time opponent draws a card, you draw a card.
-dont know man(artifact?):you can use opponents unused mana crystals
+Scorched Earth: opponent player doesnt draw a card on his/hers draw step turn for three turns
+starvation: both players must put two of their cards in the graveyard
+Honor Incitement(artifact?): every time opponent draws a card, you draw a card.
+dont know man(artifact?): you can use opponents unused mana crystals
 
 
 **the four horsemen of apocalypse**

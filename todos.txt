@@ -5,6 +5,7 @@
 * we're leaking memory through observers
 * make damage step and end combat step the same step
 * show buffs on creatures when hovering
+* NOTSELF target filter?
 
 ---------------ICUT4SANTA--------------
 * fix my shit for me dear papa santa
