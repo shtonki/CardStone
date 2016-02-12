@@ -123,7 +123,7 @@ namespace stonekart
             Player player = t.player;
             if (player.isHero)
             {
-                var p = ginterface.showCards(player.deck.cards.Take(cardCount).ToArray());
+                var p = ginterface.showCards(player.deck.cards.Reverse().Take(cardCount).ToArray());
                 shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
                 ginterface.sendSelection((int)shuffle);
                 p.closeWindow();
