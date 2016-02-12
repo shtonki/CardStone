@@ -114,6 +114,8 @@ namespace stonekart
         public List<ActivatedAbility> activatedAbilities => baseActivatedAbilities;
         public List<TriggeredAbility> triggeredAbilities => baseTriggeredAbilities;
 
+        public string flavourText { get; private set; }
+
         private int moveHackInt = 0;
 
         public List<Aura> auras { get; private set; }
@@ -403,11 +405,12 @@ namespace stonekart
                 case CardId.HorsemanOfDeath: //todo seba: review, also change name to the proper thing and description thing and stuff
                 {
                     name = "Horseman of Death";
-                    blackCost = 1;
+                    blackCost = 3;
+                    greyCost = 2;
                     cardType = CardType.Creature;
                     basePower = 5;
-                    baseToughness = 2;
-                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " target a creature and kill it instantly.",
+                    baseToughness = 4;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + "kill target creature.",
                         LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
                 } break;
 
@@ -422,9 +425,10 @@ namespace stonekart
 
                 case CardId.MeteorRain: //todo: seba review
                 {
-                    redCost = 1;
+                    redCost = 2;
+                    greyCost = 1;
                     cardType = CardType.Sorcery;
-                    castDescription = "Deal 3 damage to everything on board and face";
+                    castDescription = "Deal 3 damage to all creatures and players.";
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
                     fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.OPPONENT), -3));
@@ -434,18 +438,20 @@ namespace stonekart
                 case CardId.FuryOfTheRighteous: //todo: seba review
                 {
                     name = "Fury of the Righteous";
-                    whiteCost = 1;
+                    whiteCost = 2;
+                    greyCost = 2;
                     cardType = CardType.Sorcery;
                     castDescription = "Deal 2 damage to all non-white units";
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
                 } break;
 
-                case CardId.InstaGibb: //todo: seba review
+                case CardId.Extinguish: //todo: seba review
                     {
-                    blackCost = 1;
+                    blackCost = 2;
                     cardType = CardType.Instant;
-                    castDescription = "Be gone!";
+                    castDescription = "Kill target creature.";
+                    flavourText = "Be gone!";
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
                 } break;
 
@@ -467,7 +473,7 @@ namespace stonekart
 
                 case CardId.VikingMushroom: //todo: seba review
                     {
-                    redCost = 1;
+                    redCost = 2;
                     cardType = CardType.Sorcery;
                     castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
                     fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), Modifiable.Power, never, 2));
@@ -833,7 +839,7 @@ namespace stonekart
         IlatianWineMerchant,
         HorsemanOfDeath, 
 
-        InstaGibb,
+        Extinguish,
         Jew,
         VikingMushroom,
     }
