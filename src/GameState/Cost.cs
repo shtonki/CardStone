@@ -60,27 +60,7 @@ namespace stonekart
             }
         }
     }
-    /*
-    public class CastingCost : Cost
-    {
-        private ManaCoster manaCost;
-
-        public CastingCost(ManaCoster c) : base(c)
-        {
-            manaCost = c;
-        }
-
-        public CastingCost(ManaCoster c, params Coster[] cs) : base(new Coster[]{c}, cs)
-        {
-            manaCost = c;
-        }
-
-        public ManaCoster getManaCost()
-        {
-            return manaCost;
-        }
-    }
-    */
+    
     public abstract class SubCost
     {
         public abstract int[] check(Card c, GameInterface gi);

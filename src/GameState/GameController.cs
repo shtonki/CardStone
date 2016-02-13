@@ -467,8 +467,7 @@ namespace stonekart
         private void endStep()
         {
         }
-
-
+        
         private void givePriorityx(bool main)
         {
             //todo(seba) make it check toggleboxes and autopass
@@ -674,7 +673,6 @@ namespace stonekart
         {
             return false;
         }
-
         
         private Card[] chooseMultiple(string message, Func<Card, bool> xd)
         {

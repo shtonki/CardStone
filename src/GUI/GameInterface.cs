@@ -15,7 +15,7 @@ namespace stonekart
     {
         private Choice[] currentButtons;
 
-        public GameController game { get; private set; }
+        private GameController game;// { get; private set; }
         public GamePanel gamePanel { get; private set; }
 
         public GameConnection connection; //hack
@@ -153,6 +153,11 @@ namespace stonekart
         public void sendMessage(string s)
         {
             
+        }
+
+        public Card getCardById(int id)
+        {
+            return game.getCardById(id);
         }
 
         private WaitFor<GameElement> waitForGameElement = new WaitFor<GameElement>();

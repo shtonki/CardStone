@@ -77,6 +77,7 @@ namespace stonekart
             }
         }
 
+        public readonly bool isToken;
         public bool inCombat => defended || defending;
         public bool defended => defendedBy != null;
         public bool defending => defenderOf != null;
@@ -262,7 +263,7 @@ namespace stonekart
 
                 case CardId.Squire:
                 {
-                    cardType = CardType.Token;
+                    isToken = true;
                     race = Race.Human;
                     baseToughness = 1;
                     basePower = 1;
@@ -402,9 +403,9 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
 
-                case CardId.HorsemanOfDeath: //todo seba: review, also change name to the proper thing and description thing and stuff
+                case CardId.RiderOfDeath: 
                 {
-                    name = "Horseman of Death";
+                    name = "Rider of Death";
                     blackCost = 3;
                     greyCost = 2;
                     cardType = CardType.Creature;
@@ -428,11 +429,9 @@ namespace stonekart
                     redCost = 2;
                     greyCost = 1;
                     cardType = CardType.Sorcery;
-                    castDescription = "Deal 3 damage to all creatures and players.";
+                    castDescription = "Deal 3 damage to all creatures.";
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
-                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.OPPONENT), -3));
-                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), -3));
                 } break;
 
                 case CardId.FuryOfTheRighteous: //todo: seba review
@@ -441,7 +440,7 @@ namespace stonekart
                     whiteCost = 2;
                     greyCost = 2;
                     cardType = CardType.Sorcery;
-                    castDescription = "Deal 2 damage to all non-white units";
+                    castDescription = "Deal 2 damage to all non-white creatures";
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
                 } break;
@@ -837,7 +836,7 @@ namespace stonekart
         FuryOfTheRighteous,
         MeteorRain,
         IlatianWineMerchant,
-        HorsemanOfDeath, 
+        RiderOfDeath, 
 
         Extinguish,
         Jew,
@@ -851,7 +850,6 @@ namespace stonekart
         Sorcery,
         Relic,
         Ability,
-        Token,
     }
 
     public enum Race

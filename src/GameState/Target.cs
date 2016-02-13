@@ -37,6 +37,40 @@ namespace stonekart
         public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate);
         public abstract void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last);
         public abstract bool check(Target[] ts);
+
+        protected static Func<Target, bool> resolveLambda(FilterLambda l)
+        {
+            switch (l)
+            {
+                case FilterLambda.ANY:
+                    {
+                        return (@t => true);
+                    } break;
+                case FilterLambda.PLAYER:
+                    {
+                        return (@t => t.isPlayer);
+                    } break;
+                case FilterLambda.ZAPPABLE:
+                    {
+                        return (@t => t.isPlayer ||
+                                     t.card.location.pile == LocationPile.FIELD);
+                    } break;
+                case FilterLambda.CREATURE:
+                    {
+                        return (@t => t.isCard && t.card.getType() == CardType.Creature);
+                    } break;
+                case FilterLambda.ONFIELD:
+                    {
+                        return (@t => t.isCard && !t.isPlayer && t.card.location.pile == LocationPile.FIELD);
+                    } break;
+                case FilterLambda.INHAND:
+                    {
+                        return (@t => t.isCard && t.card.location.pile == LocationPile.HAND && t.card.controller.isHero);
+                    } break;
+                default:
+                    throw new Exception();
+            }
+        }
     }
 
     interface Forcable
@@ -57,40 +91,7 @@ namespace stonekart
 
             foreach (FilterLambda l in ls)
             {
-                switch (l)
-                {
-                    case FilterLambda.ANY:
-                        {
-                            checks.Add(@t => true);
-                        }
-                        break;
-                    case FilterLambda.PLAYER:
-                        {
-                            checks.Add(@t => t.isPlayer);
-                        }
-                        break;
-                    case FilterLambda.ZAPPABLE:
-                        {
-                            checks.Add(@t => t.isPlayer ||
-                                         t.card.location.pile == LocationPile.FIELD);
-                        }
-                        break;
-                    case FilterLambda.CREATURE:
-                        {
-                            checks.Add(@t => t.isCard && t.card.getType() == CardType.Creature);
-                        }
-                        break;
-                    case FilterLambda.ONFIELD:
-                        {
-                            checks.Add(@t => t.isCard && !t.isPlayer && t.card.location.pile == LocationPile.FIELD);
-                        } break;
-                    case FilterLambda.INHAND:
-                        {
-                            checks.Add(@t => t.isCard && t.card.location.pile == LocationPile.HAND && t.card.controller.isHero);
-                        } break;
-                    default:
-                        throw new Exception();
-                }
+                checks.Add(resolveLambda(l));
             }
 
         }
@@ -151,19 +152,24 @@ namespace stonekart
     public class ResolveTargetRule : TargetRule
     {
         private ResolveTarget www;
+        private Func<Card, bool> cardFilter;
 
         public ResolveTargetRule(ResolveTarget www)
         {
             this.www = www;
             targets = new Target[1];
+            cardFilter = (_) => true;
         }
 
+        public ResolveTargetRule(ResolveTarget www, FilterLambda l)
+        {
+            
+        }
 
         public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
         {
             return new Target[] {};
         }
-
         public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
         {
             switch (www)
@@ -194,7 +200,6 @@ namespace stonekart
                 } break;
             }
         }
-
         public override bool check(Target[] ts)
         {
             return true;
