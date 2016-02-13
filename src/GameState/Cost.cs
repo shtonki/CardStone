@@ -22,13 +22,19 @@ namespace stonekart
         */
         public int[][] check(Card card, GameInterface gi)
         {
+            gi.setContext("pay shit coach", Choice.Cancel);
             int[][] r = new int[costs.Count][];
             for (int i = 0; i < costs.Count; i++)
             {
                 int[] c = costs[i].check(card, gi);
-                if (c == null) { return null; }
+                if (c == null)
+                {
+                    r = null;
+                    break;
+                }
                 r[i] = c;
             }
+            gi.clearContext();
             return r;
         }
 
@@ -71,37 +77,32 @@ namespace stonekart
 
     public class DiscardCost : SubCost
     {
-        private int nrOfCardsToDiscard;
-        private int[] disCard;
+        private int cardsToDiscard;
 
-        public DiscardCost(int nrOfCardsToDiscard)
+        public DiscardCost(int cardsToDiscard)
         {
-            this.nrOfCardsToDiscard = nrOfCardsToDiscard;
+            this.cardsToDiscard = cardsToDiscard;
         }
 
         public override int[] check(Card card, GameInterface gi)
         {
-            disCard = new int[nrOfCardsToDiscard];
-            while (nrOfCardsToDiscard > 0)
+            int[] r = new int[cardsToDiscard];
+            int i = 0;
+            while (i < cardsToDiscard)
             {
-                GameElement element = gi.getNextGameElementPress();
-                if (filter(element))
+                GameElement e = gi.getNextGameElementPress();
+                if (e.card != null && e.card.location.pile == LocationPile.HAND && e.card.owner.isHero)
                 {
-                    disCard[nrOfCardsToDiscard] = element.card.getId();
-                    nrOfCardsToDiscard--;
+                    r[i] = e.card.getId();
+                    i++;
                 }
             }
-            return disCard;
+            return r;
         }
 
         public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
         {
             return i.Select(n => new MoveCardEvent(gi.getCardById(n), LocationPile.GRAVEYARD)).ToArray();
-        }
-
-        private bool filter(GameElement element)
-        {
-            return (element != null && element.card.location.pile == LocationPile.HAND);
         }
     }
 

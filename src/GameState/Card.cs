@@ -441,14 +441,14 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
                 } break;
 
-                case CardId.IlatianWineMerchant: //name subject to change since its a name of person but acts like sorecschery
+                case CardId.IlaxianWineMerchant: //name subject to change since its a name of person but acts like sorecschery
                 {
-                    blueCost = 1;
+                    blackCost = 1;
+                    greyCost = 2;
                     cardType = CardType.Creature;
-                    basePower = 3;
-                    baseToughness = 1;
-                    castDescription = "Discard a card: Gain life equal to its total cost.";
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(2)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)), LocationPile.FIELD, "xd"));
+                    basePower = 1;
+                    baseToughness = 2;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), LocationPile.FIELD, "Discard a card: Gain 3 life."));
                         //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
                         /*
                         fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
@@ -872,7 +872,7 @@ namespace stonekart
 
         ProtectiveSow,
         Cub,
-        IlatianWineMerchant,
+        IlaxianWineMerchant,
         Jew,
         VikingMushroom,
     }
