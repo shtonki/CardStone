@@ -488,7 +488,7 @@ namespace stonekart
                     Ability a = stackWrapper.ability;
                     if (a is ActivatedAbility)
                     {
-                        foreach (GameEvent e in ((ActivatedAbility)a).getCost().pay(stackWrapper.card, action.getCosts()))
+                        foreach (GameEvent e in ((ActivatedAbility)a).getCost().pay(stackWrapper.card, gameInterface, action.getCosts()))
                         {
                             handleEvent(e);
                         }
