@@ -74,6 +74,11 @@ namespace stonekart
         private int nrOfCardsToDiscard;
         private int[] disCard;
 
+        public DiscardCost(int nrOfCardsToDiscard)
+        {
+            this.nrOfCardsToDiscard = nrOfCardsToDiscard;
+        }
+
         public override int[] check(Card card, GameInterface gi)
         {
             disCard = new int[nrOfCardsToDiscard];
@@ -89,18 +94,14 @@ namespace stonekart
             return disCard;
         }
 
-        public override void pay(Card c, int[] i)
+        public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
         {
-            for (int j = 0; j < i.Count(); j++)
-            {
-                
-            }
+            return i.Select(n => new MoveCardEvent(gi.getCardById(n), LocationPile.GRAVEYARD)).ToArray();
         }
 
         private bool filter(GameElement element)
         {
-            if(element != null && element.card.location.pile == LocationPile.HAND) return true;
-            return false;
+            return (element != null && element.card.location.pile == LocationPile.HAND);
         }
     }
 

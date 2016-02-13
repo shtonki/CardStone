@@ -429,6 +429,7 @@ namespace stonekart
                             LocationPile.GRAVEYARD, EventTiming.Post, () => owner.field.cards.All(sow => sow.cardId == CardId.ProtectiveSow), new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Power, never, 2)));//new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
 
+                case CardId.RiderOfDeath:
                 {
                     name = "Rider of Death";
                     blackCost = 3;
@@ -443,11 +444,17 @@ namespace stonekart
                 case CardId.IlatianWineMerchant: //name subject to change since its a name of person but acts like sorecschery
                 {
                     blueCost = 1;
-                    cardType = CardType.Sorcery;
+                    cardType = CardType.Creature;
+                    basePower = 3;
+                    baseToughness = 1;
                     castDescription = "Discard a card: Gain life equal to its total cost.";
-                    fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
-                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
-                } break;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(2)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)), LocationPile.FIELD, "xd"));
+                        //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
+                        /*
+                        fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
+                        fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
+                        */
+                    } break;
 
                 case CardId.MeteorRain: //todo: seba review
                 {
@@ -471,7 +478,7 @@ namespace stonekart
                 } break;
 
                 case CardId.Extinguish: //todo: seba review
-                    {
+                {
                     blackCost = 2;
                     cardType = CardType.Instant;
                     castDescription = "Kill target creature.";
