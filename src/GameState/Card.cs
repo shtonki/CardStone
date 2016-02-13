@@ -403,7 +403,32 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
 
-                case CardId.RiderOfDeath: 
+                //todo seba: PHRASING
+                case CardId.ProtectiveSow: //todo fixa så att det bara kortet som summade cubsen dör och inte alla sows dör. och vise versa. Och översätt denna texten till engelska så att seba inte blir arg
+                {
+                    name = "Protective Sow";
+                    greenCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 2;
+                    baseToughness = 4;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " summon two cubs. If a cub dies: give +2/0 to this card. If this card dies: cubs die.", 
+                        LocationPile.FIELD, EventTiming.Post, () => true, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Cub, CardId.Cub)));
+                    //add kill cubs deathrattle thingy
+                } break;
+
+                case CardId.Cub:
+                {
+                    cardType = CardType.Creature;
+                    //cardType = CardType.Token;
+                    forceColour = Colour.GREEN;
+                    baseToughness = 1;
+                    basePower = 1;
+
+                    //todo jaseba: fix my targetrule, so that it actually targets protective sow and now whatever its targeting right now
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + " give +2/0 to protective sow.",
+                            LocationPile.GRAVEYARD, EventTiming.Post, () => owner.field.cards.All(sow => sow.cardId == CardId.ProtectiveSow), new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Power, never, 2)));//new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
+                } break;
+
                 {
                     name = "Rider of Death";
                     blackCost = 3;
@@ -835,10 +860,12 @@ namespace stonekart
         IlasGravekeeper,
         FuryOfTheRighteous,
         MeteorRain,
-        IlatianWineMerchant,
         RiderOfDeath, 
-
         Extinguish,
+
+        ProtectiveSow,
+        Cub,
+        IlatianWineMerchant,
         Jew,
         VikingMushroom,
     }

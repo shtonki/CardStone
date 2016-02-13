@@ -67,6 +67,41 @@ namespace stonekart
         abstract public void pay(Card c, int[] i);
     }
 
+    public class DiscardCost : SubCost
+    {
+        private int nrOfCardsToDiscard;
+        private int[] disCard;
+
+        public override int[] check(Card card, GameInterface gi)
+        {
+            disCard = new int[nrOfCardsToDiscard];
+            while (nrOfCardsToDiscard > 0)
+            {
+                GameElement element = gi.getNextGameElementPress();
+                if (filter(element))
+                {
+                    disCard[nrOfCardsToDiscard] = element.card.getId();
+                    nrOfCardsToDiscard--;
+                }
+            }
+            return disCard;
+        }
+
+        public override void pay(Card c, int[] i)
+        {
+            for (int j = 0; j < i.Count(); j++)
+            {
+                
+            }
+        }
+
+        private bool filter(GameElement element)
+        {
+            if(element != null && element.card.location.pile == LocationPile.HAND) return true;
+            return false;
+        }
+    }
+
     public class ManaCost : SubCost
     {
         //todo(seba) reconsider how we store this information yet again, no it's fine xd
