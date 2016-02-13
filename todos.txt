@@ -6,6 +6,9 @@
 * make damage step and end combat step the same step
 * show buffs on creatures when hovering
 * NOTSELF target filter?
+* allow cancelling of targeting
+* show which creatures are blocking which
+* implement move hack whatever
 
 ---------------ICUT4SANTA--------------
 * fix my shit for me dear papa santa
