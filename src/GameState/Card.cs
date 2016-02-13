@@ -100,7 +100,7 @@ namespace stonekart
             }
         }
         public bool canDefend => location.pile == LocationPile.FIELD && !topped;
-
+        public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
         public Ability dummyFor { get; private set; }
 

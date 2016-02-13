@@ -32,13 +32,15 @@ namespace stonekart
             return r;
         }
 
-        public void pay(Card card, int[][] i)
+        public GameEvent[] pay(Card card, int[][] i)
         {
             if (i.Length != costs.Count) { throw new Exception("can't"); }
+            List<GameEvent> r = new List<GameEvent>();
             for (int j = 0; j < i.Length; j++)
             {
-                costs[j].pay(card, i[j]);
+                r.AddRange(costs[j].pay(card, i[j]));
             }
+            return r.ToArray();
         }
 
         public Cost(params SubCost[] cs)
@@ -64,7 +66,7 @@ namespace stonekart
     public abstract class SubCost
     {
         public abstract int[] check(Card c, GameInterface gi);
-        abstract public void pay(Card c, int[] i);
+        abstract public GameEvent[] pay(Card c, int[] i);
     }
 
     public class DiscardCost : SubCost
@@ -209,9 +211,11 @@ namespace stonekart
             }
         }
 
-        public override void pay(Card card, int[] i)
+        public override GameEvent[] pay(Card card, int[] i)
         {
+            //hack as fuck
             card.owner.spendMana(i);
+            return new GameEvent[] {};
         }
     }
 }
