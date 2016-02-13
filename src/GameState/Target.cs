@@ -152,18 +152,18 @@ namespace stonekart
     public class ResolveTargetRule : TargetRule
     {
         private ResolveTarget www;
-        private Func<Card, bool> cardFilter;
+        private Func<Target, bool> filter;
 
         public ResolveTargetRule(ResolveTarget www)
         {
             this.www = www;
             targets = new Target[1];
-            cardFilter = (_) => true;
+            filter = (_) => true;
         }
 
-        public ResolveTargetRule(ResolveTarget www, FilterLambda l)
+        public ResolveTargetRule(ResolveTarget www, FilterLambda l) : this(www)
         {
-            
+            filter = resolveLambda(l);
         }
 
         public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
@@ -192,6 +192,11 @@ namespace stonekart
                 case ResolveTarget.OPPONENT:
                 {
                     targets[0] = new Target(resolving.owner.opponent);
+                } break;
+
+                case ResolveTarget.FIELDCREATURES:
+                {
+                    targets = gstate.allCards.Where(card => card.isCreature && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
                 } break;
 
                 default:
@@ -289,5 +294,6 @@ namespace stonekart
         CONTROLLER,
         LAST,
         OPPONENT,
+        FIELDCREATURES,
     }
 }
