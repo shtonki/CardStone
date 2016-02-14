@@ -17,7 +17,7 @@ namespace stonekart
         private CardPanel p;
         private CardButton[] cards;
         private Label noDeckName;
-        private TextBox tb;
+        private static TextBox tb;
         private Card[] ids;
         private List<Card> sortedIds;
         private Pile myDeckIsHard;
@@ -42,7 +42,7 @@ namespace stonekart
                     .OrderBy(card => card.colour)
                     .ToArray();
             cardInfo = new CardInfoPanel();
-            cardInfo.BackColor = Color.Fuchsia;
+            cardInfo.BackColor = BackColor;
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
 
@@ -77,7 +77,6 @@ namespace stonekart
             //todo: you need to double press if you scroll one way then the other. 
             scrollLeftButton.MouseDown += (_, __) =>
             {
-                
                 if (currentPage > 0) currentPage--;
                 int cardSlotNr = cardsPerPage-1;
                 for (int i = currentPage*cardsPerPage+cardsPerPage-1; i > currentPage*cardsPerPage-1; i--)
@@ -272,12 +271,14 @@ namespace stonekart
                         string line = sr.ReadLine();
                         if (line != null) myDeck.Add((CardId)Enum.Parse(typeof(CardId), line));
                     }
+                    tb.Text = deckName.Substring(0, deckName.Length - 4);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
+                return null;
             }
             return myDeck;
         }
@@ -299,8 +300,8 @@ namespace stonekart
             scrollRightButton.Location = new Point(Size.Width-250, Size.Height/8);
 
             //todo jasin: fix 8 to something else, so we can change it easier MAYBE? coach??
-            int currentXPosition = cardSlot[0].Width*2;
-            int currentYPosition = Size.Height/3;
+            int currentXPosition = Width / 5;
+            int currentYPosition = Size.Height/4;
             
             for (int i = 0; i < 8; i++)
             {
@@ -308,14 +309,13 @@ namespace stonekart
                 cardSlot[i].Location = new Point(currentXPosition, currentYPosition);
                 if (i == 3)
                 {
-                    currentXPosition = cardSlot[i].Width*2;
+                    currentXPosition = Width/5;
                     currentYPosition += cardSlot[i].Height;
                 }
                 else currentXPosition += cardSlot[i].Width;
 
-                //size wutifak 
-                //cardSlot[i].Width = Size.Width/3;
-               // cardSlot[i].Height = Size.Height/2;
+                //size
+                cardSlot[i].setWidth(Width/10);
             }
             
 
