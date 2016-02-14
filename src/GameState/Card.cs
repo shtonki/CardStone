@@ -406,7 +406,7 @@ namespace stonekart
                 case CardId.Tree:
                 {
                     greenCost = 1;
-                    basePower = 0;
+                    basePower = 1;
                     baseToughness = 5;
                     cardType = CardType.Creature;
                     
