@@ -37,6 +37,7 @@ Honor Incitement(artifact?): every time opponent draws a card, you draw a card.
 dont know man(artifact?): you can use opponents unused mana crystals
 decieving terrains: mill 3 cards.
 Protective sow rework: spellbender for bears
+zealous crucifier: sacrifice a friendly creature, gain +2/+2
 
 **the four horsemen of apocalypse**
 Horseman of Death: destroy target unit 

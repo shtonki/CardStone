@@ -402,13 +402,13 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
 
-                case CardId.Tree:
+                //todo: phrasing and balance
+                case CardId.DeadCreatureLover: 
                 {
-                    greenCost = 1;
+                    blackCost = 3;
                     basePower = 1;
                     baseToughness = 5;
                     cardType = CardType.Creature;
-                    
 
                     EventFilter f = (e) =>
                     {
@@ -541,12 +541,21 @@ namespace stonekart
                 } break;
 
                 case CardId.VikingMushroom: //todo: seba review
-                    {
+                {
                     redCost = 2;
                     cardType = CardType.Sorcery;
                     castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
                     fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), Modifiable.Power, never, 2));
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
+                } break;
+
+                case CardId.EssenceOfDemise:
+                {
+                    name = "Essence of Demise";
+                    blackCost = 1;
+                    cardType = CardType.Relic;
+                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
+                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
                 } break;
 
                 default: 
@@ -907,7 +916,8 @@ namespace stonekart
         MeteorRain,
         RiderOfDeath, 
         Extinguish,
-        Tree,
+        DeadCreatureLover,
+        EssenceOfDemise,
 
         Infiltrator,
         ProtectiveSow,
