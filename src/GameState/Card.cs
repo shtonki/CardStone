@@ -408,6 +408,9 @@ namespace stonekart
                     greenCost = 1;
                     basePower = 0;
                     baseToughness = 5;
+                    cardType = CardType.Creature;
+                    
+
                     EventFilter f = (e) =>
                     {
                         if (e.type != GameEventType.MOVECARD) return false;
@@ -415,10 +418,10 @@ namespace stonekart
                         return mevent.from?.pile == LocationPile.FIELD && mevent.to?.pile == LocationPile.GRAVEYARD &&
                                mevent.card.owner.isHero && mevent.card.isCreature && mevent.card != this;
                     };
+
                     triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 2)));
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "", LocationPile.FIELD, EventTiming.Post,
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 2)));
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, () => false, 2),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 2)));
                     } break;
 
                 case CardId.Infiltrator:
