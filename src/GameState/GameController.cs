@@ -548,11 +548,11 @@ namespace stonekart
                 }
                 
 
-                foreach (var v in game.fieldCards)
+                foreach (Card c in game.fieldCards)
                 {
-                    if (v.currentToughness <= 0)
+                    if (c.hasPT() && c.currentToughness <= 0)
                     {
-                        xd.Add(new MoveCardEvent(v, LocationPile.GRAVEYARD));
+                        xd.Add(new MoveCardEvent(c, LocationPile.GRAVEYARD));
                     }
                 }
 
