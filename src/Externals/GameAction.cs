@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace stonekart
 {
 
-    //todo(seba) make this entire thing serializable
     public abstract class GameAction
     {
 
@@ -146,9 +145,6 @@ namespace stonekart
 
     public class CastAction : GameAction
     {
-        //todo seba this entire class is about as current as internet exploder
-
-
         private StackWrapper sw;
         private int[][] costs;
 
@@ -208,7 +204,7 @@ namespace stonekart
                     cs.Append(i);
                     cs.Append("*");
                 }
-                if (v.Length == 0) { continue; } //todo this whole thing is awful sketchy and since it hasn't been tested probably works flawlessly
+                if (v.Length == 0) { continue; } //
                 cs.Length--;
                 cs.Append("'");
             }

@@ -9,22 +9,22 @@ namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
     {
-        CardInfoPanel cardInfo;
-        Button saveButton, loadButton;
-        Button[] sortButtons;
-        Button scrollLeftButton, scrollRightButton;
-        CardButton[] cardSlot;
-        CardPanel p;
-        CardButton[] cards;
-        Label noDeckName;
-        TextBox tb;
-        Card[] ids;
-        List<Card> sortedIds;
-        Pile myDeckIsHard;
-        const int paddingX = 8;
-        const int paddingY = 8;
-        const int CARDS_PER_ROW = 6;
-        Colour currentSortingColor;
+        private CardInfoPanel cardInfo;
+        private Button saveButton, loadButton;
+        private Button[] sortButtons;
+        private Button scrollLeftButton, scrollRightButton;
+        private CardButton[] cardSlot;
+        private CardPanel p;
+        private CardButton[] cards;
+        private Label noDeckName;
+        private TextBox tb;
+        private Card[] ids;
+        private List<Card> sortedIds;
+        private Pile myDeckIsHard;
+        private const int paddingX = 8;
+        private const int paddingY = 8;
+        private const int CARDS_PER_ROW = 6;
+        private Colour currentSortingColor;
         public DeckEditorPanel()
         {
             BackColor = Color.Beige;

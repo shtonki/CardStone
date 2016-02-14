@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace stonekart
 {
-    //todo(seba) make it work more like a union
     public class Target
     {
         public Player player { get; private set; }
@@ -34,7 +33,7 @@ namespace stonekart
         {
             return targets;
         }
-        public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate);
+        public abstract Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable);
         public abstract void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last);
         public abstract bool check(Target[] ts);
 
@@ -96,10 +95,17 @@ namespace stonekart
 
         }
 
-        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
             int i = 0;
-            ginterface.setContext("choose targetx");
+            if (cancellable)
+            {
+                ginterface.setContext("choose targetx", Choice.Cancel);
+            }
+            else
+            {
+                ginterface.setContext("choose targetx");
+            }
             while (i < targetCount)
             {
                 GameElement ge = ginterface.getNextGameElementPress();
@@ -166,7 +172,7 @@ namespace stonekart
             filter = resolveLambda(l);
         }
 
-        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
             return new Target[] {};
         }
@@ -232,9 +238,9 @@ namespace stonekart
             (takePileFrom as Forcable)?.forceTargets(ts);
         }
 
-        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
-            return takePileFrom.resolveCastTargets(ginterface, gstate);
+            return takePileFrom.resolveCastTargets(ginterface, gstate, cancellable);
         }
 
         public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)

@@ -190,7 +190,7 @@ namespace stonekart
 
         public DamagePlayerEvent(Player plr, Card src, int dmg) : base(plr, GameEventType.DAMAGEPLAYER)
         {
-
+            source = src;
             damage = dmg;
         }
         

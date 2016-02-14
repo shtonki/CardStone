@@ -24,12 +24,12 @@ namespace stonekart
             this.preResolveCheck = preResolveCheck;
         }
 
-        public Target[] aquireTargets(GameInterface ginterface, GameState gstate)
+        public Target[] aquireTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
             List<Target> l = new List<Target>();
             foreach (SubEffect e in subEffects)
             {
-                Target[] ts = e.resolveCastTargets(ginterface, gstate);
+                Target[] ts = e.resolveCastTargets(ginterface, gstate, cancellable);
                 if (ts == null) return null;
                 l.AddRange(ts);
             }
@@ -91,9 +91,9 @@ namespace stonekart
             }
             return r.ToArray();
         }
-        public Target[] resolveCastTargets(GameInterface ginterface, GameState gstate)
+        public Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
-            return targetRule.resolveCastTargets(ginterface, gstate);
+            return targetRule.resolveCastTargets(ginterface, gstate, cancellable);
         }
         public void resolveResolveTargets(GameInterface gi, GameState gstate, Card resolving, Target[] last)
         {

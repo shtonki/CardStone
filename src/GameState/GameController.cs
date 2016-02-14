@@ -76,7 +76,7 @@ namespace stonekart
             p.setLife(25);
             Choice c;
             int life = 1;
-            while (p.getLife() > 15)
+            while (true)
             {
                 while (p.hand.count > 0)
                 {
@@ -88,6 +88,11 @@ namespace stonekart
                     moveCardTo(p.deck.peek(), p.hand);
                 }
 
+                if (p.getLife() < 16)
+                {
+                    break;
+                }
+
                 if (p.isHero)
                 {
                     c = gameInterface.getChoice("Do you want to mulligan?", Choice.Yes, Choice.No);
@@ -97,6 +102,7 @@ namespace stonekart
                 {
                     gameInterface.setContext("Opponent is mulliganing.");
                     c = (Choice)gameInterface.demandSelection();
+                    gameInterface.clearContext();
                 }
                 if (c != Choice.Yes)
                 {
@@ -720,7 +726,6 @@ namespace stonekart
         /// <returns>Defenders as the first list, defended as the second</returns>
         private Tuple<Card[], Card[]> chooseDefenders()
         {
-            //todo(seba) could keep track of undefended attackers
             List<Card> blockers = new List<Card>();
 
             while (true)
@@ -794,11 +799,6 @@ namespace stonekart
             gameInterface.clearContext();
             Card[] bkds = blockers.Select(@c => c.defenderOf).ToArray();
             return new Tuple<Card[], Card[]>(blockers.ToArray(), bkds);
-        }
-
-        private void combatDamage()
-        {
-            
         }
 
         private void resolveTop()
@@ -945,8 +945,6 @@ namespace stonekart
             return game.getCardById(i);
         }
 
-        /*todo 0 - home 1 - away; meaning one has to flip it when getting a 
-         * message from the other player which is anything but practical */
         public Player getPlayerById(LocationPlayer side)
         {
             if (side == LocationPlayer.HERO) return game.hero;

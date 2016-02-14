@@ -17,7 +17,7 @@ namespace stonekart
         public CardPanel villainFieldPanel;
         private TurnPanel turnPanel;
         private CardInfoPanel cardInfoPanel;
-        private List<ArrowPanel> arrows = new List<ArrowPanel>();   //todo(seba) allow the arrow to move when what it's pointing to/from moves
+        private List<ArrowPanel> arrows = new List<ArrowPanel>();   
 
         public string message { get { return choicePanel.Text; } set { choicePanel.Text = value; } }
 

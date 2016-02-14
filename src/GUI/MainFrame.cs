@@ -58,7 +58,7 @@ namespace stonekart
             friendPanel = new FriendPanel();
             friendPanel.Location = new Point(10, 880);
 
-            Controls.Add(labelx);       //todo(seba) figure out why the fuck the game just actually stops working if you add this last instead of first like what the fuck is even going on at this point microsoft
+            Controls.Add(labelx);
             //Controls.Add(gamePanel);
             Controls.Add(mainMenuPanel);
             Controls.Add(friendPanel);
@@ -222,7 +222,6 @@ namespace stonekart
             p.Y = ny + y;
         }
         
-        //todo(seba) make this not cover enitire sceen
         public void setStartAndEnd(int x1, int y1, int x2, int y2)
         {
             int dx = x2 - x1;
