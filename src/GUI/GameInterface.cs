@@ -34,6 +34,7 @@ namespace stonekart
             var t = cruft.Pop();
             gamePanel.message = t.Item1;
             gamePanel.showButtons(t.Item2);
+            currentButtons = t.Item2;
         }
 
         public void setContext(string message, params Choice[] cs)

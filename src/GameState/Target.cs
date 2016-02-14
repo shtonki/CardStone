@@ -128,8 +128,8 @@ namespace stonekart
                 }
                 if (ge.choice != null && ge.choice.Value == Choice.Cancel)
                 {
-                    targets = null;
-                    break;
+                    ginterface.clearContext();
+                    return null;
                 }
             }
             ginterface.clearContext();
