@@ -315,7 +315,7 @@ namespace stonekart
         protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
             Player p = t.player;
-            GameEvent[] r = p.hand.cards.Take(cards).Select((c) => new MoveCardEvent(c, LocationPile.GRAVEYARD)).ToArray();
+            GameEvent[] r = p.deck.cards.Take(cards).Select((c) => new MoveCardEvent(c, LocationPile.GRAVEYARD)).ToArray();;
             return r;
         }
     }
@@ -328,7 +328,7 @@ namespace stonekart
         public Pyro(TargetRule t, int damage, Func<Card, bool> cardFilter) : base(t)
         {
             this.damage = damage;
-            this.cardFilter = cardFilter;;
+            this.cardFilter = cardFilter;
         }
 
         protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)

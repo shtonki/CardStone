@@ -403,6 +403,41 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
 
+                case CardId.Tree:
+                {
+                    greenCost = 1;
+                    basePower = 0;
+                    baseToughness = 5;
+                    EventFilter f = (e) =>
+                    {
+                        if (e.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) e;
+                        return mevent.from.pile == LocationPile.FIELD && mevent.from.pile == LocationPile.GRAVEYARD &&
+                               mevent.card.owner.isHero && mevent.card.isCreature && mevent.card != this;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 2)));
+                    /*triggeredAbilities.Add(new TriggeredAbility(this, f, "", LocationPile.FIELD, EventTiming.Post,
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 2)));*/
+                    } break;
+
+                case CardId.Infiltrator:
+                {
+                    blueCost = 1;
+                    basePower = 2;
+                    baseToughness = 4;
+                    cardType = CardType.Creature;
+                    keyAbilities.Add(KeyAbility.Fervor);
+                    EventFilter f = (e) =>
+                    {
+                        if (e.type != GameEventType.DAMAGEPLAYER) { return false; }
+                        DamagePlayerEvent devent = (DamagePlayerEvent)e;
+                        return devent.source == this; 
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, " DO STUFF ", LocationPile.FIELD, EventTiming.Post,
+                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
+                } break;
+
                 //todo seba: PHRASING
                 case CardId.ProtectiveSow: //todo fixa så att det bara kortet som summade cubsen dör och inte alla sows dör. och vise versa. Och översätt denna texten till engelska så att seba inte blir arg
                 {
@@ -441,20 +476,21 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
                 } break;
 
-                case CardId.IlaxianWineMerchant: //name subject to change since its a name of person but acts like sorecschery
+                case CardId.IlatianWineMerchant:
                 {
                     blackCost = 1;
                     greyCost = 2;
                     cardType = CardType.Creature;
                     basePower = 1;
                     baseToughness = 2;
+
                     activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), LocationPile.FIELD, "Discard a card: Gain 3 life."));
                         //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
                         /*
-                        fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
-                        fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
+                        Card c = fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
+                        fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), c.manacost));
                         */
-                    } break;
+                } break;
 
                 case CardId.MeteorRain: //todo: seba review
                 {
@@ -869,10 +905,12 @@ namespace stonekart
         MeteorRain,
         RiderOfDeath, 
         Extinguish,
+        Tree,
 
+        Infiltrator,
         ProtectiveSow,
         Cub,
-        IlaxianWineMerchant,
+        IlatianWineMerchant,
         Jew,
         VikingMushroom,
     }

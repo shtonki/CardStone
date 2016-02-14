@@ -12,7 +12,6 @@ Overkill: deal 2 damage to target creature. If target dies, deal 2 damage to FAC
 blood magic: sacrifice friendly creature and return a creature from graveyard with 1 health
 grave looter: when grave looter enters the battlefield return target creature from your graveyard to your hand
 dark confidant: at the begining of your replenish step reveal the top card of your deck, put it in to your hand and lose equal to its total mana cost
-Ilatian whine merchant: Discard a card: Gain life equal to its total cost.
 Final will: Target creature gains "When this creature dies deal its attack damage to target creature or player"
 
 //revision
@@ -36,7 +35,8 @@ Scorched Earth: opponent player doesnt draw a card on his/hers draw step turn fo
 starvation: both players must put two of their cards in the graveyard
 Honor Incitement(artifact?): every time opponent draws a card, you draw a card.
 dont know man(artifact?): you can use opponents unused mana crystals
-
+decieving terrains: mill 3 cards.
+Protective sow rework: spellbender for bears
 
 **the four horsemen of apocalypse**
 Horseman of Death: destroy target unit 
