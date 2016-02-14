@@ -181,7 +181,7 @@ namespace stonekart
 
                 case ResolveTarget.SELF:
                 {
-                    targets[0] = new Target(resolving);
+                    targets[0] = new Target(resolving.isDummy ? resolving.dummyFor.card : resolving);
                 } break;
 
                 case ResolveTarget.LAST:

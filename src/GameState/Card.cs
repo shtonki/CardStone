@@ -406,8 +406,9 @@ namespace stonekart
                 case CardId.Tree:
                 {
                     greenCost = 1;
-                    basePower = 0;
+                    basePower = 1;
                     baseToughness = 5;
+                    cardType = CardType.Creature;
                     EventFilter f = (e) =>
                     {
                         if (e.type != GameEventType.MOVECARD) return false;
@@ -416,8 +417,7 @@ namespace stonekart
                                mevent.card.owner.isHero && mevent.card.isCreature && mevent.card != this;
                     };
                     triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 2)));
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "", LocationPile.FIELD, EventTiming.Post,
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 2),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 2)));
                     } break;
 
