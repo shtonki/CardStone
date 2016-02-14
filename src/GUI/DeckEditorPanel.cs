@@ -5,6 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Linq;
+
+/*todo:
+    just hide scroll buttons when you are at last page and first page?
+    list of filters
+*/
 namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
