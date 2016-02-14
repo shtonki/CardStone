@@ -39,11 +39,36 @@ namespace stonekart
         public void addModifier(T modifyBy, Clojurex removeClojure)
         {
             modifier = add(modifier, modifyBy);
-            hks.Add(new Housekeeping(modifier, removeClojure));
+            hks.Add(new Housekeeping(modifyBy, removeClojure));
         }
 
         public void check()
         {
+            List<Housekeeping> rs = new List<Housekeeping>();
+
+            foreach (Housekeeping v in hks)
+            {
+                if (v.clojure())
+                {
+                    rs.Add(v);
+                }
+            }
+
+            foreach (Housekeeping v in rs)
+            {
+                modifier = subtract(modifier, v.value);
+                if (!hks.Remove(v)) throw new Exception();
+            }
+
+            T b = default(T);
+
+            foreach (var v in hks)
+            {
+                b = add(b, v.value);
+            }
+
+
+            /*
             for (int i = hks.Count - 1; i >= 0; i--)
             {
                 if (hks[i].clojure())
@@ -52,6 +77,18 @@ namespace stonekart
                     hks.RemoveAt(i);
                 }
             }
+            */
+        }
+
+        private void nignog()
+        {
+            T b = default(T);
+            foreach (var v in hks)
+            {
+                b = add(b, v.value);
+            }
+
+            modifier = b;
         }
 
         public void clear()
