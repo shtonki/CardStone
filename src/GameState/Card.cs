@@ -129,7 +129,6 @@ namespace stonekart
             auras = new List<Aura>();
         }
 
-        //todo(seba) move this entire constructor to a XML document
         public Card(CardId c)
         {
             cardId = c;

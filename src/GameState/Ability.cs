@@ -22,7 +22,7 @@ namespace stonekart
 
         public Target[] aquireTargets(GameInterface gi, GameState gs)
         {
-            return effect.aquireTargets(gi, gs);
+            return effect.aquireTargets(gi, gs, this is ActivatedAbility);
         }
 
         public void setCastTargets(Target[] ts)

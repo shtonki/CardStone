@@ -358,7 +358,6 @@ namespace stonekart
         }
     }
 
-    //todo(seba) overhaul so that everything uses SPanel
     public class SPanel : Panel
     {
         public void setVisible(bool b)
