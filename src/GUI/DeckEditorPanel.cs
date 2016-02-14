@@ -48,19 +48,8 @@ namespace stonekart
 
             for (int i = 0; i < nrOfCards; i++)
             {
-                //int i0 = i;
                 cards[i] = new CardButton(ids[i].cardId);
                 sortedIds.Add(ids[i]);
-                //Controls.Add(cards[i]);
-                /*cards[i].MouseDown += (_, __) =>
-                {
-                    if (__.Button == MouseButtons.Left) addToDeck(cards[i0].Card.cardId);
-                    else if (__.Button == MouseButtons.Right) removeFromDeck(cards[i0].Card.cardId);
-                };
-                cards[i].MouseHover += (_, __) =>
-                {
-                    cardInfo.showCard(cards[i0].Card);
-                };*/
             }
             
             for (int i = 0; i < cardsPerPage; i++)
@@ -88,23 +77,23 @@ namespace stonekart
             //todo: you need to double press if you scroll one way then the other. 
             scrollLeftButton.MouseDown += (_, __) =>
             {
+                
+                if (currentPage > 0) currentPage--;
                 int cardSlotNr = cardsPerPage-1;
                 for (int i = currentPage*cardsPerPage+cardsPerPage-1; i > currentPage*cardsPerPage-1; i--)
                 {
-                    Console.WriteLine(i);
                     cardSlot[cardSlotNr].Visible = true;
                     cardSlot[cardSlotNr].notifyObserver(new Card(sortedIds[i].cardId), null);
                     cardSlotNr--;
                 }
-                if (currentPage > 0) currentPage--;
-                Console.WriteLine("\n");
+                Console.WriteLine(currentPage);
             };
             scrollRightButton.MouseDown += (_, __) =>
             {
+                if (currentPage * cardsPerPage - cardsPerPage < sortedIds.Count - cardsPerPage * 2) currentPage++;
                 int cardSlotNr = 0;
-                for (int i = currentPage * cardsPerPage; i < currentPage * cardsPerPage + cardsPerPage; i++)
+                for (int i = currentPage * cardsPerPage - cardsPerPage; i < currentPage * cardsPerPage; i++)
                 {
-                    Console.WriteLine(i);
                     if (i < sortedIds.Count - cardsPerPage)
                     {
                         cardSlot[cardSlotNr].Visible = true;
@@ -113,7 +102,6 @@ namespace stonekart
                     else cardSlot[cardSlotNr].Visible = false;
                     cardSlotNr++;
                 }
-                if (currentPage * cardsPerPage < sortedIds.Count - cardsPerPage*2) currentPage++;
             };
             /* all borked up
             scrollLeftButton.MouseDown += (_, __) =>
