@@ -145,6 +145,8 @@ namespace stonekart
             addBaseHandler(GameEventType.GAINLIFE, _gainlife);
             addBaseHandler(GameEventType.SUMMONTOKEN, _summontoken);
             addBaseHandler(GameEventType.MODIFYCARD, _modifycard);
+            addBaseHandler(GameEventType.SHUFFLEDECK, _shuffle);
+            addBaseHandler(GameEventType.COUNTERSPELL, _counterspell);
         }
 
         private void addBaseHandler(GameEventType t, EventAction a)
@@ -152,6 +154,26 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _counterspell(GameEvent gevent)
+        {
+            CounterSpellEvent e = (CounterSpellEvent)gevent;
+            Stack<StackWrapper> xd = new Stack<StackWrapper>();
+            while (true)
+            {
+                StackWrapper w = stackxd.Pop();
+                if (w.card == e.card)
+                {
+                    break;
+                }
+                xd.Push(w);
+            }
+            while (xd.Count > 0)
+            {
+                stackxd.Push(xd.Pop());
+            }
+
+            handleEvent(new MoveCardEvent(e.card, LocationPile.GRAVEYARD));
+        }
         private void _shuffle(GameEvent gevent)
         {
             ShuffleDeckEvent e = (ShuffleDeckEvent)gevent;
@@ -176,7 +198,7 @@ namespace stonekart
         private void _topcard(GameEvent gevent)
         {
             TopEvent e = (TopEvent)gevent;
-            e.getCard().topped = true;
+            e.card.topped = true;
         }
         private void _step(GameEvent gevent)
         {

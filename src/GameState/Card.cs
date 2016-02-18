@@ -582,6 +582,15 @@ namespace stonekart
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
                 } break;
 
+                case CardId.Counterspell:
+                {
+                    blueCost = 2;
+                    greyCost = 1;
+                    cardType = CardType.Instant;
+                    castDescription = "Counter target spell.";
+                    fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
+                } break;
+
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -945,6 +954,7 @@ namespace stonekart
         Extinguish,
         DeadCreatureLover,
         EssenceOfDemise,
+        Counterspell,
 
         Infiltrator,
         ProtectiveSow,

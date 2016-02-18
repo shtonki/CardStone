@@ -40,8 +40,9 @@ namespace stonekart
 
         public GameEvent[] pay(Card card, GameInterface gi, int[][] i)
         {
-            if (i.Length != costs.Count) { throw new Exception("can't"); }
             List<GameEvent> r = new List<GameEvent>();
+            if (i.Length == 0) { return r.ToArray(); }
+            if (i.Length != costs.Count) { throw new Exception("can't"); }
             for (int j = 0; j < i.Length; j++)
             {
                 r.AddRange(costs[j].pay(card, gi, i[j]));

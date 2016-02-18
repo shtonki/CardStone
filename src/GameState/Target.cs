@@ -66,6 +66,11 @@ namespace stonekart
                     {
                         return (@t => t.isCard && t.card.location.pile == LocationPile.HAND && t.card.controller.isHero);
                     } break;
+
+                case FilterLambda.ONSTACK:
+                {
+                    return (@t => t.isCard && t.card.location.pile == LocationPile.STACK);
+                }
                 default:
                     throw new Exception();
             }
@@ -302,6 +307,7 @@ namespace stonekart
         CREATURE,
         ZAPPABLE,
         ONFIELD,
+        ONSTACK,
         INHAND,
         //ZAPPABLECREATURE, 
     }

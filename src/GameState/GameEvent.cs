@@ -27,6 +27,7 @@ namespace stonekart
         SUMMONTOKEN,
         MODIFYCARD,
         SHUFFLEDECK,
+        COUNTERSPELL,
     }
 
     /// <summary>
@@ -172,6 +173,13 @@ namespace stonekart
         }
     }
 
+    class CounterSpellEvent : CardEvent
+    {
+        public CounterSpellEvent(Card c) : base(c, GameEventType.COUNTERSPELL)
+        {
+        }
+    }
+
     class SummonTokenEvent : GameEvent
     {
         public CardId id {get; private set; }
@@ -257,16 +265,10 @@ namespace stonekart
 
     abstract class CardEvent : GameEvent
     {
-        protected Card c;
-
+        public Card card { get; private set; }
         public CardEvent(Card card, GameEventType type) : base(type)
         {
-            c = card;
-        }
-
-        public Card getCard()
-        {
-            return c;
+            this.card = card;
         }
     }
 

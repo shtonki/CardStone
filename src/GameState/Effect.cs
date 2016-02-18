@@ -267,41 +267,16 @@ namespace stonekart
         }
     }
 
-    /*
-    public class Duress : SubEffect
+    public class CounterSpell : SubEffect
     {
-        private Func<Card, bool> cardFilter;
-
-        public Duress(Func<Card, bool> cardFilter)
+        public CounterSpell(TargetRule t) : base(t)
         {
-            this.cardFilter = cardFilter;
-            setTargets(FilterLambda.CONTROLLER, FilterLambda.PLAYER);
         }
-
-        protected override GameEvent[] resolve(GameInterface ginterface, GameState game)
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
         {
-            Player caster = nextPlayer();
-            Player victim = nextPlayer();
-            Card discard;
-            if (caster.isHero)
-            {
-                CardPanelControl p = ginterface.showCards(victim.hand.cards.ToArray());
-                ginterface.setContext("Pick a card");
-                discard = p.waitForCard();
-                ginterface.clearContext();
-                p.closeWindow();
-                ginterface.sendCard(discard);
-            }
-            else
-            {
-                discard = ginterface.demandCard(game);
-            }
-            var r = new MoveCardEvent(discard, LocationPile.GRAVEYARD);
-            return new[] {r};
-
+            return new[] {new CounterSpellEvent(t.card) };
         }
     }
-    */
 
     public class Mill : SubEffect
     {
