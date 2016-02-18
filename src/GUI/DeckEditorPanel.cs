@@ -149,9 +149,9 @@ namespace stonekart
                 }
             };
 
-            sortButtons = new Button[5];
+            sortButtons = new Button[6];
             //todo use images or something, instead of solid colors
-            Color[] colors = new Color[5] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green};
+            Color[] colors = new Color[6] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green, Color.Gray};
             for(int i = 0; i < sortButtons.Count(); i++)
             {
                 //todo ask seba why i0 is needed
@@ -180,12 +180,12 @@ namespace stonekart
 
         private void sortAfterColor(Colour colour)
         {
-            if (currentSortingColor == colour) currentSortingColor = Colour.GREY;
+            if (currentSortingColor == colour) currentSortingColor = Colour.MULTI;
             else currentSortingColor = colour;
 
             foreach (Card id in ids)
             {
-                if (id.colour != currentSortingColor && currentSortingColor != Colour.GREY)
+                if (id.colour != currentSortingColor && currentSortingColor != Colour.MULTI)
                 {
                     sortedIds.Remove(id);
                 }
@@ -314,10 +314,10 @@ namespace stonekart
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
             loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y + saveButton.Height);
+
             for (int i = 0; i < sortButtons.Count(); i++)
             {
-                //ishigity
-                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 35, Size.Height / 20);
+                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 60, Size.Height / 20);
             }
 
             noDeckName.Location = new Point(tb.Location.X, tb.Location.Y - 20);

@@ -657,6 +657,17 @@ namespace stonekart
                 } break;
                 */
 
+                case CardId.AngryCoolDragonX:
+                {
+                    redCost = 1;
+                    baseToughness = 1;
+                    basePower = 3;
+                    cardType = CardType.Creature;;
+
+                    keyAbilities.Add(KeyAbility.Fervor);
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "dies and end of turn.",
+                        LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.GRAVEYARD)));
+                } break;
 
                 default: 
                 {
@@ -1031,6 +1042,7 @@ namespace stonekart
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
+        AngryCoolDragonX,
         Tree,
         Infiltrator,
         ProtectiveSow,
