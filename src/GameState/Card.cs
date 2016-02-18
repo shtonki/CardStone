@@ -590,7 +590,7 @@ namespace stonekart
                 case CardId.EssenceOfDemise:
                 {
                     name = "Essence of Demise";
-                    blackCost = 1;
+                    blackCost = 3;
                     cardType = CardType.Relic;
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
@@ -668,9 +668,9 @@ namespace stonekart
 
                 case CardId.AngryCoolDragonX:
                 {
-                    redCost = 1;
+                    redCost = 2;
                     baseToughness = 1;
-                    basePower = 3;
+                    basePower = 5;
                     cardType = CardType.Creature;;
 
                     keyAbilities.Add(KeyAbility.Fervor);
