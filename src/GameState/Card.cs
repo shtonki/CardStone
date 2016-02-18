@@ -586,6 +586,7 @@ namespace stonekart
                         LocationPile.FIELD, "1G: gain +1/+1"));
                 } break;
 
+                //todo: each time player casts spell deal one damage to face
                 case CardId.EssenceOfDemise:
                 {
                     name = "Essence of Demise";
@@ -614,6 +615,48 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
                 } break;
+
+                /* 
+                case CardId.EssenceOfWilderness:
+                {
+                    name = "Essence of Wilderness";
+                    greenCost = 3;
+                    cardType = CardType.Relic;
+
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) gevent;
+                        return mevent.to.pile == LocationPile.FIELD &&mevent.card.cardType == CardType.Creature;
+                    };
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, ));
+                } break;
+                */
+
+                /*
+                case CardId.EssenceOfValor:
+                {
+                    name = "Essence of Valor";
+                    whiteCost = 3;
+                    cardType = CardType.Relic;
+
+                    //creatures with more than 3 damage cannot attack
+                } break;
+                */
+
+                /*
+                case CardId.IlasMagicLamp:
+                {
+                    name = "Ila's Magic Lamp";
+                    blackCost = 1;
+                    cardType = CardType.Sorcery;
+                    
+                    //has three charges, get card from deck and shuffle deck
+
+                } break;
+                */
+
 
                 default: 
                 {
@@ -810,12 +853,6 @@ namespace stonekart
             */
             }
 
-        public bool getFrame(CardId id)
-        {
-            
-            return true;
-        }
-
         public bool isCast(Ability a)
         {
             return a == castAbility;
@@ -991,6 +1028,9 @@ namespace stonekart
         EssenceOfDemise,
         EssenceOfRage,
         EssenceOfClarity,
+        //EssenceOfWilderness,
+        //EssenceOfValor,
+        //IlasMagicLamp,
         Tree,
         Infiltrator,
         ProtectiveSow,

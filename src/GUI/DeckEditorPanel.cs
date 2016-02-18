@@ -15,7 +15,7 @@ namespace stonekart
     class DeckEditorPanel : DisplayPanel
     {
         private CardInfoPanel cardInfo;
-        private Button saveButton, loadButton;
+        private Button saveButton, loadButton, backToMainMenuButton;
         private Button[] sortButtons;
         private Button scrollLeftButton, scrollRightButton;
         private CardButton[] cardSlot;
@@ -50,6 +50,8 @@ namespace stonekart
             cardInfo.BackColor = BackColor;
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
+
+            
 
             for (int i = 0; i < nrOfCards; i++)
             {
@@ -108,34 +110,15 @@ namespace stonekart
                     cardSlotNr++;
                 }
             };
-            /* all borked up
-            scrollLeftButton.MouseDown += (_, __) =>
+
+            backToMainMenuButton = new Button();
+            backToMainMenuButton.Size = new Size(120, 40);
+            backToMainMenuButton.Text = "back to main menu";
+            backToMainMenuButton.MouseDown += (_, __) =>
             {
-                for (int i = 8*currentPage+8; i > 8*currentPage; i--)
-                {
-                    if (i - 8 > 0)
-                    {
-                        cardSlot[i % 8].Visible = true;
-                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i - 8].cardId), null);
-                    }
-                    else cardSlot[i % 8].Visible = false;
-                }
-                if (currentPage > 1) currentPage = currentPage - 1;
+                GUI.transitionToMainMenu();
             };
-            scrollRightButton.MouseDown += (_, __) =>
-            {
-                for (int i = 8*currentPage; i < 8*currentPage+8; i++)
-                {
-                    if (i + 8 < sortedIds.Count)
-                    {
-                        cardSlot[i % 8].Visible = true;
-                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i + 8].cardId), null);
-                    }
-                    else cardSlot[i%8].Visible = false;
-                }
-                currentPage = currentPage < (sortedIds.Count / 8)-1 ? currentPage + 1 : currentPage;
-            };
-            */
+
             Controls.Add(scrollLeftButton);
             Controls.Add(scrollRightButton);
 
@@ -192,7 +175,7 @@ namespace stonekart
             Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
-            
+            Controls.Add(backToMainMenuButton);
         }
 
         private void sortAfterColor(Colour colour)
@@ -323,7 +306,8 @@ namespace stonekart
                 //size
                 cardSlot[i].setWidth(Width/10);
             }
-            
+
+            backToMainMenuButton.Location = new Point(Width/10, 0);
 
             tb.Size = new Size(Size.Width / 10, Size.Height / 30);
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
