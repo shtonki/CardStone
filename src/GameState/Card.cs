@@ -678,6 +678,19 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.GRAVEYARD)));
                 } break;
 
+                case CardId.MorenianMedic:
+                {
+                    whiteCost = 2;
+                    basePower = 2;
+                    baseToughness = 2;
+                        activatedAbilities.Add(new ActivatedAbility(this, 
+                            new Cost(new ManaCost(1, 0, 0, 0, 0, 1)), 
+                            new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2)), 
+                            true,
+                            LocationPile.FIELD, 
+                            "1W: Gain 2 life."));
+                } break;
+
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -1048,6 +1061,7 @@ namespace stonekart
         EssenceOfDemise,
         EssenceOfRage,
         EssenceOfClarity,
+        MorenianMedic,
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
