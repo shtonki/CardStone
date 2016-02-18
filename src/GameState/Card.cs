@@ -573,14 +573,6 @@ namespace stonekart
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                 } break;
 
-                case CardId.EssenceOfDemise:
-                {
-                    name = "Essence of Demise";
-                    blackCost = 1;
-                    cardType = CardType.Relic;
-                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
-                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
-                } break;
 
                 case CardId.Tree: //todo serious balance and flavor issues
                 {
@@ -592,6 +584,35 @@ namespace stonekart
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
                         LocationPile.FIELD, "1G: gain +1/+1"));
+                } break;
+
+                case CardId.EssenceOfDemise:
+                {
+                    name = "Essence of Demise";
+                    blackCost = 1;
+                    cardType = CardType.Relic;
+                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
+                    auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
+                } break;
+
+                case CardId.EssenceOfRage:
+                {
+                    name = "Essence of Rage";
+                    redCost = 3;
+                    cardType = CardType.Relic;
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to both players.",
+                        LocationPile.FIELD, EventTiming.Post, new Ping(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1), new Ping(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
+                } break;
+
+                case CardId.EssenceOfClarity:
+                {
+                    name = "Essence of Clarity";
+                    blueCost = 3;
+                    cardType = CardType.Relic;
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
+                        LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
                 } break;
 
                 default: 
@@ -715,6 +736,17 @@ namespace stonekart
                 MoveCardEvent moveEvent = (MoveCardEvent)e;
 
                 return moveEvent.card == c && moveEvent.to.pile == LocationPile.GRAVEYARD && moveEvent.from.pile == LocationPile.FIELD;
+            };
+        }
+
+        //todo add description
+        private static EventFilter stepFilter(Step step)
+        {
+            return @e =>
+            {
+                if (e.type != GameEventType.STEP) return false;
+                StepEvent stepEvent = (StepEvent)e;
+                return stepEvent.step == step;
             };
         }
 
@@ -957,7 +989,8 @@ namespace stonekart
         Extinguish,
         DeadCreatureLover,
         EssenceOfDemise,
-        
+        EssenceOfRage,
+        EssenceOfClarity,
         Tree,
         Infiltrator,
         ProtectiveSow,
@@ -1003,7 +1036,7 @@ namespace stonekart
         Power,
         Toughness,
     }
-
+    //JAOIJAOJAJ
     public class Aura
     {
         public Func<Card, bool> filter { get; private set; }
