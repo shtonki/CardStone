@@ -678,11 +678,6 @@ namespace stonekart
             }
         }
 
-        private bool checkAutoPass()
-        {
-            return false;
-        }
-        
         private Card[] chooseMultiple(string message, Func<Card, bool> xd)
         {
             List<Card> cards = new List<Card>();
