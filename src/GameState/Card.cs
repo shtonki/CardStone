@@ -103,6 +103,7 @@ namespace stonekart
         public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
         public Ability dummyFor { get; private set; }
+        public readonly bool isExperimental;
 
         //private List<Ability> abilities;
         private readonly List<ActivatedAbility> baseActivatedAbilities;
@@ -160,20 +161,23 @@ namespace stonekart
 
             switch (cardId)
             {
+                #region Kappa
                 case CardId.Kappa:
                 {
-                    blueCost = 2;
+                    blueCost = 1;
                     basePower = 1;
                     baseToughness = 3;
                     cardType = CardType.Creature;
                     race = Race.Salamander;
                     activatedAbilities.Add(new ActivatedAbility(this,
-                        new Cost(new ManaCost(0, 2, 0, 0, 0, 2)),
+                        new Cost(new ManaCost(0, 1, 0, 0, 0, 2)),
                         new Effect(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)),
+                        true,
                         LocationPile.FIELD, 
                         "2BB: Target player draws a card."));
                     } break;
-
+                #endregion
+                #region GrizzlyBear
                 case CardId.GrizzlyBear:
                 {
                     greenCost = 2;
@@ -183,7 +187,8 @@ namespace stonekart
                     basePower = 3;
                     baseToughness = 3;
                 } break;
-
+                #endregion
+                #region LightningBolt
                 case CardId.LightningBolt:
                 {
                     redCost = 1;
@@ -191,7 +196,8 @@ namespace stonekart
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 3));
                     castDescription = "Deal 3 damage to target player or creature.";
                 } break;
-
+                #endregion
+                #region ForkedLightning
                 case CardId.ForkedLightning:
                 {
                     redCost = 1;
@@ -199,7 +205,8 @@ namespace stonekart
                     fx.Add(new Ping(new FilterTargetRule(2, FilterLambda.ZAPPABLE), 1));
                     castDescription = "Deal 1 damage to 2 target players or creatures.";
                 } break;
-
+                #endregion
+                #region SolemnAberration
                 case CardId.SolemnAberration:
                 {
                     blackCost = 1;
@@ -208,7 +215,8 @@ namespace stonekart
                     basePower = 2;
                     baseToughness = 1;
                 } break;
-
+                #endregion
+                #region PropheticVision
                 case CardId.PropheticVision:
                 {
                     blueCost = 2;
@@ -216,7 +224,8 @@ namespace stonekart
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
                     castDescription = "Draw 2 cards";
                 } break;
-
+                #endregion
+                #region DragonHatchling
                 case CardId.DragonHatchling:
                 {
                     redCost = 1;
@@ -226,7 +235,8 @@ namespace stonekart
                     baseToughness = 1;
                     keyAbilities.Add(KeyAbility.Fervor);
                     } break;
-
+                #endregion
+                #region TempleHealer
                 case CardId.TempleHealer:
                 {
                     whiteCost = 3;
@@ -242,7 +252,8 @@ namespace stonekart
                         underYourControlETBDescription + "gain 1 life.", 
                         LocationPile.FIELD, EventTiming.Post, new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
-
+                #endregion
+                #region Rapture
                 case CardId.Rapture:
                 {
                     whiteCost = 2;
@@ -251,7 +262,8 @@ namespace stonekart
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.EXILE));
                     castDescription = "Exile target creature";
                 } break;
-
+                #endregion
+                #region CallToArms
                 case CardId.CallToArms:
                 {
                     whiteCost = 1;
@@ -259,7 +271,8 @@ namespace stonekart
                     fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Squire, CardId.Squire));
                     castDescription = "Summon two Squires.";
                 } break;
-
+                #endregion
+                #region Squire
                 case CardId.Squire:
                 {
                     isToken = true;
@@ -269,7 +282,8 @@ namespace stonekart
                     forceColour = Colour.WHITE;
                     
                 } break;
-
+                #endregion
+                #region ShimmeringKoi
                 case CardId.ShimmeringKoi:
                 {
                     blueCost = 2;
@@ -285,7 +299,8 @@ namespace stonekart
                         new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)
                         ));
                 } break;
-
+                #endregion
+                #region Belwas
                 case CardId.Belwas:
                 {
                     whiteCost = 2;
@@ -301,7 +316,8 @@ namespace stonekart
                         "Other white creatures you control get +1/+0");
                     auras.Add(a);
                 } break;
-
+                #endregion
+                #region AlterTime
                 case CardId.AlterTime:
                 {
                     blueCost = 1;
@@ -310,7 +326,8 @@ namespace stonekart
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1));
                     castDescription = "Timelapse 2 " + timelapseReminder2 + "\nDraw a card.";
                 } break;
-
+                #endregion
+                #region GrizzlyCub
                 case CardId.GrizzlyCub:
                 {
                     greenCost = 1;
@@ -319,7 +336,8 @@ namespace stonekart
                     basePower = 2;
                     baseToughness = 2;
                 } break;
-
+                #endregion
+                #region EvolveFangs
                 case CardId.EvolveFangs:
                 {
                     greenCost = 1;
@@ -327,7 +345,8 @@ namespace stonekart
                     fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), Modifiable.Power, never, 2));
                     castDescription = "Target creature gets +2/+0.";
                 } break;
-
+                #endregion
+                #region IlasGambit
                 case CardId.IlasGambit:
                 {
                     name = "Ila's Gambit";
@@ -343,7 +362,8 @@ namespace stonekart
                     castDescription =
                         "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
                 } break;
-
+                #endregion
+                #region YungLich
                 case CardId.YungLich:
                 {
                     blackCost = 1;
@@ -359,7 +379,8 @@ namespace stonekart
                         LocationPile.GRAVEYARD, EventTiming.Post, 
                         new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
-
+                #endregion
+                #region Unmake
                 case CardId.Unmake:
                 {
                     blueCost = 1;
@@ -367,7 +388,8 @@ namespace stonekart
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND));
                     castDescription = "Return target creature to its owners hand";
                 } break;
-
+                #endregion
+                #region EnragedDragon
                 case CardId.EnragedDragon:
                 {
                     redCost = 2;
@@ -380,7 +402,8 @@ namespace stonekart
                             () => true, 
                             new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 1)));
                 } break;
-
+                #endregion
+                #region SteamBolt
                 case CardId.SteamBolt:
                 {
                     redCost = 1;
@@ -390,7 +413,8 @@ namespace stonekart
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1));
                     castDescription = "Deal 1 damage to target creature or player.\nDraw a card.";
                 } break;
-
+                #endregion
+                #region IlasGravekeeper
                 case CardId.IlasGravekeeper:
                 {
                     name = "Ila's Gravekeeper";
@@ -401,7 +425,7 @@ namespace stonekart
                     race = Race.Zombie;
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
-
+                #endregion
                 //todo: phrasing and balance
                 case CardId.DeadCreatureLover: 
                 {
@@ -486,7 +510,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
 
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), LocationPile.FIELD, "Discard a card: Gain 3 life."));
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), true, LocationPile.FIELD, "Discard a card: Gain 3 life."));
                         //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
                         /*
                         Card c = fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
@@ -576,8 +600,11 @@ namespace stonekart
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
             Cost cc = new Cost(castingCost);
-            castAbility = new ActivatedAbility(this, cc, x, LocationPile.HAND, castDescription);
-            castAbility.setInstant(cardType == CardType.Instant);
+            castAbility = new ActivatedAbility(this,
+                new Cost(new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost)),
+                new Effect(fx.ToArray()), 
+                cardType == CardType.Instant, 
+                LocationPile.HAND, castDescription);
             baseActivatedAbilities.Add(castAbility);
 
             if ((basePower == null) != (baseToughness == null))
@@ -719,7 +746,7 @@ namespace stonekart
         public IList<ActivatedAbility> getAvailableActivatedAbilities(bool canSorc)
         {
             return activatedAbilities.Where(@a =>
-                (canSorc || a.isInstant()) &&
+                (canSorc || a.instant) &&
                 a.castableFrom(location.pile)).ToList();
 
             /*

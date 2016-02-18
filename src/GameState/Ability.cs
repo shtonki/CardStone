@@ -35,12 +35,12 @@ namespace stonekart
     {
         private Cost cost;
         private LocationPile from;
-        private bool instant;
+        public bool instant;
         
-        public ActivatedAbility(Card ca, Cost c, Effect e, LocationPile pile, string desc) : base(ca)
+        public ActivatedAbility(Card ca, Cost c, Effect e, bool instantSpeed, LocationPile pile, string desc) : base(ca)
         {
             from = pile;
-
+            instant = instantSpeed;
             card = ca;
             cost = c;
             effect = e;
@@ -58,17 +58,6 @@ namespace stonekart
         {
             return from == p;
         }
-
-        public void setInstant(bool b)
-        {
-            instant = b;
-        }
-
-        public bool isInstant()
-        {
-            return instant;
-        }
-        
     }
 
     public class TriggeredAbility : Ability
