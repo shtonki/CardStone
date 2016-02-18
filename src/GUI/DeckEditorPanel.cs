@@ -94,6 +94,7 @@ namespace stonekart
             };
             scrollRightButton.MouseDown += (_, __) =>
             {
+                //this if doesn't even make sense, but it just werks. todo 
                 if (currentPage * cardsPerPage - cardsPerPage < sortedIds.Count - cardsPerPage * 2) currentPage++;
                 int cardSlotNr = 0;
                 for (int i = currentPage * cardsPerPage - cardsPerPage; i < currentPage * cardsPerPage; i++)
@@ -339,7 +340,6 @@ namespace stonekart
             noDeckName.Size = tb.Size;
             //drawTheseButtons(cards);
 
-            //todo jasin: fix size
             cardInfo.Size = new Size(cardSlot[0].Width*2, cardSlot[0].Height*2 + 250);
             cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
         }

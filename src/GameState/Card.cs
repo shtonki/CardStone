@@ -558,6 +558,18 @@ namespace stonekart
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
                 } break;
 
+                case CardId.Tree: //todo serious balance and flavor issues
+                {
+                    greenCost = 1;
+                    basePower = 1;
+                    baseToughness = 2;
+                    cardType = CardType.Creature;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,0)),
+                        new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)),
+                        LocationPile.FIELD, "1G: gain +1/+1"));
+                } break;
+
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -737,7 +749,7 @@ namespace stonekart
 
             return r;
             */
-        }
+            }
 
         public bool getFrame(CardId id)
         {
@@ -918,7 +930,8 @@ namespace stonekart
         Extinguish,
         DeadCreatureLover,
         EssenceOfDemise,
-
+        
+        Tree,
         Infiltrator,
         ProtectiveSow,
         Cub,
