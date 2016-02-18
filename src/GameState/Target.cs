@@ -205,6 +205,18 @@ namespace stonekart
                     targets = gstate.allCards.Where(card => card.isCreature && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
                 } break;
 
+                case ResolveTarget.ACTIVE:
+                {
+                    targets[0] = new Target(gstate.activePlayer);
+                } break;
+
+                case ResolveTarget.INACTIVE:
+                {
+                    targets[0] = new Target(gstate.inactivePlayer);
+                }
+                break;
+
+
                 default:
                 {
                     throw new Exception("xd");
@@ -301,5 +313,7 @@ namespace stonekart
         LAST,
         OPPONENT,
         FIELDCREATURES,
+        ACTIVE, 
+        INACTIVE,
     }
 }
