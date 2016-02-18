@@ -580,7 +580,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,0)),
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,1)),
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
                         LocationPile.FIELD, "1G: gain +1/+1"));
