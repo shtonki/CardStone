@@ -427,12 +427,14 @@ namespace stonekart
                 } break;
                 #endregion
                 //todo: phrasing and balance
-                case CardId.DeadCreatureLover: 
+                case CardId.RottingZombie: 
                 {
-                    blackCost = 3;
-                    basePower = 1;
-                    baseToughness = 5;
+                    blackCost = 2;
+                    greyCost = 1;
+                    basePower = 2;
+                    baseToughness = 3;
                     cardType = CardType.Creature;
+                    race = Race.Zombie;
 
                     EventFilter f = (e) =>
                     {
@@ -443,15 +445,15 @@ namespace stonekart
                     };
 
                     triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, () => false, 2),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 2)));
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, () => false, 1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 1)));
                     } break;
 
                 case CardId.Infiltrator:
                 {
-                    blueCost = 1;
+                    blueCost = 3;
                     basePower = 2;
-                    baseToughness = 4;
+                    baseToughness = 2;
                     cardType = CardType.Creature;
                     keyAbilities.Add(KeyAbility.Fervor);
                     EventFilter f = (e) =>
@@ -580,7 +582,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,0)),
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,1)),
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
                         LocationPile.FIELD, "1G: gain +1/+1"));
@@ -1057,7 +1059,7 @@ namespace stonekart
         MeteorRain,
         RiderOfDeath, 
         Extinguish,
-        DeadCreatureLover,
+        RottingZombie,
         EssenceOfDemise,
         EssenceOfRage,
         EssenceOfClarity,
