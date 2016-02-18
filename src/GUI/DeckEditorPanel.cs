@@ -5,12 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Linq;
+
+/*todo:
+    just hide scroll buttons when you are at last page and first page?
+    list of filters
+*/
 namespace stonekart
 {
     class DeckEditorPanel : DisplayPanel
     {
         private CardInfoPanel cardInfo;
-        private Button saveButton, loadButton;
+        private Button saveButton, loadButton, backToMainMenuButton;
         private Button[] sortButtons;
         private Button scrollLeftButton, scrollRightButton;
         private CardButton[] cardSlot;
@@ -45,6 +50,8 @@ namespace stonekart
             cardInfo.BackColor = BackColor;
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
+
+            
 
             for (int i = 0; i < nrOfCards; i++)
             {
@@ -89,6 +96,7 @@ namespace stonekart
             };
             scrollRightButton.MouseDown += (_, __) =>
             {
+                //this if doesn't even make sense, but it just werks. todo 
                 if (currentPage * cardsPerPage - cardsPerPage < sortedIds.Count - cardsPerPage * 2) currentPage++;
                 int cardSlotNr = 0;
                 for (int i = currentPage * cardsPerPage - cardsPerPage; i < currentPage * cardsPerPage; i++)
@@ -102,34 +110,15 @@ namespace stonekart
                     cardSlotNr++;
                 }
             };
-            /* all borked up
-            scrollLeftButton.MouseDown += (_, __) =>
+
+            backToMainMenuButton = new Button();
+            backToMainMenuButton.Size = new Size(120, 40);
+            backToMainMenuButton.Text = "back to main menu";
+            backToMainMenuButton.MouseDown += (_, __) =>
             {
-                for (int i = 8*currentPage+8; i > 8*currentPage; i--)
-                {
-                    if (i - 8 > 0)
-                    {
-                        cardSlot[i % 8].Visible = true;
-                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i - 8].cardId), null);
-                    }
-                    else cardSlot[i % 8].Visible = false;
-                }
-                if (currentPage > 1) currentPage = currentPage - 1;
+                GUI.transitionToMainMenu();
             };
-            scrollRightButton.MouseDown += (_, __) =>
-            {
-                for (int i = 8*currentPage; i < 8*currentPage+8; i++)
-                {
-                    if (i + 8 < sortedIds.Count)
-                    {
-                        cardSlot[i % 8].Visible = true;
-                        cardSlot[i % 8].notifyObserver(new Card(sortedIds[i + 8].cardId), null);
-                    }
-                    else cardSlot[i%8].Visible = false;
-                }
-                currentPage = currentPage < (sortedIds.Count / 8)-1 ? currentPage + 1 : currentPage;
-            };
-            */
+
             Controls.Add(scrollLeftButton);
             Controls.Add(scrollRightButton);
 
@@ -160,9 +149,9 @@ namespace stonekart
                 }
             };
 
-            sortButtons = new Button[5];
+            sortButtons = new Button[6];
             //todo use images or something, instead of solid colors
-            Color[] colors = new Color[5] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green};
+            Color[] colors = new Color[6] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green, Color.Gray};
             for(int i = 0; i < sortButtons.Count(); i++)
             {
                 //todo ask seba why i0 is needed
@@ -186,17 +175,17 @@ namespace stonekart
             Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
-            
+            Controls.Add(backToMainMenuButton);
         }
 
         private void sortAfterColor(Colour colour)
         {
-            if (currentSortingColor == colour) currentSortingColor = Colour.GREY;
+            if (currentSortingColor == colour) currentSortingColor = Colour.MULTI;
             else currentSortingColor = colour;
 
             foreach (Card id in ids)
             {
-                if (id.colour != currentSortingColor && currentSortingColor != Colour.GREY)
+                if (id.colour != currentSortingColor && currentSortingColor != Colour.MULTI)
                 {
                     sortedIds.Remove(id);
                 }
@@ -317,24 +306,24 @@ namespace stonekart
                 //size
                 cardSlot[i].setWidth(Width/10);
             }
-            
+
+            backToMainMenuButton.Location = new Point(Width/10, 0);
 
             tb.Size = new Size(Size.Width / 10, Size.Height / 30);
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
             loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y + saveButton.Height);
+
             for (int i = 0; i < sortButtons.Count(); i++)
             {
-                //ishigity
-                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 35, Size.Height / 20);
+                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i - 60, Size.Height / 20);
             }
 
             noDeckName.Location = new Point(tb.Location.X, tb.Location.Y - 20);
             noDeckName.Size = tb.Size;
             //drawTheseButtons(cards);
 
-            //todo jasin: fix size
             cardInfo.Size = new Size(cardSlot[0].Width*2, cardSlot[0].Height*2 + 250);
             cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
         }

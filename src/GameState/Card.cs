@@ -573,6 +573,20 @@ namespace stonekart
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                 } break;
 
+
+                case CardId.Tree: //todo serious balance and flavor issues
+                {
+                    greenCost = 1;
+                    basePower = 1;
+                    baseToughness = 2;
+                    cardType = CardType.Creature;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,0)),
+                        new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
+                        LocationPile.FIELD, "1G: gain +1/+1"));
+                } break;
+
+                //todo: each time player casts spell deal one damage to face
                 case CardId.EssenceOfDemise:
                 {
                     name = "Essence of Demise";
@@ -589,6 +603,79 @@ namespace stonekart
                     cardType = CardType.Instant;
                     castDescription = "Counter target spell.";
                     fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
+                } break;
+
+                case CardId.EssenceOfRage:
+                {
+                    name = "Essence of Rage";
+                    redCost = 3;
+                    cardType = CardType.Relic;
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to both players.",
+                        LocationPile.FIELD, EventTiming.Post, new Ping(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1), new Ping(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
+                } break;
+
+                case CardId.EssenceOfClarity:
+                {
+                    name = "Essence of Clarity";
+                    blueCost = 3;
+                    cardType = CardType.Relic;
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
+                        LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
+                } break;
+
+                /* 
+                case CardId.EssenceOfWilderness:
+                {
+                    name = "Essence of Wilderness";
+                    greenCost = 3;
+                    cardType = CardType.Relic;
+
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) gevent;
+                        return mevent.to.pile == LocationPile.FIELD &&mevent.card.cardType == CardType.Creature;
+                    };
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, ));
+                } break;
+                */
+
+                /*
+                case CardId.EssenceOfValor:
+                {
+                    name = "Essence of Valor";
+                    whiteCost = 3;
+                    cardType = CardType.Relic;
+
+                    //creatures with more than 3 damage cannot attack
+                } break;
+                */
+
+                /*
+                case CardId.IlasMagicLamp:
+                {
+                    name = "Ila's Magic Lamp";
+                    blackCost = 1;
+                    cardType = CardType.Sorcery;
+                    
+                    //has three charges, get card from deck and shuffle deck
+
+                } break;
+                */
+
+                case CardId.AngryCoolDragonX:
+                {
+                    redCost = 1;
+                    baseToughness = 1;
+                    basePower = 3;
+                    cardType = CardType.Creature;;
+
+                    keyAbilities.Add(KeyAbility.Fervor);
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "dies and end of turn.",
+                        LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.GRAVEYARD)));
                 } break;
 
                 default: 
@@ -715,6 +802,17 @@ namespace stonekart
             };
         }
 
+        //todo add description
+        private static EventFilter stepFilter(Step step)
+        {
+            return @e =>
+            {
+                if (e.type != GameEventType.STEP) return false;
+                StepEvent stepEvent = (StepEvent)e;
+                return stepEvent.step == step;
+            };
+        }
+
         private const string timelapseReminder1 = "(Look at the top card of your deck, you may shuffle your deck)";
         private const string timelapseReminder2 = "(Look at the top two cards of your deck, you may shuffle your deck)";
         private const string timelapseReminder3 = "(Look at the top three cards of your deck, you may shuffle your deck)";
@@ -773,13 +871,7 @@ namespace stonekart
 
             return r;
             */
-        }
-
-        public bool getFrame(CardId id)
-        {
-            
-            return true;
-        }
+            }
 
         public bool isCast(Ability a)
         {
@@ -954,8 +1046,14 @@ namespace stonekart
         Extinguish,
         DeadCreatureLover,
         EssenceOfDemise,
+        EssenceOfRage,
+        EssenceOfClarity,
+        //EssenceOfWilderness,
+        //EssenceOfValor,
+        //IlasMagicLamp,
+        AngryCoolDragonX,
+        Tree,
         Counterspell,
-
         Infiltrator,
         ProtectiveSow,
         Cub,
@@ -1000,7 +1098,7 @@ namespace stonekart
         Power,
         Toughness,
     }
-
+    //JAOIJAOJAJ
     public class Aura
     {
         public Func<Card, bool> filter { get; private set; }
