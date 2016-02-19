@@ -156,6 +156,8 @@ namespace stonekart
             baseActivatedAbilities = new List<ActivatedAbility>();
             baseTriggeredAbilities = new List<TriggeredAbility>();
 
+            List<SubCost> castingCosts = new List<SubCost>();
+
             Colour? forceColour = null;
             int? basePower = null, baseToughness = null;
 
@@ -192,6 +194,7 @@ namespace stonekart
                 case CardId.LightningBolt:
                 {
                     redCost = 1;
+                    greyCost = 1;
                     cardType = CardType.Instant;
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 3));
                     castDescription = "Deal 3 damage to target player or creature.";
@@ -201,6 +204,7 @@ namespace stonekart
                 case CardId.ForkedLightning:
                 {
                     redCost = 1;
+                    greyCost = 1;
                     cardType = CardType.Sorcery;
                     fx.Add(new Ping(new FilterTargetRule(2, FilterLambda.ZAPPABLE), 1));
                     castDescription = "Deal 1 damage to 2 target players or creatures.";
@@ -351,6 +355,7 @@ namespace stonekart
                 {
                     name = "Ila's Gambit";
                     blackCost = 1;
+                    castingCosts.Add(new PayLifeCost(3));
                     cardType = CardType.Sorcery;
                     fx.Add(
                         new MoveTo(new SelectFromTargetRule(
@@ -358,9 +363,8 @@ namespace stonekart
                             new FilterTargetRule(1, FilterLambda.PLAYER), 
                             p => p.hand.cards.ToArray()),
                         LocationPile.GRAVEYARD) );
-                    fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), -2));
                     castDescription =
-                        "Look at target players hand and choose 1 card from it. The chosen card is discarded.\nLose 2 life.";
+                        "As an additional cost to casting this card pay 3 life.\nLook at target players hand and choose 1 card from it. The chosen card is discarded.";
                 } break;
                 #endregion
                 #region YungLich
@@ -693,6 +697,15 @@ namespace stonekart
                             "1W: Gain 2 life."));
                 } break;
 
+                case CardId.MattysGambit:
+                {
+                    name = "Matty's Gambit";
+                    redCost = 1;
+                    castingCosts.Add(new PayLifeCost(3));
+                    cardType = CardType.Instant;
+                    fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
+                } break;
+
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -710,9 +723,10 @@ namespace stonekart
 
             Effect x = new Effect(fx.ToArray());
             castingCost = new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost);
-            Cost cc = new Cost(castingCost);
+            castingCosts.Add(castingCost);
+            Cost cc = new Cost(castingCosts.ToArray());
             castAbility = new ActivatedAbility(this,
-                new Cost(new ManaCost(whiteCost, blueCost, blackCost, redCost, greenCost, greyCost)),
+                cc,
                 new Effect(fx.ToArray()), 
                 cardType == CardType.Instant, 
                 LocationPile.HAND, castDescription);
@@ -1064,6 +1078,7 @@ namespace stonekart
         EssenceOfRage,
         EssenceOfClarity,
         MorenianMedic,
+        MattysGambit,
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
