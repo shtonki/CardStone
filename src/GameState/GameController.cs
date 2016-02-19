@@ -261,6 +261,7 @@ namespace stonekart
         }
         #endregion
 
+        //todo remove like half of the steps pls
         private void doStepStuff(Step step)
         {
             switch (step)
