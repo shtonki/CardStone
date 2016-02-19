@@ -28,7 +28,7 @@ namespace stonekart
 
             Action<CardButton> clickCallBack = (b) => g.gameElementPressed(new GameElement(b.Card));
             FML f = new FML(clickCallBack, g.addArrows, g.clearArrows, (c) => g.setFocusCard(c.Card));
-            handPanel = new CardPanel(()=>new CardButton(f), new LayoutArgs(false, false));
+            handPanel = new CardPanel(()=>new CardButton(f), new LayoutArgs(false, true));
             //handPanel.Location = new Point(400, 660);
 
             cardInfoPanel = new CardInfoPanel();

@@ -221,4 +221,31 @@ namespace stonekart
             return new GameEvent[] {};
         }
     }
+
+    public class PayLifeCost : SubCost
+    {
+        public readonly int amount;
+
+        public PayLifeCost(int amount)
+        {
+            this.amount = amount;
+        }
+
+        public override int[] check(Card c, GameInterface gi)
+        {
+            if (c.owner.getLife() > amount)
+            {
+                return new[] {amount};
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
+        {
+            return new[] {new GainLifeEvent(c.owner, -i[0])};
+        }
+    }
 }
