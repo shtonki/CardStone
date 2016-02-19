@@ -430,6 +430,8 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
                 #endregion
+                #region RottingZombie
+                //todo: phrasing and balance
                 case CardId.RottingZombie: 
                 {
                    //todo: phrasing and balance
@@ -451,8 +453,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, () => false, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 1)));
-                    } break;
-
+                } break;
+                #endregion
                 case CardId.Infiltrator:
                 {
                     blueCost = 3;
@@ -693,12 +695,12 @@ namespace stonekart
                     whiteCost = 2;
                     basePower = 2;
                     baseToughness = 2;
-                        activatedAbilities.Add(new ActivatedAbility(this, 
-                            new Cost(new ManaCost(1, 0, 0, 0, 0, 1)), 
-                            new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2)), 
-                            true,
-                            LocationPile.FIELD, 
-                            "1W: Gain 2 life."));
+                    activatedAbilities.Add(new ActivatedAbility(this, 
+                        new Cost(new ManaCost(1, 0, 0, 0, 0, 1)), 
+                        new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2)), 
+                        true,
+                        LocationPile.FIELD, 
+                        "1W: Gain 2 life."));
                 } break;
 
                 case CardId.MattysGambit:
