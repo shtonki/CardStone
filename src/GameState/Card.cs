@@ -454,6 +454,7 @@ namespace stonekart
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 1)));
                 } break;
                 #endregion
+                #region Infiltrator
                 case CardId.Infiltrator:
                 {
                     blueCost = 3;
@@ -470,7 +471,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, f, " DO STUFF ", LocationPile.FIELD, EventTiming.Post,
                         new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
                 } break;
-
+                #endregion
+                #region ProtectiveSow
                 //todo seba: PHRASING
                 case CardId.ProtectiveSow: //todo fixa så att det bara kortet som summade cubsen dör och inte alla sows dör. och vise versa. Och översätt denna texten till engelska så att seba inte blir arg
                 {
@@ -483,7 +485,8 @@ namespace stonekart
                         LocationPile.FIELD, EventTiming.Post, () => true, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Cub, CardId.Cub)));
                     //add kill cubs deathrattle thingy
                 } break;
-
+                #endregion
+                #region Cub
                 case CardId.Cub:
                 {
                     cardType = CardType.Creature;
@@ -496,7 +499,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + " give +2/0 to protective sow.",
                             LocationPile.GRAVEYARD, EventTiming.Post, () => owner.field.cards.All(sow => sow.cardId == CardId.ProtectiveSow), new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Power, never, 2)));//new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
-
+                #endregion
+                #region RiderOfDeath
                 case CardId.RiderOfDeath:
                 {
                     name = "Rider of Death";
@@ -508,7 +512,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + "kill target creature.",
                         LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
                 } break;
-
+                #endregion
+                #region IlatianWineMerchant
                 case CardId.IlatianWineMerchant:
                 {
                     blackCost = 1;
@@ -524,7 +529,8 @@ namespace stonekart
                         fx.Add(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), c.manacost));
                         */
                 } break;
-
+                #endregion
+                #region MeteorRain
                 case CardId.MeteorRain: //todo: seba review
                 {
                     redCost = 2;
@@ -534,7 +540,8 @@ namespace stonekart
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
                 } break;
-
+                #endregion
+                #region FuryOfTheRighteous
                 case CardId.FuryOfTheRighteous: //todo: seba review
                 {
                     name = "Fury of the Righteous";
@@ -545,7 +552,8 @@ namespace stonekart
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
                     fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
                 } break;
-
+                #endregion
+                #region Extinguish
                 case CardId.Extinguish: //todo: seba review
                 {
                     blackCost = 2;
@@ -554,7 +562,8 @@ namespace stonekart
                     flavourText = "Be gone!";
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
                 } break;
-
+                #endregion
+                #region Jew
                 case CardId.Jew: //todo: seba review
                     {
                     blueCost = 4;
@@ -570,7 +579,8 @@ namespace stonekart
                         triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
-
+                #endregion
+                #region VikingMushroom
                 case CardId.VikingMushroom: //todo: seba review
                 {
                     redCost = 2;
@@ -579,8 +589,8 @@ namespace stonekart
                     fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), Modifiable.Power, never, 2));
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                 } break;
-
-
+                #endregion
+                #region Tree
                 case CardId.Tree: //todo serious balance and flavor issues
                 {
                     greenCost = 1;
@@ -592,7 +602,8 @@ namespace stonekart
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
                         LocationPile.FIELD, "1G: gain +1/+1"));
                 } break;
-
+                #endregion
+                #region EssenceOfDemise
                 //todo: each time player casts spell deal one damage to face
                 case CardId.EssenceOfDemise:
                 {
@@ -602,7 +613,8 @@ namespace stonekart
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
                     auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
                 } break;
-
+                #endregion
+                #region Counterspell
                 case CardId.Counterspell:
                 {
                     blueCost = 2;
@@ -611,7 +623,8 @@ namespace stonekart
                     castDescription = "Counter target spell.";
                     fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
                 } break;
-
+                #endregion
+                #region EssenceOfRage
                 case CardId.EssenceOfRage:
                 {
                     name = "Essence of Rage";
@@ -621,7 +634,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to both players.",
                         LocationPile.FIELD, EventTiming.Post, new Ping(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1), new Ping(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
                 } break;
-
+                #endregion
+                #region EssenceOfClarity
                 case CardId.EssenceOfClarity:
                 {
                     name = "Essence of Clarity";
@@ -631,7 +645,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
                 } break;
-
+                #endregion
+                #region EssenceOfWilderness
                 /* 
                 case CardId.EssenceOfWilderness:
                 {
@@ -649,7 +664,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, ));
                 } break;
                 */
-
+                #endregion
+                #region EssenceOfValor
                 /*
                 case CardId.EssenceOfValor:
                 {
@@ -660,7 +676,8 @@ namespace stonekart
                     //creatures with more than 3 damage cannot attack
                 } break;
                 */
-
+                #endregion
+                #region IlasMagicLamp
                 /*
                 case CardId.IlasMagicLamp:
                 {
@@ -672,7 +689,8 @@ namespace stonekart
 
                 } break;
                 */
-
+                #endregion
+                #region AngryCoolDragonX
                 case CardId.AngryCoolDragonX:
                 {
                     redCost = 2;
@@ -684,7 +702,8 @@ namespace stonekart
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "dies and end of turn.",
                         LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.GRAVEYARD)));
                 } break;
-
+                #endregion
+                #region MorenianMedic
                 case CardId.MorenianMedic:
                 {
                     whiteCost = 2;
@@ -697,7 +716,8 @@ namespace stonekart
                         LocationPile.FIELD, 
                         "1W: Gain 2 life."));
                 } break;
-
+                #endregion
+                #region MattysGambit
                 case CardId.MattysGambit:
                 {
                     name = "Matty's Gambit";
@@ -706,13 +726,15 @@ namespace stonekart
                     cardType = CardType.Instant;
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
                 } break;
-
+                #endregion
+                #region default
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
                 }
+                #endregion
             }
-
+            //
             if (basePower != null)
             {
                 power = new Modifiable<int>(add, sub);
