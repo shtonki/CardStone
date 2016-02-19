@@ -430,9 +430,9 @@ namespace stonekart
                     auras.Add(new DynamicAura((a) => a == this, Modifiable.Power, () => owner.field.cards.Count(card => card.race == Race.Zombie), "Ila's Gravekeeper gets +1/+0 for each zombie under your control."));
                 } break;
                 #endregion
-                //todo: phrasing and balance
                 case CardId.RottingZombie: 
                 {
+                   //todo: phrasing and balance
                     blackCost = 2;
                     greyCost = 1;
                     basePower = 2;
@@ -615,6 +615,7 @@ namespace stonekart
                 {
                     name = "Essence of Rage";
                     redCost = 3;
+                    greyCost = 1;
                     cardType = CardType.Relic;
 
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to both players.",
@@ -625,11 +626,14 @@ namespace stonekart
                 {
                     name = "Essence of Clarity";
                     blueCost = 3;
+                    greyCost = 1;
                     cardType = CardType.Relic;
 
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
                         LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
                 } break;
+
+
 
                 /* 
                 case CardId.EssenceOfWilderness:
@@ -702,8 +706,22 @@ namespace stonekart
                     name = "Matty's Gambit";
                     redCost = 1;
                     castingCosts.Add(new PayLifeCost(3));
-                    cardType = CardType.Instant;
+                    castDescription =
+                        "As an additional cost to casting this card pay 3 life.\nDeal 3 damage to target creature or player.";
+                        cardType = CardType.Instant;
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
+                } break;
+
+                case CardId.BelwasGambit:
+                {
+                    name = "Belwas's Gambit";
+                    whiteCost = 1;
+                    castingCosts.Add(new PayLifeCost(3));
+                    castDescription =
+                        "As an additional cost to casting this card pay 3 life.\nTarget creature gets +4/+4.";
+                        cardType = CardType.Instant;
+                    fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 4));
+                    fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 4));
                 } break;
 
                 default: 
@@ -1079,6 +1097,7 @@ namespace stonekart
         EssenceOfClarity,
         MorenianMedic,
         MattysGambit,
+        BelwasGambit,
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
