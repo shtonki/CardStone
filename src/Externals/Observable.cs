@@ -38,9 +38,16 @@ namespace stonekart
         {
             if (observers == null) { return; }
             var inpt = arg ?? this;
-            foreach (Observer o in observers)
+            try
             {
-                o.notifyObserver(this, inpt);
+                foreach (Observer o in observers)
+                {
+                    o.notifyObserver(this, inpt);
+                }
+            }
+            catch (Exception)
+            {
+                notifyObservers(arg);
             }
         }
     }

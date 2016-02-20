@@ -452,7 +452,7 @@ namespace stonekart
                                mevent.card.owner.isHero && mevent.card.isCreature && mevent.card != this;
                     };
 
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, " gets +2/+2 when a friendly creature dies ", LocationPile.FIELD, EventTiming.Post,
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "Whenever a friendly creature dies this creature gets +1/+1.", LocationPile.FIELD, EventTiming.Post,
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, () => false, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, () => false, 1)));
                 } break;
@@ -461,18 +461,17 @@ namespace stonekart
                 case CardId.Infiltrator:
                 {
                     blueCost = 3;
-                    basePower = 2;
-                    baseToughness = 2;
+                    basePower = 3;
+                    baseToughness = 3;
                     cardType = CardType.Creature;
-                    keyAbilities.Add(KeyAbility.Fervor);
                     EventFilter f = (e) =>
                     {
                         if (e.type != GameEventType.DAMAGEPLAYER) { return false; }
                         DamagePlayerEvent devent = (DamagePlayerEvent)e;
                         return devent.source == this; 
                     };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, " DO STUFF ", LocationPile.FIELD, EventTiming.Post,
-                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "Whenever this creature deals damage to a player that player mills 3", LocationPile.FIELD, EventTiming.Post,
+                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 3)));
                 } break;
                 #endregion
                 #region ProtectiveSow
@@ -593,18 +592,18 @@ namespace stonekart
                     fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                 } break;
                 #endregion
-                #region Tree
-                case CardId.Tree: //todo serious balance and flavor issues
+                #region ElderTreeant
+                case CardId.ElderTreeant: //todo serious balance and flavor issues
                 {
-                    greenCost = 1;
+                    greenCost = 2;
                     greyCost = 1;
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,1,1)),
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,3,0)),
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
-                        LocationPile.FIELD, "1G: gain +1/+1"));
+                        LocationPile.FIELD, "GGG: gain +1/+1"));
                 } break;
                 #endregion
                 #region EssenceOfDemise
@@ -698,8 +697,8 @@ namespace stonekart
                 } break;
                 */
                 #endregion
-                #region AngryCoolDragonX
-                case CardId.AngryCoolDragonX:
+                #region StampedingDragon
+                case CardId.StampedingDragon:
                 {
                     redCost = 3;
                     baseToughness = 1;
@@ -732,7 +731,7 @@ namespace stonekart
                         redCost = 1;
                         castingCosts.Add(new PayLifeCost(3));
                         castDescription =
-                            "As an additional cost to casting this card pay 3 life.\nDeal 3 damage to target creature or player.";
+                            "As an additional cost to casting this card pay 3 life.\nDeal 4 damage to target creature or player.";
                         cardType = CardType.Instant;
                         fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
                     }
@@ -796,7 +795,7 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region FireTornadoYeti
+                #region GrazingBison
                 case CardId.GrazingBison:
                     {
                         cardType = CardType.Creature;
@@ -808,8 +807,8 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region ItsAllOgre
-                case CardId.RockfistOgre:
+                #region RockhandOgre
+                case CardId.RockhandOgre:
                     {
                         cardType = CardType.Creature;
                         race = Race.Ogre;
@@ -829,10 +828,22 @@ namespace stonekart
                     castDescription = "Search your deck for a card and move it to your hand. Shuffle your deck.";
                     fx.Add(new MoveTo(
                         new SelectFromTargetRule(new ResolveTargetRule(ResolveTarget.CONTROLLER), new ResolveTargetRule(ResolveTarget.LAST), 
-                        (p) => p.hand.cards.ToArray()), 
+                        (p) => p.deck.cards.ToArray()), 
                         LocationPile.HAND));
                     fx.Add(new Shuffle(new ResolveTargetRule(ResolveTarget.CONTROLLER), false));
                 } break;
+                #endregion
+                #region SebasGambit
+                case CardId.SebasGambit:
+                {
+                    name = "Seba's Gambit";
+                    blueCost = 1;
+                    castingCosts.Add(new PayLifeCost(4));
+                    castDescription =
+                        "As an additional cost to casting this card pay 4 life.\nCounter target spell.";
+                    cardType = CardType.Instant;
+                    fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
+                 } break;
                 #endregion
                 #region default
                 default: 
@@ -1215,18 +1226,19 @@ namespace stonekart
             rarities[(int)CardId.EssenceOfDemise] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfRage] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfClarity] = Rarity.Ebin;
-            rarities[(int)CardId.MorenianMedic] = Rarity.Common;
+            rarities[(int)CardId.MorenianMedic] = Rarity.Ebin;
             rarities[(int)CardId.MattysGambit] = Rarity.Ebin;
             rarities[(int)CardId.IlasGambit] = Rarity.Ebin;
             rarities[(int)CardId.BelwasGambit] = Rarity.Ebin;
             rarities[(int)CardId.Figment] = Rarity.Ebin;
-            rarities[(int)CardId.AngryCoolDragonX] = Rarity.Ebin;
-            rarities[(int)CardId.Tree] = Rarity.Uncommon;
+            rarities[(int)CardId.StampedingDragon] = Rarity.Ebin;
+            rarities[(int)CardId.ElderTreeant] = Rarity.Uncommon;
             rarities[(int)CardId.Counterspell] = Rarity.Common;
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
             rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
-            rarities[(int)CardId.RockfistOgre] = Rarity.Common;
+            rarities[(int)CardId.RockhandOgre] = Rarity.Common;
             rarities[(int)CardId.GrazingBison] = Rarity.Common;
+            rarities[(int)CardId.SebasGambit] = Rarity.Ebin;
         }
     }
     public enum CardId
@@ -1267,8 +1279,8 @@ namespace stonekart
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
-        AngryCoolDragonX,
-        Tree,
+        StampedingDragon,
+        ElderTreeant,
         Counterspell,
         Infiltrator,
         ProtectiveSow,
@@ -1280,8 +1292,9 @@ namespace stonekart
         GreenFourDropThatDoesCoolShit,
         SumHyenas,
         Hyena,
-        RockfistOgre,
+        RockhandOgre,
         GrazingBison,
+        SebasGambit,
     }
 
     public enum CardType

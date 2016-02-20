@@ -159,6 +159,11 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _exhaust(GameEvent gevent)
+        {
+            ExhaustEvent e = (ExhaustEvent)gevent;
+            e.card.topped = true;
+        }
         private void _counterspell(GameEvent gevent)
         {
             CounterSpellEvent e = (CounterSpellEvent)gevent;
