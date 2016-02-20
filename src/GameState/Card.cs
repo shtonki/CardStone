@@ -796,21 +796,24 @@ namespace stonekart
                     break;
                 #endregion
                 #region FireTornadoYeti
-                case CardId.FireTornadoYeti:
+                case CardId.GrazingBison:
                     {
                         cardType = CardType.Creature;
-                        greenCost = 4;
+                        race = Race.Bison;
+                        greenCost = 2;
+                        greyCost = 2;
                         basePower = 4;
                         baseToughness = 5;
                     }
                     break;
                 #endregion
                 #region ItsAllOgre
-                case CardId.ItsAllOgre:
+                case CardId.RockfistOgre:
                     {
                         cardType = CardType.Creature;
-                        greenCost = 4;
-                        greyCost = 2;
+                        race = Race.Ogre;
+                        greenCost = 3;
+                        greyCost = 3;
                         basePower = 6;
                         baseToughness = 7;
                     }
@@ -1217,7 +1220,8 @@ namespace stonekart
             rarities[(int)CardId.Counterspell] = Rarity.Common;
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
             rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
-
+            rarities[(int)CardId.RockfistOgre] = Rarity.Common;
+            rarities[(int)CardId.GrazingBison] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1271,8 +1275,8 @@ namespace stonekart
         GreenFourDropThatDoesCoolShit,
         SumHyenas,
         Hyena,
-        ItsAllOgre,
-        FireTornadoYeti,
+        RockfistOgre,
+        GrazingBison,
     }
 
     public enum CardType
@@ -1292,6 +1296,8 @@ namespace stonekart
         Bear,
         Zombie,
         Dragon,
+        Ogre,
+        Bison,
     }
 
     public enum SubType
