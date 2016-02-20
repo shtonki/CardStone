@@ -719,14 +719,96 @@ namespace stonekart
                 #endregion
                 #region MattysGambit
                 case CardId.MattysGambit:
-                {
-                    name = "Matty's Gambit";
-                    redCost = 1;
-                    castingCosts.Add(new PayLifeCost(3));
-                    cardType = CardType.Instant;
-                    fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
-                } break;
+                    {
+                        name = "Matty's Gambit";
+                        redCost = 1;
+                        castingCosts.Add(new PayLifeCost(3));
+                        castDescription =
+                            "As an additional cost to casting this card pay 3 life.\nDeal 3 damage to target creature or player.";
+                        cardType = CardType.Instant;
+                        fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
+                    }
+                    break;
                 #endregion
+                #region BelwasGambit
+                case CardId.BelwasGambit:
+                    {
+                        name = "Belwas's Gambit";
+                        whiteCost = 1;
+                        castingCosts.Add(new PayLifeCost(3));
+                        castDescription =
+                            "As an additional cost to casting this card pay 3 life.\nTarget creature gets +4/+4.";
+                        cardType = CardType.Instant;
+                        fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 4));
+                        fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 4));
+                    }
+                    break;
+                #endregion
+                #region GreenFourDropThatDoesCoolShit
+                //todo balance and name and stuff and flavor and stuff
+                case CardId.GreenFourDropThatDoesCoolShit:
+                    {
+                        greenCost = 1;
+                        cardType = CardType.Creature;
+                        triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
+                            thisETBDescription + " heal target creature for 3hp",
+                            LocationPile.FIELD, EventTiming.Post,
+                            new Ping(new FilterTargetRule(1, FilterLambda.ONFIELD), -3)));
+                    }
+                    break;
+                #endregion
+                #region SumHyenas
+                case CardId.SumHyenas:
+                    {
+                        greenCost = 1;
+                        cardType = CardType.Instant;
+                        fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Hyena, CardId.Hyena));
+                        castDescription = "Summon two hyenas. Grants +1/+1 to all other hyenas.";
+                    }
+                    break;
+                #endregion
+                #region Hyena
+                case CardId.Hyena:
+                    {
+                        cardType = CardType.Creature;
+                        isToken = true;
+                        baseToughness = 2;
+                        basePower = 2;
+                        Aura a = new Aura(
+                            (crd) => crd.cardId == CardId.Hyena && crd != this,
+                            Modifiable.Power, 1,
+                            "Other hyenas get +1/+1");
+                        Aura aa = new Aura(
+                            (crd) => crd.cardId == CardId.Hyena && crd != this,
+                            Modifiable.Toughness, 1,
+                            "");
+                        auras.Add(a);
+                        auras.Add(aa);
+                    }
+                    break;
+                #endregion
+                #region FireTornadoYeti
+                case CardId.FireTornadoYeti:
+                    {
+                        cardType = CardType.Creature;
+                        greenCost = 4;
+                        basePower = 4;
+                        baseToughness = 5;
+                    }
+                    break;
+                #endregion
+                #region ItsAllOgre
+                case CardId.ItsAllOgre:
+                    {
+                        cardType = CardType.Creature;
+                        greenCost = 4;
+                        greyCost = 2;
+                        basePower = 6;
+                        baseToughness = 7;
+                    }
+                    break;
+                #endregion
+
                 #region default
                 default: 
                 {
@@ -1114,6 +1196,12 @@ namespace stonekart
         IlatianWineMerchant,
         Jew,
         VikingMushroom,
+        BelwasGambit,
+        GreenFourDropThatDoesCoolShit,
+        SumHyenas,
+        Hyena,
+        ItsAllOgre,
+        FireTornadoYeti,
     }
 
     public enum CardType
