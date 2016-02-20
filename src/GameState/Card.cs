@@ -734,6 +734,20 @@ namespace stonekart
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
                 } break;
                 #endregion
+                #region Figment
+                case CardId.Figment:
+                {
+                    blackCost = 2;
+                    greyCost = 1;
+                    cardType = CardType.Sorcery;
+                    castDescription = "Search your deck for a card and move it to your hand. Shuffle your deck.";
+                    fx.Add(new MoveTo(
+                        new SelectFromTargetRule(new ResolveTargetRule(ResolveTarget.CONTROLLER), new ResolveTargetRule(ResolveTarget.LAST), 
+                        (p) => p.hand.cards.ToArray()), 
+                        LocationPile.HAND));
+                    fx.Add(new Shuffle(new ResolveTargetRule(ResolveTarget.CONTROLLER), false));
+                } break;
+                #endregion
                 #region default
                 case CardId.BelwasGambit:
                 {
@@ -1122,6 +1136,7 @@ namespace stonekart
         MorenianMedic,
         MattysGambit,
         BelwasGambit,
+        Figment,
         //EssenceOfWilderness,
         //EssenceOfValor,
         //IlasMagicLamp,
@@ -1172,7 +1187,7 @@ namespace stonekart
         Power,
         Toughness,
     }
-    //JAOIJAOJAJ
+
     public class Aura
     {
         public Func<Card, bool> filter { get; private set; }

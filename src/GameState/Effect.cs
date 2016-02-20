@@ -141,6 +141,37 @@ namespace stonekart
         }
     }
 
+    public class Shuffle : SubEffect
+    {
+        private bool optional;
+
+        public Shuffle(TargetRule t, bool optional) : base(t)
+        {
+            this.optional = optional;
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
+        {
+            Choice shuffle = Choice.No;
+            Player player = t.player;
+            if (player.isHero && optional)
+            {
+                shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
+                ginterface.sendSelection((int)shuffle);
+            }
+            else
+            {
+                shuffle = (Choice)ginterface.demandSelection();
+            }
+
+            if (shuffle == Choice.Yes)
+            {
+                return new GameEvent[] { new ShuffleDeckEvent(player), };
+            }
+            return new GameEvent[] { };
+        }
+    }
+
     public class Draw : SubEffect
     {
         private int cardCount;
