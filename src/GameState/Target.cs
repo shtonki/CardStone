@@ -264,8 +264,8 @@ namespace stonekart
         {
             targets = new Target[cardCount];
             showCardsTo.resolveResolveTargets(ginterface, gstate, resolving, last);
-            takePileFrom.resolveResolveTargets(ginterface, gstate, resolving, last);
             Target[] showPlayerx = showCardsTo.getTargets();
+            takePileFrom.resolveResolveTargets(ginterface, gstate, resolving, showPlayerx);
             Target[] takePlayerx = takePileFrom.getTargets();
 
             if (showPlayerx.Length != 1 || !showPlayerx[0].isPlayer ||
