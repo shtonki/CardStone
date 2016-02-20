@@ -780,6 +780,7 @@ namespace stonekart
                         isToken = true;
                         baseToughness = 2;
                         basePower = 2;
+                        forceColour = Colour.GREEN;
                         Aura a = new Aura(
                             (crd) => crd.cardId == CardId.Hyena && crd != this,
                             Modifiable.Power, 1,
@@ -829,18 +830,6 @@ namespace stonekart
                 } break;
                 #endregion
                 #region default
-                case CardId.BelwasGambit:
-                {
-                    name = "Belwas's Gambit";
-                    whiteCost = 1;
-                    castingCosts.Add(new PayLifeCost(3));
-                    castDescription =
-                        "As an additional cost to casting this card pay 3 life.\nTarget creature gets +4/+4.";
-                        cardType = CardType.Instant;
-                    fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 4));
-                    fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 4));
-                } break;
-
                 default: 
                 {
                     throw new Exception("pls no" + c.ToString());
@@ -1215,7 +1204,6 @@ namespace stonekart
         EssenceOfClarity,
         MorenianMedic,
         MattysGambit,
-        BelwasGambit,
         Figment,
         //EssenceOfWilderness,
         //EssenceOfValor,

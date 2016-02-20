@@ -176,6 +176,28 @@ namespace stonekart
             Controls.Add(tb);
             Controls.Add(p);
             Controls.Add(backToMainMenuButton);
+           
+        }
+
+        private bool deckVerificationThing(CardId[] ids)
+        {
+            const int minDeckSize = 25;
+            if (ids.Count() < minDeckSize) return false;
+
+            int nrOfIds = Enum.GetNames(typeof (CardId)).Length;
+            int[] ctrs = new int[nrOfIds];
+            foreach (CardId id in ids)
+            {
+                ctrs[(int) id]++;
+            }
+
+            for (int i = 0; i < nrOfIds; i++)
+            {
+                if (ctrs[i] > maxOf((CardId) i)) return false;
+            }
+
+
+            return true;
         }
 
         private void sortAfterColor(Colour colour)
@@ -225,7 +247,6 @@ namespace stonekart
             foreach (string name in deckNames)
             {
                 c++;
-                
                 var xd = new Button();
                 xd.Text = name;
                 xd.Location = new Point(X, Y);
