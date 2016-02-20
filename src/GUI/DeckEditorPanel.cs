@@ -219,14 +219,22 @@ namespace stonekart
             deckAsker.Size = new Size(500, 200);
             //deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
+            int X = 0;
+            int c = 0;
             var g = GUI.showWindow(deckAsker);
             foreach (string name in deckNames)
             {
+                c++;
+                
                 var xd = new Button();
                 xd.Text = name;
-                xd.Location = new Point(0, Y);
+                xd.Location = new Point(X, Y);
                 Y += xd.Height;
-
+                if (c%5 == 0)
+                {
+                    X += 80;
+                    Y = 0;
+                }
                 var name1 = name;
                 xd.MouseDown += (_, __) =>
                 {
