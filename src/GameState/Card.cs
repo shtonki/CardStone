@@ -743,12 +743,12 @@ namespace stonekart
                     {
                         name = "Belwas's Gambit";
                         whiteCost = 1;
-                        castingCosts.Add(new PayLifeCost(3));
+                        castingCosts.Add(new PayLifeCost(4));
                         castDescription =
-                            "As an additional cost to casting this card pay 3 life.\nTarget creature gets +4/+4.";
+                            "As an additional cost to casting this card pay 4 life.\nTarget creature gets +3/+3.";
                         cardType = CardType.Instant;
-                        fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 4));
-                        fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 4));
+                        fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 3));
+                        fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 3));
                     }
                     break;
                 #endregion
