@@ -126,7 +126,8 @@ namespace stonekart
 
         public void winGame(bool wonnered)
         {
-            //GameController.
+            Console.WriteLine("You " + (wonnered ? "won." : "lost."));
+            GUI.transitionToMainMenu();
         }
 
         private EventHandler[] baseEventHandlers = new EventHandler[Enum.GetNames(typeof(GameEventType)).Length];
@@ -550,6 +551,8 @@ namespace stonekart
         
         private void checkGameState()
         {
+            if (game.hero.getLife() < 1) winGame(false);
+            if (game.villain.getLife() < 1) winGame(true);
             List<MoveCardEvent> xd = new List<MoveCardEvent>();
             do
             {
