@@ -795,21 +795,24 @@ namespace stonekart
                     break;
                 #endregion
                 #region FireTornadoYeti
-                case CardId.FireTornadoYeti:
+                case CardId.GrazingBison:
                     {
                         cardType = CardType.Creature;
-                        greenCost = 4;
+                        race = Race.Bison;
+                        greenCost = 2;
+                        greyCost = 2;
                         basePower = 4;
                         baseToughness = 5;
                     }
                     break;
                 #endregion
                 #region ItsAllOgre
-                case CardId.ItsAllOgre:
+                case CardId.RockfistOgre:
                     {
                         cardType = CardType.Creature;
-                        greenCost = 4;
-                        greyCost = 2;
+                        race = Race.Ogre;
+                        greenCost = 3;
+                        greyCost = 3;
                         basePower = 6;
                         baseToughness = 7;
                     }
@@ -830,17 +833,6 @@ namespace stonekart
                 } break;
                 #endregion
                 #region default
-                case CardId.BelwasGambit:
-                {
-                    name = "Belwas's Gambit";
-                    whiteCost = 1;
-                    castingCosts.Add(new PayLifeCost(3));
-                    castDescription =
-                        "As an additional cost to casting this card pay 3 life.\nTarget creature gets +4/+4.";
-                        cardType = CardType.Instant;
-                    fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD), Modifiable.Power, never, 4));
-                    fx.Add(new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never, 4));
-                } break;
 
                 default: 
                 {
@@ -1228,7 +1220,8 @@ namespace stonekart
             rarities[(int)CardId.Counterspell] = Rarity.Common;
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
             rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
-
+            rarities[(int)CardId.RockfistOgre] = Rarity.Common;
+            rarities[(int)CardId.GrazingBison] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1265,7 +1258,6 @@ namespace stonekart
         EssenceOfClarity,
         MorenianMedic,
         MattysGambit,
-        BelwasGambit,
         Figment,
         //EssenceOfWilderness,
         //EssenceOfValor,
@@ -1283,8 +1275,8 @@ namespace stonekart
         GreenFourDropThatDoesCoolShit,
         SumHyenas,
         Hyena,
-        ItsAllOgre,
-        FireTornadoYeti,
+        RockfistOgre,
+        GrazingBison,
     }
 
     public enum CardType
@@ -1304,6 +1296,8 @@ namespace stonekart
         Bear,
         Zombie,
         Dragon,
+        Ogre,
+        Bison,
     }
 
     public enum SubType

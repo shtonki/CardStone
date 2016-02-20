@@ -92,6 +92,7 @@ namespace stonekart
         #endregion
         
         protected Brush[] brushes = new Brush[6];
+        protected Brush[] rarityBrushes = new Brush[10];
         protected Font cardNameFont, textFont, PTFont;
 
         public CardButton()
@@ -106,6 +107,12 @@ namespace stonekart
             brushes[(int)Colour.BLUE] = new SolidBrush(Color.Blue);
             brushes[(int)Colour.GREEN] = new SolidBrush(Color.Green);
             brushes[(int)Colour.GREY] = new SolidBrush(Color.Gray);
+
+            rarityBrushes[(int)Rarity.Common] = brushes[(int)Colour.GREY];
+            rarityBrushes[(int)Rarity.Uncommon] = new SolidBrush(Color.DodgerBlue);
+            rarityBrushes[(int)Rarity.Ebin] = brushes[(int)Colour.RED];
+            rarityBrushes[(int)Rarity.Legendair] = new SolidBrush(Color.Goldenrod);
+            rarityBrushes[(int)Rarity.Xperimental] = new SolidBrush(Color.Fuchsia);
 
             Visible = true;
             int i = 0;
@@ -229,7 +236,7 @@ namespace stonekart
             TextLocationX =     (int)Math.Round(CardHeight * 0.075f);
             TextLocationY =     (int)Math.Round(CardHeight * 0.646428571428571f);
             TextWidth =         (int)Math.Round(CardHeight * 0.464285714285714f);
-            TextHeight =        (int)Math.Round(CardHeight * 0.172142857142857f);
+            TextHeight =        (int)Math.Round(CardHeight * 0.192142857142857f);
             ManaOrbLocationX =  (int)Math.Round(CardHeight * 0.55f);
             ManaOrbLocationY =  (int)Math.Round(CardHeight * 0.025f);
             ManaOrbSize =       (int)Math.Round(CardHeight * 0.0392857142857143f);
@@ -278,7 +285,7 @@ namespace stonekart
                 pevent.Graphics.DrawString(name, cardNameFont, b, NameLocationX, NameLocationY);
                 pevent.Graphics.DrawString(archtype, textFont, b, TypeTextLocationX, TypeTextLocationY);
                 pevent.Graphics.DrawString(abilityText, textFont, b, TextRectangle);
-                pevent.Graphics.DrawString("A", PTFont, brushes[(int)rarity], (PTTextLocationP + PTTextLocationT)/2, PTTextLocationY + PTTextLocationY/55);
+                pevent.Graphics.DrawString("A", PTFont, rarityBrushes[(int)rarity] ?? rarityBrushes[(int)Rarity.Xperimental], (PTTextLocationP + PTTextLocationT)/2, PTTextLocationY + PTTextLocationY/55);
 
                 int[] mc = costs;
 
