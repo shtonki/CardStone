@@ -184,9 +184,8 @@ namespace stonekart
             Controls.Add(backToMainMenuButton);
         }
 
-        private bool deckVerificationThing(CardId[] ids)
+        public static bool deckVerificationThing(CardId[] ids)
         {
-            Console.WriteLine("IS LEGIT?");
             const int minDeckSize = 25;
             if (ids.Count() < minDeckSize) return false;
 
@@ -201,12 +200,11 @@ namespace stonekart
             {
                 if (ctrs[i] >= maxOf(Card.rarityOf((CardId)i))) return false;
             }
-            Console.WriteLine("LEGIT");
             return true;
         }
 
         //todo fix 99999999 cuz we're just brain damaged ironically
-        private int maxOf(Rarity r)
+        private static int maxOf(Rarity r)
         {
             switch (r)
             {
