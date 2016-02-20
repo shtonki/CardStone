@@ -49,6 +49,7 @@ namespace stonekart
         private SubType? subType;
         public Colour colour;
         public StackWrapper stackWrapper;
+        public readonly Rarity rarity;
 
         private Modifiable<int>[] mods = new Modifiable<int>[Enum.GetNames(typeof(Modifiable)).Count()];
 
@@ -1186,6 +1187,14 @@ namespace stonekart
     {
         Power,
         Toughness,
+    }
+
+    public enum Rarity
+    {
+        Common,
+        Spicy,
+        Rare,
+        SpicyRare,
     }
 
     public class Aura

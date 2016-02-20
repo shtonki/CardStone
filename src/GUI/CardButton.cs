@@ -55,6 +55,7 @@ namespace stonekart
         protected string power;
         protected string toughness;
         protected bool isDamaged;
+        protected Rarity rarity;
         public bool isExhausted { get; private set; }
         private IEnumerable<Target> targets;
 
