@@ -701,9 +701,9 @@ namespace stonekart
                 #region AngryCoolDragonX
                 case CardId.AngryCoolDragonX:
                 {
-                    redCost = 2;
+                    redCost = 3;
                     baseToughness = 1;
-                    basePower = 5;
+                    basePower = 6;
                     cardType = CardType.Creature;;
 
                     keyAbilities.Add(KeyAbility.Fervor);
@@ -1079,6 +1079,10 @@ namespace stonekart
             power?.clear();
             toughness?.clear();
             summoningSick = true;
+            topped = false;
+            if (defenderOf != null) defenderOf.defendedBy = null;
+            if (defendedBy != null) defendedBy.defenderOf = null;
+            defendedBy = defenderOf = null;
         }
 
         //hack assumes that abilities looks the same for both the players
