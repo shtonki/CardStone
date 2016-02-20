@@ -11,7 +11,7 @@ using System.Linq;
     list of filters
     make cardcount textthing instead of label, so we can change size and what not
     make unable to save deck that arent approved by shitstain
-
+    create sub categories which shows uncompleted and completed decks. Or legit and illegit decks or watchamacallit
 */
 namespace stonekart
 {
