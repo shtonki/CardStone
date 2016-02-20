@@ -734,6 +734,17 @@ namespace stonekart
                     fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 4));
                 } break;
                 #endregion
+                #region GreenFourDropThatDoesCoolShit
+                case CardId.GreenFourDropThatDoesCoolShit:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Creature;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
+                        thisETBDescription + " heal target creature for 3hp",
+                        LocationPile.FIELD, EventTiming.Post,
+                        new Ping(new FilterTargetRule(1, FilterLambda.ONFIELD), -3)));
+                } break;
+                #endregion
                 #region default
                 case CardId.BelwasGambit:
                 {
@@ -1134,6 +1145,7 @@ namespace stonekart
         IlatianWineMerchant,
         Jew,
         VikingMushroom,
+        GreenFourDropThatDoesCoolShit,
     }
 
     public enum CardType
