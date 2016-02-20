@@ -391,6 +391,7 @@ namespace stonekart
 
         private bool addToDeck(CardId id)
         {
+            if (myDeckIsHard.cards.Count(card => card.cardId == id) == maxOf(Card.rarityOf(id))) return false;
             myDeckIsHard.add(new Card(id));
             cardCount.Text = "Count: " + myDeckIsHard.count;
             return true;

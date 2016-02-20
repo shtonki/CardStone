@@ -114,10 +114,14 @@ namespace stonekart
 
         private CardId[] loadDeck()
         {
-            WaitFor<string> w = new WaitFor<string>();
-            DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
-            return DeckEditorPanel.loadDeck(w.wait()).ToArray();
-            //return (CardId[])Enum.GetValues(typeof (CardId));
+            CardId[] r = null;
+            while (true)
+            {
+                WaitFor<string> w = new WaitFor<string>();
+                DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
+                CardId[] ids = DeckEditorPanel.loadDeck(w.wait()).ToArray();
+                if (DeckEditorPanel.deckVerificationThing(ids)) return ids;
+            }
         }
 
         public void winGame(bool wonnered)
