@@ -49,7 +49,7 @@ namespace stonekart
         private SubType? subType;
         public Colour colour;
         public StackWrapper stackWrapper;
-        public readonly Rarity rarity;
+        public Rarity rarity => rarities[(int)cardId];
 
         private Modifiable<int>[] mods = new Modifiable<int>[Enum.GetNames(typeof(Modifiable)).Count()];
 
@@ -167,17 +167,18 @@ namespace stonekart
                 #region Kappa
                 case CardId.Kappa:
                 {
-                    blueCost = 1;
+                    blueCost = 2;
+                    greyCost = 2;
                     basePower = 1;
                     baseToughness = 3;
                     cardType = CardType.Creature;
                     race = Race.Salamander;
                     activatedAbilities.Add(new ActivatedAbility(this,
                         new Cost(new ManaCost(0, 1, 0, 0, 0, 2)),
-                        new Effect(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)),
+                        new Effect(new Mill(new ResolveTargetRule(ResolveTarget.CONTROLLER), 4)),
                         true,
                         LocationPile.FIELD, 
-                        "2BB: Target player draws a card."));
+                        "2B: Target player mills 4 cards."));
                     } break;
                 #endregion
                 #region GrizzlyBear
@@ -847,7 +848,7 @@ namespace stonekart
                 }
                 #endregion
             }
-            //
+
             if (basePower != null)
             {
                 power = new Modifiable<int>(add, sub);
@@ -1180,6 +1181,55 @@ namespace stonekart
             return b.ToString();
         }
 
+        public static Rarity rarityOf(CardId id)
+        {
+            return rarities[(int)id];
+        }
+        private static Rarity[] rarities = new Rarity[Enum.GetNames(typeof (CardId)).Count()];
+
+        static Card()
+        {
+            rarities[(int)CardId.Kappa] = Rarity.Common;
+            rarities[(int)CardId.GrizzlyBear] = Rarity.Uncommon;
+            rarities[(int)CardId.LightningBolt] = Rarity.Uncommon;
+            rarities[(int)CardId.SolemnAberration] = Rarity.Common;
+            rarities[(int)CardId.PropheticVision] = Rarity.Common;
+            rarities[(int)CardId.ForkedLightning] = Rarity.Common;
+            rarities[(int)CardId.DragonHatchling] = Rarity.Common;
+            rarities[(int)CardId.TempleHealer] = Rarity.Ebin;
+            rarities[(int)CardId.Rapture] = Rarity.Common;
+            rarities[(int)CardId.Squire] = Rarity.Token;
+            rarities[(int)CardId.CallToArms] = Rarity.Common;
+            rarities[(int)CardId.ShimmeringKoi] = Rarity.Common;
+            rarities[(int)CardId.Belwas] = Rarity.Legendair;
+            rarities[(int)CardId.AlterTime] = Rarity.Common;
+            rarities[(int)CardId.EvolveFangs] = Rarity.Common;
+            rarities[(int)CardId.GrizzlyCub] = Rarity.Common;
+            rarities[(int)CardId.YungLich] = Rarity.Ebin;
+            rarities[(int)CardId.Unmake] = Rarity.Common;
+            rarities[(int)CardId.EnragedDragon] = Rarity.Uncommon;
+            rarities[(int)CardId.SteamBolt] = Rarity.Uncommon;
+            rarities[(int)CardId.IlasGravekeeper] = Rarity.Ebin;
+            rarities[(int)CardId.FuryOfTheRighteous] = Rarity.Uncommon;
+            rarities[(int)CardId.MeteorRain] = Rarity.Uncommon;
+            rarities[(int)CardId.RiderOfDeath] = Rarity.Legendair;
+            rarities[(int)CardId.Extinguish] = Rarity.Ebin;
+            rarities[(int)CardId.RottingZombie] = Rarity.Uncommon;
+            rarities[(int)CardId.EssenceOfDemise] = Rarity.Ebin;
+            rarities[(int)CardId.EssenceOfRage] = Rarity.Ebin;
+            rarities[(int)CardId.EssenceOfClarity] = Rarity.Ebin;
+            rarities[(int)CardId.MorenianMedic] = Rarity.Common;
+            rarities[(int)CardId.MattysGambit] = Rarity.Ebin;
+            rarities[(int)CardId.IlasGambit] = Rarity.Ebin;
+            rarities[(int)CardId.BelwasGambit] = Rarity.Ebin;
+            rarities[(int)CardId.Figment] = Rarity.Ebin;
+            rarities[(int)CardId.AngryCoolDragonX] = Rarity.Ebin;
+            rarities[(int)CardId.Tree] = Rarity.Uncommon;
+            rarities[(int)CardId.Counterspell] = Rarity.Common;
+            rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
+            rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
+
+        }
     }
     public enum CardId
     {
@@ -1276,10 +1326,12 @@ namespace stonekart
 
     public enum Rarity
     {
+        Xperimental,
+        Token,
         Common,
-        Spicy,
-        Rare,
-        SpicyRare,
+        Uncommon,
+        Ebin,
+        Legendair,
     }
 
     public class Aura

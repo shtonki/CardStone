@@ -187,6 +187,7 @@ namespace stonekart
             costs = card.getManaCost().costs;
             hasPT = false;
             isExhausted = card.topped;
+            rarity = card.rarity;
             if (card.attacking)
             {
                 borderColor = Color.Red;
@@ -271,18 +272,13 @@ namespace stonekart
                 pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 pevent.Graphics.DrawImage(ImageLoader.getFrame(colour, new Size(CardWidth, CardHeight)), new Point(0, 0));
-
                 pevent.Graphics.DrawImage(ImageLoader.getCardArt(art, new Size(ArtWidth, ArtHeight)), ArtLocationX, ArtLocationY);
 
                 pevent.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-
                 pevent.Graphics.DrawString(name, cardNameFont, b, NameLocationX, NameLocationY);
-
                 pevent.Graphics.DrawString(archtype, textFont, b, TypeTextLocationX, TypeTextLocationY);
-
                 pevent.Graphics.DrawString(abilityText, textFont, b, TextRectangle);
-
-
+                pevent.Graphics.DrawString("A", PTFont, brushes[(int)rarity], (PTTextLocationP + PTTextLocationT)/2, PTTextLocationY + PTTextLocationY/55);
 
                 int[] mc = costs;
 
