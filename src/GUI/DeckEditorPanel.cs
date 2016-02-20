@@ -9,6 +9,9 @@ using System.Linq;
 /*todo:
     just hide scroll buttons when you are at last page and first page?
     list of filters
+    make cardcount textthing instead of label, so we can change size and what not
+    make unable to save deck that arent approved by shitstain
+
 */
 namespace stonekart
 {
@@ -21,7 +24,7 @@ namespace stonekart
         private CardButton[] cardSlot;
         private CardPanel p;
         private CardButton[] cards;
-        private Label noDeckName;
+        private Label noDeckName, cardCount;
         private static TextBox tb;
         private Card[] ids;
         private List<Card> sortedIds;
@@ -50,8 +53,8 @@ namespace stonekart
             cardInfo.BackColor = BackColor;
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
+            cardCount = new Label();
 
-            
 
             for (int i = 0; i < nrOfCards; i++)
             {
@@ -169,19 +172,22 @@ namespace stonekart
                 Controls.Add(sortButtons[i]);
             }
 
+            
+
             tb = new TextBox();
+            Controls.Add(cardCount);
             Controls.Add(saveButton);
             Controls.Add(noDeckName);
             Controls.Add(loadButton);
             Controls.Add(tb);
             Controls.Add(p);
             Controls.Add(backToMainMenuButton);
-           
         }
 
         private bool deckVerificationThing(CardId[] ids)
         {
-            const int minDeckSize = 25;
+            Console.WriteLine("IS LEGIT?");
+            const int minDeckSize = 5;
             if (ids.Count() < minDeckSize) return false;
 
             int nrOfIds = Enum.GetNames(typeof (CardId)).Length;
@@ -190,16 +196,30 @@ namespace stonekart
             {
                 ctrs[(int) id]++;
             }
-
+            
             for (int i = 0; i < nrOfIds; i++)
             {
-                if (ctrs[i] > maxOf((CardId) i)) return false;
+                if (ctrs[i] >= maxOf(Card.rarityOf((CardId)i))) return false;
             }
-
-
+            Console.WriteLine("LEGIT");
             return true;
         }
 
+        //todo fix 99999999 cuz we're just brain damaged ironically
+        private int maxOf(Rarity r)
+        {
+            switch (r)
+            {
+                case Rarity.Common: return 4;
+                case Rarity.Uncommon: return 3;
+                case Rarity.Ebin: return 2;
+                case Rarity.Legendair: return 1;
+                case Rarity.Token: return 0;
+                case Rarity.Xperimental: return 99999999;
+            }
+            return 99999999;
+        }
+        
         private void sortAfterColor(Colour colour)
         {
             if (currentSortingColor == colour) currentSortingColor = Colour.MULTI;
@@ -340,6 +360,9 @@ namespace stonekart
 
             tb.Size = new Size(Size.Width / 10, Size.Height / 30);
             tb.Location = new Point(Size.Width / 2, Size.Height / 40);
+            cardCount.Size = new Size(Size.Width / 10, Size.Height / 30);
+            cardCount.Location = new Point(backToMainMenuButton.Location.X, backToMainMenuButton.Location.Y+backToMainMenuButton.Size.Height);
+
             saveButton.Location = new Point(Size.Width - saveButton.Image.Width, 0);
             p.Size = new Size(cards[0].Width, Size.Height);
             loadButton.Location = new Point(saveButton.Location.X, saveButton.Location.Y + saveButton.Height);
@@ -351,7 +374,6 @@ namespace stonekart
 
             noDeckName.Location = new Point(tb.Location.X, tb.Location.Y - 20);
             noDeckName.Size = tb.Size;
-            //drawTheseButtons(cards);
 
             cardInfo.Size = new Size(cardSlot[0].Width*2, cardSlot[0].Height*2 + 250);
             cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
@@ -372,6 +394,7 @@ namespace stonekart
         private bool addToDeck(CardId id)
         {
             myDeckIsHard.add(new Card(id));
+            cardCount.Text = "Count: " + myDeckIsHard.count;
             return true;
         }
 
