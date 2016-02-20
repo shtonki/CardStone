@@ -597,6 +597,7 @@ namespace stonekart
                 case CardId.Tree: //todo serious balance and flavor issues
                 {
                     greenCost = 1;
+                    greyCost = 1;
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
