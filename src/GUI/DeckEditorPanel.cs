@@ -198,7 +198,7 @@ namespace stonekart
             
             for (int i = 0; i < nrOfIds; i++)
             {
-                if (ctrs[i] >= maxOf(Card.rarityOf((CardId)i))) return false;
+                if (ctrs[i] > maxOf(Card.rarityOf((CardId)i))) return false;
             }
             return true;
         }
