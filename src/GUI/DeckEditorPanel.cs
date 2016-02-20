@@ -187,7 +187,7 @@ namespace stonekart
         private bool deckVerificationThing(CardId[] ids)
         {
             Console.WriteLine("IS LEGIT?");
-            const int minDeckSize = 5;
+            const int minDeckSize = 25;
             if (ids.Count() < minDeckSize) return false;
 
             int nrOfIds = Enum.GetNames(typeof (CardId)).Length;
