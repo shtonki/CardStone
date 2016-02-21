@@ -186,15 +186,19 @@ namespace stonekart
         {
             Choice shuffle = Choice.No;
             Player player = t.player;
-            if (player.isHero && optional)
+            if (optional)
             {
-                shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
-                ginterface.sendSelection((int)shuffle);
+                if (player.isHero)
+                {
+                    shuffle = ginterface.getChoice("Shuffle deck?", Choice.Yes, Choice.No);
+                    ginterface.sendSelection((int)shuffle);
+                }
+                else
+                {
+                    shuffle = (Choice)ginterface.demandSelection();
+                }
             }
-            else
-            {
-                shuffle = (Choice)ginterface.demandSelection();
-            }
+            
 
             if (shuffle == Choice.Yes)
             {
