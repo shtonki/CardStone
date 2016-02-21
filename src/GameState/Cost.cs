@@ -76,6 +76,104 @@ namespace stonekart
         abstract public GameEvent[] pay(Card c, GameInterface gi, int[] i);
     }
 
+    public class ExhaustCost : SubCost
+    {
+        private Card exhaustMe;
+
+        public ExhaustCost(Card exhaustMe)
+        {
+            this.exhaustMe = exhaustMe;
+        }
+
+        public override int[] check(Card c, GameInterface gi)
+        {
+            if (exhaustMe.canExhaust)
+            {
+                return new[] {exhaustMe.getId()};
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
+        {
+            GameEvent[] r = new GameEvent[i.Length];
+            for (int v = 0; v < r.Length; v++)
+            {
+                r[v] = new ExhaustEvent(gi.getCardById(i[v]));
+            }
+            return r;
+        }
+    }
+
+    public class SacrificeCost : SubCost
+    {
+        public override int[] check(Card c, GameInterface gi)
+        {
+            int[] r;
+            gi.setContext("Select sacrifice.", Choice.Cancel);
+            while (true)
+            {
+                GameElement e = gi.getNextGameElementPress();
+
+                if (e.card != null)
+                {
+                    Card card = e.card;
+
+                    if (card.owner.isHero)
+                    {
+                        r = new[] {card.getId()};
+                        break;
+                    }
+                }
+                if (e.choice != null)
+                {
+                    if (e.choice.Value == Choice.Cancel)
+                    {
+                        r = null;
+                        break;
+                    }
+                }
+            }
+            gi.clearContext();
+            return r;
+        }
+
+        public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
+        {
+            GameEvent[] r = new GameEvent[i.Length];
+            for (int v = 0; v < r.Length; v++)
+            {
+                r[v] = new MoveCardEvent(gi.getCardById(i[v]), LocationPile.GRAVEYARD);
+            }
+            return r;
+        }
+    }
+
+    public class SacrificeThisCost : SacrificeCost
+    {
+        private Card sacMe;
+
+        public SacrificeThisCost(Card sacMe)
+        {
+            this.sacMe = sacMe;
+        }
+
+        public override int[] check(Card c, GameInterface gi)
+        {
+            if (sacMe.location.pile == LocationPile.FIELD && sacMe.controller.isHero)
+            {
+                return new[] {sacMe.getId()};
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
     public class DiscardCost : SubCost
     {
         private int cardsToDiscard;

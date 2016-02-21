@@ -56,7 +56,7 @@ namespace stonekart
 
         public void advanceStep()
         {
-            currentStep = (Step)(((int)currentStep + 1) % 10);
+            currentStep = (Step)(((int)currentStep + 1) % (Enum.GetNames(typeof(Step))).Count());
             herosTurn = currentStep == 0 ? !herosTurn : herosTurn;
         }
 
@@ -106,13 +106,11 @@ namespace stonekart
     public enum Step
     {
         UNTOP,
-        DRAW,
         MAIN1,
         STARTCOMBAT,
         ATTACKERS,
         DEFENDERS,
         DAMAGE,
-        ENDCOMBAT,
         MAIN2,
         END,
     }

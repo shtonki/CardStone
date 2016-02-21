@@ -193,7 +193,7 @@ namespace stonekart
             abilityText = card.getAbilitiesString();
             costs = card.getManaCost().costs;
             hasPT = false;
-            isExhausted = card.topped;
+            isExhausted = card.exhausted;
             rarity = card.rarity;
             if (card.attacking)
             {

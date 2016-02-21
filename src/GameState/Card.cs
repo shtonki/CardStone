@@ -22,6 +22,8 @@ namespace stonekart
 
     public class Card : Observable
     {
+        public static int CARDCOUNT = Enum.GetNames(typeof(CardId)).Count();
+
         private int id;
         public CardId cardId { get; private set; }
         public Location location { get; set; }
@@ -33,7 +35,7 @@ namespace stonekart
         private Card DefendedBy;
         
         private bool _topped;
-        public bool topped
+        public bool exhausted
         {
             get { return _topped; }
             set
@@ -100,9 +102,10 @@ namespace stonekart
                 notifyObservers();
             }
         }
-        public bool canDefend => location.pile == LocationPile.FIELD && !topped;
+        public bool canDefend => location.pile == LocationPile.FIELD && !exhausted;
         public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
+        public bool canExhaust => !exhausted && !summoningSick;
         public Ability dummyFor { get; private set; }
         public readonly bool isExperimental;
 
@@ -174,11 +177,11 @@ namespace stonekart
                     cardType = CardType.Creature;
                     race = Race.Salamander;
                     activatedAbilities.Add(new ActivatedAbility(this,
-                        new Cost(new ManaCost(0, 1, 0, 0, 0, 2)),
+                        new Cost(new ExhaustCost(this)),
                         new Effect(new Mill(new ResolveTargetRule(ResolveTarget.CONTROLLER), 4)),
                         true,
                         LocationPile.FIELD, 
-                        "2B: Target player mills 4 cards."));
+                        "E: Target player mills 4 cards."));
                     } break;
                 #endregion
                 #region GrizzlyBear
@@ -565,23 +568,6 @@ namespace stonekart
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
                 } break;
                 #endregion
-                #region Jew
-                case CardId.Jew: //todo: seba review
-                    {
-                    blueCost = 4;
-                    cardType = CardType.Creature;
-                    basePower = 2;
-                    baseToughness = 2;
-                        EventFilter f = (gameEvent) =>
-                        {
-                            if (gameEvent.type != GameEventType.STEP) return false;
-                            StepEvent stepevent = (StepEvent)gameEvent;
-                            return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
-                        LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
-                } break;
-                #endregion
                 #region VikingMushroom
                 case CardId.VikingMushroom: //todo: seba review
                 {
@@ -600,10 +586,10 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,3,0)),
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,2,1)),
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
-                        LocationPile.FIELD, "GGG: gain +1/+1"));
+                        LocationPile.FIELD, "1GG: gain +1/+1"));
                 } break;
                 #endregion
                 #region EssenceOfDemise
@@ -717,11 +703,11 @@ namespace stonekart
                     basePower = 2;
                     baseToughness = 2;
                     activatedAbilities.Add(new ActivatedAbility(this, 
-                        new Cost(new ManaCost(1, 0, 0, 0, 0, 1)), 
+                        new Cost(new ExhaustCost(this), new ManaCost(1, 0, 0, 0, 0, 1)), 
                         new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2)), 
                         true,
                         LocationPile.FIELD, 
-                        "1W: Gain 2 life."));
+                        "E, 1W: Gain 2 life."));
                 } break;
                 #endregion
                 #region MattysGambit
@@ -845,6 +831,28 @@ namespace stonekart
                     fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
                  } break;
                 #endregion
+                #region AberrantSacrifice
+                case CardId.AberrantSacrifice:
+                {
+                    blackCost = 2;
+                    castingCosts.Add(new SacrificeCost());
+                    cardType = CardType.Sorcery;
+                    fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
+                    castDescription = "As an additional cost to cast this card sacrifice a creature.\nDraw 2 cards.";
+                } break;
+                #endregion
+                case CardId.X:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Relic;
+                    activatedAbilities.Add(new ActivatedAbility(this, 
+                        new Cost(new SacrificeThisCost(this)),
+                        new Effect(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)),
+                        true,
+                        LocationPile.FIELD, 
+                        "Sacrifice this: Draw 1 card."
+                        ));
+                } break;
                 #region default
                 default: 
                 {
@@ -1055,7 +1063,7 @@ namespace stonekart
         
         public bool isTopped()
         {
-            return topped;
+            return exhausted;
         }
 
         public bool hasPT()
@@ -1090,7 +1098,7 @@ namespace stonekart
             power?.clear();
             toughness?.clear();
             summoningSick = true;
-            topped = false;
+            exhausted = false;
             if (defenderOf != null) defenderOf.defendedBy = null;
             if (defendedBy != null) defendedBy.defenderOf = null;
             defendedBy = defenderOf = null;
@@ -1205,7 +1213,7 @@ namespace stonekart
             rarities[(int)CardId.ForkedLightning] = Rarity.Common;
             rarities[(int)CardId.DragonHatchling] = Rarity.Common;
             rarities[(int)CardId.TempleHealer] = Rarity.Ebin;
-            rarities[(int)CardId.Rapture] = Rarity.Common;
+            rarities[(int)CardId.Rapture] = Rarity.Uncommon;
             rarities[(int)CardId.Squire] = Rarity.Token;
             rarities[(int)CardId.CallToArms] = Rarity.Common;
             rarities[(int)CardId.ShimmeringKoi] = Rarity.Common;
@@ -1226,7 +1234,7 @@ namespace stonekart
             rarities[(int)CardId.EssenceOfDemise] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfRage] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfClarity] = Rarity.Ebin;
-            rarities[(int)CardId.MorenianMedic] = Rarity.Ebin;
+            rarities[(int)CardId.MorenianMedic] = Rarity.Uncommon;
             rarities[(int)CardId.MattysGambit] = Rarity.Ebin;
             rarities[(int)CardId.IlasGambit] = Rarity.Ebin;
             rarities[(int)CardId.BelwasGambit] = Rarity.Ebin;
@@ -1286,7 +1294,6 @@ namespace stonekart
         ProtectiveSow,
         Cub,
         IlatianWineMerchant,
-        Jew,
         VikingMushroom,
         BelwasGambit,
         GreenFourDropThatDoesCoolShit,
@@ -1295,8 +1302,9 @@ namespace stonekart
         RockhandOgre,
         GrazingBison,
         SebasGambit,
+        AberrantSacrifice,
+        X,
     }
-
     public enum CardType
     {
         Creature,
