@@ -27,6 +27,8 @@ namespace stonekart
         public DisplayPanel activePanel { get; private set; }
         private Button labelx;
 
+        public DisplayPanel draftPanel { get; private set; }
+
         public MainFrame()
         {
             labelx = new Button();
@@ -50,6 +52,9 @@ namespace stonekart
             //setupMainMenuPanel();
             mainMenuPanel = new MainMenuPanel();
 
+            draftPanel = new DraftPanel();
+            draftPanel.Size = new Size(0, 0);
+
             //setupGamePanel();
             //gamePanel = new GamePanel();
 
@@ -64,6 +69,7 @@ namespace stonekart
             Controls.Add(friendPanel);
             Controls.Add(deckEditorPanel);
             Controls.Add(deckEditorPanel);
+            Controls.Add(draftPanel);
 
             friendPanel.BringToFront();
             friendPanel.Hide();

@@ -52,6 +52,11 @@ namespace stonekart
             frame.transitionTo(frame.deckEditorPanel);
         }
 
+        public static void transitionToDraftPanel()
+        {
+            frame.transitionTo(frame.draftPanel);
+        }
+
         public static void addGameWindow(GameInterface g)
         {
             frame.createGamePanel(g);

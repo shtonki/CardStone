@@ -15,7 +15,7 @@ namespace stonekart
         public Player opponent => isHero ? gameState.villain : gameState.hero;
 
         //todo(seba) move all these to props
-        private int[] curMana, maxMana;
+        private int[] curMana, maxMana, bonusMana;
         private int health;
         private Pile[] piles;
 
@@ -111,7 +111,7 @@ namespace stonekart
 
             foreach (Card c in field.cards)
             {
-                c.topped = false;
+                c.exhausted = false;
                 c.summoningSick = false;
             }
         }

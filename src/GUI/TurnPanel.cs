@@ -16,7 +16,7 @@ namespace stonekart
 
         public TurnPanel()
         {
-            BackColor = Color.Red;
+            BackColor = Color.Black;
             //Size = new Size(70, 700);
             /*
             refill = Image.FromFile(Settings.resButton + "refill.png");
@@ -91,11 +91,11 @@ namespace stonekart
             int height = Size.Height;
             int width = Size.Width;
             //todo(seba) find out if this leaks memory
-            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,         70, 140);
-            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 2 * width, 70, 70);
-            e.Graphics.FillRectangle(new SolidBrush(Color.DarkRed),     0, 3 * width, 70, 350);
-            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 8 * width, 70, 70);
-            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 9 * width, 70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 0,         70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 1 * width, 70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.DarkRed),     0, 2 * width, 70, 280);
+            e.Graphics.FillRectangle(new SolidBrush(Color.ForestGreen), 0, 6 * width, 70, 70);
+            e.Graphics.FillRectangle(new SolidBrush(Color.DodgerBlue),  0, 7 * width, 70, 70);
             
             for (int i = 0; i < images.Length; i++)
             {

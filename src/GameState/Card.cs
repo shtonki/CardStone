@@ -22,6 +22,8 @@ namespace stonekart
 
     public class Card : Observable
     {
+        public static int CARDCOUNT = Enum.GetNames(typeof(CardId)).Count();
+
         private int id;
         public CardId cardId { get; private set; }
         public Location location { get; set; }
@@ -33,7 +35,7 @@ namespace stonekart
         private Card DefendedBy;
         
         private bool _topped;
-        public bool topped
+        public bool exhausted
         {
             get { return _topped; }
             set
@@ -67,7 +69,14 @@ namespace stonekart
         //private Modifiable<int> power, toughness;
         public int currentPower => power.getValue();
         public int currentToughness => toughness.getValue();
-        public bool summoningSick { get; set; }
+        private bool _summoningSick { get; set; }
+
+        public bool summoningSick
+        {
+            get { return isCreature && _summoningSick; }
+            set { _summoningSick = value; }
+        }
+
         public bool attacking
         {
             get { return Attacking; }
@@ -100,9 +109,10 @@ namespace stonekart
                 notifyObservers();
             }
         }
-        public bool canDefend => location.pile == LocationPile.FIELD && !topped;
+        public bool canDefend => location.pile == LocationPile.FIELD && !exhausted;
         public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
+        public bool canExhaust => !exhausted && !_summoningSick;
         public Ability dummyFor { get; private set; }
         public readonly bool isExperimental;
 
@@ -174,11 +184,11 @@ namespace stonekart
                     cardType = CardType.Creature;
                     race = Race.Salamander;
                     activatedAbilities.Add(new ActivatedAbility(this,
-                        new Cost(new ManaCost(0, 1, 0, 0, 0, 2)),
+                        new Cost(new ExhaustCost(this)),
                         new Effect(new Mill(new ResolveTargetRule(ResolveTarget.CONTROLLER), 4)),
                         true,
                         LocationPile.FIELD, 
-                        "2B: Target player mills 4 cards."));
+                        "E: Target player mills 4 cards."));
                     } break;
                 #endregion
                 #region GrizzlyBear
@@ -524,7 +534,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
 
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), true, LocationPile.FIELD, "Discard a card: Gain 3 life."));
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new MoveToCost(LocationPile.HAND, LocationPile.GRAVEYARD, 1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), true, LocationPile.FIELD, "Discard a card: Gain 3 life."));
                         //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
                         /*
                         Card c = fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
@@ -539,8 +549,7 @@ namespace stonekart
                     greyCost = 1;
                     cardType = CardType.Sorcery;
                     castDescription = "Deal 3 damage to all creatures.";
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3));
                 } break;
                 #endregion
                 #region FuryOfTheRighteous
@@ -551,8 +560,7 @@ namespace stonekart
                     greyCost = 2;
                     cardType = CardType.Sorcery;
                     castDescription = "Deal 2 damage to all non-white creatures";
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES, FilterLambda.NONWHITE), 2));
                 } break;
                 #endregion
                 #region Extinguish
@@ -563,23 +571,6 @@ namespace stonekart
                     castDescription = "Kill target creature.";
                     flavourText = "Be gone!";
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
-                } break;
-                #endregion
-                #region Jew
-                case CardId.Jew: //todo: seba review
-                    {
-                    blueCost = 4;
-                    cardType = CardType.Creature;
-                    basePower = 2;
-                    baseToughness = 2;
-                        EventFilter f = (gameEvent) =>
-                        {
-                            if (gameEvent.type != GameEventType.STEP) return false;
-                            StepEvent stepevent = (StepEvent)gameEvent;
-                            return stepevent.step == Step.DRAW && owner.hand.count >= 5 && stepevent.activePlayer == owner;
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "If you have five or more cards in your hand at beginning of your draw step, draw a card.",
-                        LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
                 } break;
                 #endregion
                 #region VikingMushroom
@@ -600,10 +591,10 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
                     cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,3,0)),
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,2,1)),
                         new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
-                        LocationPile.FIELD, "GGG: gain +1/+1"));
+                        LocationPile.FIELD, "1GG: gain +1/+1"));
                 } break;
                 #endregion
                 #region EssenceOfDemise
@@ -717,11 +708,11 @@ namespace stonekart
                     basePower = 2;
                     baseToughness = 2;
                     activatedAbilities.Add(new ActivatedAbility(this, 
-                        new Cost(new ManaCost(1, 0, 0, 0, 0, 1)), 
+                        new Cost(new ExhaustCost(this), new ManaCost(1, 0, 0, 0, 0, 1)), 
                         new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2)), 
                         true,
                         LocationPile.FIELD, 
-                        "1W: Gain 2 life."));
+                        "E, 1W: Gain 2 life."));
                 } break;
                 #endregion
                 #region MattysGambit
@@ -844,6 +835,86 @@ namespace stonekart
                     cardType = CardType.Instant;
                     fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
                  } break;
+                #endregion
+                #region AberrantSacrifice
+                case CardId.AberrantSacrifice:
+                {
+                    blackCost = 2;
+                    castingCosts.Add(new MoveToCost(LocationPile.FIELD, LocationPile.GRAVEYARD, 1));
+                    cardType = CardType.Sorcery;
+                    fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
+                    castDescription = "As an additional cost to cast this card sacrifice a creature.\nDraw 2 cards.";
+                } break;
+                #endregion
+                #region Spark
+                case CardId.Spark:
+                {
+                    redCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2));
+                    castDescription = "Deal 2 damage to target creature or player.";
+                } break;
+                #endregion
+                #region MaleficentSpirit
+                case CardId.MaleficentSpirit:
+                {
+                    blackCost = 2;
+                    greyCost = 2;
+                    basePower = 3;
+                    baseToughness = 2;
+                    cardType = CardType.Creature;
+                    triggeredAbilities.Add(new TriggeredAbility(this,
+                        thisETB(this),
+                        thisETBDescription + "target player discards a card",
+                        LocationPile.FIELD, 
+                        EventTiming.Post,
+                        new Effect(new MoveTo(new SelectFromTargetRule(
+                            new FilterTargetRule(1, FilterLambda.PLAYER),
+                            new ResolveTargetRule(ResolveTarget.LAST), 
+                            p => p.hand.cards.ToArray()), LocationPile.GRAVEYARD)) 
+                        ));
+                } break;
+                #endregion
+                #region Bubastis
+                case CardId.Bubastis:
+                {
+                    blueCost = 4;
+                    greyCost = 3;
+                    basePower = 5;
+                    baseToughness = 5;
+                    cardType = CardType.Creature;
+                    activatedAbilities.Add(new ActivatedAbility(this, 
+                        new Cost(new ManaCost(0, 2, 0, 0, 0, 1)),
+                        new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD))),
+                        true,
+                        LocationPile.FIELD, 
+                        "1BB: Exhaust target creature."
+                        ));
+                } break;
+                #endregion
+                #region HauntedChapel
+                case CardId.HauntedChapel:
+                {
+                    blackCost = 2;
+                    whiteCost = 2;
+                    cardType = CardType.Relic;
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new MoveToCost(LocationPile.GRAVEYARD, LocationPile.EXILE, 1)),
+                        new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Spirit)),
+                        true,
+                        LocationPile.FIELD, 
+                        "E, Exile a card from your graveyard: Summon a Spirit token."
+                        ));
+                } break;
+                #endregion
+                #region Spirit
+                case CardId.Spirit:
+                {
+                    isToken = true;
+                    forceColour = Colour.WHITE;
+                    basePower = 1;
+                    baseToughness = 1;
+                } break;
                 #endregion
                 #region default
                 default: 
@@ -1055,7 +1126,7 @@ namespace stonekart
         
         public bool isTopped()
         {
-            return topped;
+            return exhausted;
         }
 
         public bool hasPT()
@@ -1076,7 +1147,7 @@ namespace stonekart
 
         public bool canAttack()
         {
-            return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
+            return canExhaust;
         }
 
         public bool has(KeyAbility a)
@@ -1089,8 +1160,8 @@ namespace stonekart
             moveHackInt++;
             power?.clear();
             toughness?.clear();
-            summoningSick = true;
-            topped = false;
+            _summoningSick = true;
+            exhausted = false;
             if (defenderOf != null) defenderOf.defendedBy = null;
             if (defendedBy != null) defendedBy.defenderOf = null;
             defendedBy = defenderOf = null;
@@ -1205,7 +1276,7 @@ namespace stonekart
             rarities[(int)CardId.ForkedLightning] = Rarity.Common;
             rarities[(int)CardId.DragonHatchling] = Rarity.Common;
             rarities[(int)CardId.TempleHealer] = Rarity.Ebin;
-            rarities[(int)CardId.Rapture] = Rarity.Common;
+            rarities[(int)CardId.Rapture] = Rarity.Uncommon;
             rarities[(int)CardId.Squire] = Rarity.Token;
             rarities[(int)CardId.CallToArms] = Rarity.Common;
             rarities[(int)CardId.ShimmeringKoi] = Rarity.Common;
@@ -1226,7 +1297,7 @@ namespace stonekart
             rarities[(int)CardId.EssenceOfDemise] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfRage] = Rarity.Ebin;
             rarities[(int)CardId.EssenceOfClarity] = Rarity.Ebin;
-            rarities[(int)CardId.MorenianMedic] = Rarity.Ebin;
+            rarities[(int)CardId.MorenianMedic] = Rarity.Uncommon;
             rarities[(int)CardId.MattysGambit] = Rarity.Ebin;
             rarities[(int)CardId.IlasGambit] = Rarity.Ebin;
             rarities[(int)CardId.BelwasGambit] = Rarity.Ebin;
@@ -1237,8 +1308,12 @@ namespace stonekart
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
             rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
             rarities[(int)CardId.RockhandOgre] = Rarity.Common;
-            rarities[(int)CardId.GrazingBison] = Rarity.Common;
+            rarities[(int)CardId.GrazingBison] = Rarity.Uncommon;
             rarities[(int)CardId.SebasGambit] = Rarity.Ebin;
+            rarities[(int)CardId.Spark] = Rarity.Common;
+            rarities[(int)CardId.AberrantSacrifice] = Rarity.Uncommon;
+            rarities[(int)CardId.MaleficentSpirit] = Rarity.Common;
+            rarities[(int)CardId.Bubastis] = Rarity.Legendair;
         }
     }
     public enum CardId
@@ -1276,9 +1351,6 @@ namespace stonekart
         MorenianMedic,
         MattysGambit,
         Figment,
-        //EssenceOfWilderness,
-        //EssenceOfValor,
-        //IlasMagicLamp,
         StampedingDragon,
         ElderTreeant,
         Counterspell,
@@ -1286,7 +1358,6 @@ namespace stonekart
         ProtectiveSow,
         Cub,
         IlatianWineMerchant,
-        Jew,
         VikingMushroom,
         BelwasGambit,
         GreenFourDropThatDoesCoolShit,
@@ -1295,8 +1366,13 @@ namespace stonekart
         RockhandOgre,
         GrazingBison,
         SebasGambit,
+        AberrantSacrifice,
+        Spark,
+        MaleficentSpirit,
+        Bubastis,
+        HauntedChapel,
+        Spirit,
     }
-
     public enum CardType
     {
         Creature,

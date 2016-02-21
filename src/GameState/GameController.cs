@@ -120,7 +120,7 @@ namespace stonekart
                 WaitFor<string> w = new WaitFor<string>();
                 DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
                 CardId[] ids = DeckEditorPanel.loadDeck(w.wait()).ToArray();
-                if (DeckEditorPanel.deckVerificationThing(ids)) return ids;
+                if (gameInterface.connection is DummyConnection || DeckEditorPanel.deckVerificationThing(ids)) return ids;
             }
         }
 
@@ -137,7 +137,6 @@ namespace stonekart
         #region eventHandlers
         private void setupEventHandlers()
         {
-
             addBaseHandler(GameEventType.TOPCARD, _topcard);
             addBaseHandler(GameEventType.STEP, _step);
             addBaseHandler(GameEventType.DRAW, _draw);
@@ -152,6 +151,7 @@ namespace stonekart
             addBaseHandler(GameEventType.MODIFYCARD, _modifycard);
             addBaseHandler(GameEventType.SHUFFLEDECK, _shuffle);
             addBaseHandler(GameEventType.COUNTERSPELL, _counterspell);
+            addBaseHandler(GameEventType.EXHAUST, _exhaust);
         }
 
         private void addBaseHandler(GameEventType t, EventAction a)
@@ -162,7 +162,7 @@ namespace stonekart
         private void _exhaust(GameEvent gevent)
         {
             ExhaustEvent e = (ExhaustEvent)gevent;
-            e.card.topped = true;
+            e.card.exhausted = true;
         }
         private void _counterspell(GameEvent gevent)
         {
@@ -208,7 +208,7 @@ namespace stonekart
         private void _topcard(GameEvent gevent)
         {
             TopEvent e = (TopEvent)gevent;
-            e.card.topped = true;
+            e.card.exhausted = true;
         }
         private void _step(GameEvent gevent)
         {
@@ -281,12 +281,7 @@ namespace stonekart
                         untopStep();
                     }
                     break;
-
-                case Step.DRAW:
-                    {
-                        drawStep();
-                    }
-                    break;
+                    
                 case Step.MAIN1:
                     {
                         mainStep();
@@ -312,11 +307,6 @@ namespace stonekart
                         damageStep();
                     }
                     break;
-                case Step.ENDCOMBAT:
-                    {
-                        endCombatStep();
-                    }
-                    break;
                 case Step.MAIN2:
                     {
                         mainStep();
@@ -327,9 +317,9 @@ namespace stonekart
                         endStep();
                     }
                     break;
-
+                    
                 default:
-                    throw new Exception(); //paranoid
+                    Console.WriteLine(step); throw new Exception(); //paranoid
             }
         }
 
@@ -340,7 +330,15 @@ namespace stonekart
                 gameInterface.setStep(game.currentStep, game.herosTurn);
                 doStepStuff(game.currentStep);
                 handleEvent(new StepEvent(game.currentStep, game.activePlayer));
-                givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
+                if (game.currentStep == Step.ATTACKERS && attackers == null)
+                {
+                    game.advanceStep();
+                    game.advanceStep();
+                }
+                else
+                {
+                    givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
+                }
                 game.advanceStep();
             }
         }
@@ -349,6 +347,7 @@ namespace stonekart
         {
             autoPass = false;
 
+            handleEvent(new DrawEvent(game.activePlayer));
             handleEvent(new UntopPlayerEvent(game.activePlayer));
 
             int s;
@@ -376,11 +375,6 @@ namespace stonekart
             handleEvent(new GainManaOrbEvent(game.activePlayer, s));
         }
 
-        private void drawStep()
-        {
-            handleEvent(new DrawEvent(game.activePlayer));
-        }
-
         private void mainStep()
         {
         }
@@ -391,21 +385,28 @@ namespace stonekart
 
         private void attackersStep()
         {
-            if (game.herosTurn)
+            if (game.herosTurn && game.hero.field.cards.Any(card => card.canAttack()))
             {
-                attackers = chooseMultiple("Choose attackers", c =>
+                if (game.hero.field.cards.Any(card => card.canAttack()))
                 {
-                    if (c.owner.isHero && c.canAttack() && !(c.attacking))
+                    attackers = chooseMultiple("Choose attackers", c =>
                     {
-                        c.attacking = true;
-                        return true;
-                    }
-                    else
-                    {
-                        c.attacking = false;
-                        return false;
-                    }
-                });
+                        if (c.owner.isHero && c.canAttack() && !(c.attacking))
+                        {
+                            c.attacking = true;
+                            return true;
+                        }
+                        else
+                        {
+                            c.attacking = false;
+                            return false;
+                        }
+                    });
+                }
+                else
+                {
+                    attackers = new Card[0];
+                }
                 gameInterface.sendMultiSelection(attackers);
             }
             else
@@ -420,8 +421,6 @@ namespace stonekart
             if (attackers.Length == 0)
             {
                 attackers = null;
-                game.advanceStep();
-                game.advanceStep();
             }
             else
             {
@@ -478,11 +477,7 @@ namespace stonekart
                     }
                 }
             }
-            
-        }
 
-        private void endCombatStep()
-        {
             if (attackers != null)
             {
 
@@ -500,7 +495,6 @@ namespace stonekart
                 }
                 attackers = defenders = null;
             }
-
         }
 
         private void endStep()
@@ -564,6 +558,10 @@ namespace stonekart
                 xd.Clear();
                 foreach (var v in game.allCards)
                 {
+                    if (v.isToken && v.location.pile != LocationPile.FIELD)
+                    {
+                        pileFromLocation(v.location).remove(v);
+                    }
                     v.checkModifiers();
                 }
                 

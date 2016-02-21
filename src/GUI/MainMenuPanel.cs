@@ -86,6 +86,15 @@ namespace stonekart
                 GUI.transitionToDeckEditor();
             };
 
+            Button draftButton = new Button();
+            draftButton.Location = new Point(20, 100);
+            draftButton.Text = "Rip Packs";
+            startGamePanel.Controls.Add(draftButton);
+            draftButton.Click += (a, aa) =>
+            {
+                GUI.transitionToDraftPanel();
+            };
+
             loginPanel.Controls.Add(usernameLabel);
             loginPanel.Controls.Add(usernameBox);
             loginPanel.Controls.Add(loginButton);
