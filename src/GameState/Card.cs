@@ -69,7 +69,14 @@ namespace stonekart
         //private Modifiable<int> power, toughness;
         public int currentPower => power.getValue();
         public int currentToughness => toughness.getValue();
-        public bool summoningSick { get; set; }
+        private bool _summoningSick { get; set; }
+
+        public bool summoningSick
+        {
+            get { return isCreature && _summoningSick; }
+            set { _summoningSick = value; }
+        }
+
         public bool attacking
         {
             get { return Attacking; }
@@ -105,7 +112,7 @@ namespace stonekart
         public bool canDefend => location.pile == LocationPile.FIELD && !exhausted;
         public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
-        public bool canExhaust => !exhausted && !summoningSick;
+        public bool canExhaust => !exhausted && !_summoningSick;
         public Ability dummyFor { get; private set; }
         public readonly bool isExperimental;
 
@@ -848,7 +855,7 @@ namespace stonekart
                     castDescription = "Deal 2 damage to target creature or player.";
                 } break;
                 #endregion
-                #region MaleficentSpirit:
+                #region MaleficentSpirit
                 case CardId.MaleficentSpirit:
                 {
                     blackCost = 2;
@@ -868,18 +875,23 @@ namespace stonekart
                         ));
                 } break;
                 #endregion
-                case CardId.X:
+                #region Bubastis
+                case CardId.Bubastis:
                 {
-                    blueCost = 1;
-                    cardType = CardType.Relic;
+                    blueCost = 4;
+                    greyCost = 3;
+                    basePower = 5;
+                    baseToughness = 5;
+                    cardType = CardType.Creature;
                     activatedAbilities.Add(new ActivatedAbility(this, 
-                        new Cost(new SacrificeThisCost(this)),
-                        new Effect(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)),
+                        new Cost(new ManaCost(0, 2, 0, 0, 0, 1)),
+                        new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD))),
                         true,
                         LocationPile.FIELD, 
-                        "Sacrifice this: Draw 1 card."
+                        "1BB: Exhaust target creature."
                         ));
                 } break;
+                #endregion
                 #region default
                 default: 
                 {
@@ -1111,7 +1123,7 @@ namespace stonekart
 
         public bool canAttack()
         {
-            return location.pile == LocationPile.FIELD && (!summoningSick || has(KeyAbility.Fervor));
+            return canExhaust;
         }
 
         public bool has(KeyAbility a)
@@ -1124,7 +1136,7 @@ namespace stonekart
             moveHackInt++;
             power?.clear();
             toughness?.clear();
-            summoningSick = true;
+            _summoningSick = true;
             exhausted = false;
             if (defenderOf != null) defenderOf.defendedBy = null;
             if (defendedBy != null) defendedBy.defenderOf = null;
@@ -1272,11 +1284,12 @@ namespace stonekart
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
             rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
             rarities[(int)CardId.RockhandOgre] = Rarity.Common;
-            rarities[(int)CardId.GrazingBison] = Rarity.Common;
+            rarities[(int)CardId.GrazingBison] = Rarity.Uncommon;
             rarities[(int)CardId.SebasGambit] = Rarity.Ebin;
             rarities[(int)CardId.Spark] = Rarity.Common;
             rarities[(int)CardId.AberrantSacrifice] = Rarity.Uncommon;
             rarities[(int)CardId.MaleficentSpirit] = Rarity.Common;
+            rarities[(int)CardId.Bubastis] = Rarity.Legendair;
         }
     }
     public enum CardId
@@ -1314,9 +1327,6 @@ namespace stonekart
         MorenianMedic,
         MattysGambit,
         Figment,
-        //EssenceOfWilderness,
-        //EssenceOfValor,
-        //IlasMagicLamp,
         StampedingDragon,
         ElderTreeant,
         Counterspell,
@@ -1335,7 +1345,8 @@ namespace stonekart
         AberrantSacrifice,
         Spark,
         MaleficentSpirit,
-        X,
+        Bubastis,
+        HauntedChapel,
     }
     public enum CardType
     {
