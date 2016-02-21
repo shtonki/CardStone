@@ -249,7 +249,7 @@ namespace stonekart
         
         public void showGraveyard(Player p)
         {
-            FML f = new FML((a) => { }, (a, b) => { }, () => { }, (c) => setFocusCard(c.Card));
+            FML f = new FML((a) => { gameElementPressed(new GameElement(a.Card)); }, (a, b) => { }, () => { }, (c) => setFocusCard(c.Card));
             CardPanel l = new CardPanel(() => new CardButton(f), new LayoutArgs(false, false),p.graveyard);
             GUI.showWindow(l, new WindowedPanelArgs("Graveyard", true, true, false));
             

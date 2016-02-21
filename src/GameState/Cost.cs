@@ -107,56 +107,13 @@ namespace stonekart
             return r;
         }
     }
+    
 
-    public class SacrificeCost : SubCost
-    {
-        public override int[] check(Card c, GameInterface gi)
-        {
-            int[] r;
-            gi.setContext("Select sacrifice.", Choice.Cancel);
-            while (true)
-            {
-                GameElement e = gi.getNextGameElementPress();
-
-                if (e.card != null)
-                {
-                    Card card = e.card;
-
-                    if (card.owner.isHero)
-                    {
-                        r = new[] {card.getId()};
-                        break;
-                    }
-                }
-                if (e.choice != null)
-                {
-                    if (e.choice.Value == Choice.Cancel)
-                    {
-                        r = null;
-                        break;
-                    }
-                }
-            }
-            gi.clearContext();
-            return r;
-        }
-
-        public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
-        {
-            GameEvent[] r = new GameEvent[i.Length];
-            for (int v = 0; v < r.Length; v++)
-            {
-                r[v] = new MoveCardEvent(gi.getCardById(i[v]), LocationPile.GRAVEYARD);
-            }
-            return r;
-        }
-    }
-
-    public class SacrificeThisCost : SacrificeCost
+    public class MoveThisCost : MoveToCost
     {
         private Card sacMe;
 
-        public SacrificeThisCost(Card sacMe)
+        public MoveThisCost(LocationPile from, LocationPile to, int cardsToMove, Card sacMe) : base(from, to, cardsToMove)
         {
             this.sacMe = sacMe;
         }
@@ -174,26 +131,34 @@ namespace stonekart
         }
     }
 
-    public class DiscardCost : SubCost
+    public class MoveToCost : SubCost
     {
-        private int cardsToDiscard;
+        private LocationPile to;
+        private LocationPile from;
+        private int cardsToMove;
 
-        public DiscardCost(int cardsToDiscard)
+        public MoveToCost(LocationPile from, LocationPile to, int cardsToMove)
         {
-            this.cardsToDiscard = cardsToDiscard;
+            this.to = to;
+            this.from = from;
+            this.cardsToMove = cardsToMove;
         }
 
         public override int[] check(Card card, GameInterface gi)
         {
-            int[] r = new int[cardsToDiscard];
+            int[] r = new int[cardsToMove];
             int i = 0;
-            while (i < cardsToDiscard)
+            while (i < cardsToMove)
             {
                 GameElement e = gi.getNextGameElementPress();
-                if (e.card != null && e.card.location.pile == LocationPile.HAND && e.card.owner.isHero)
+                if (e.card != null && e.card.location.pile == from && e.card.owner.isHero)
                 {
                     r[i] = e.card.getId();
                     i++;
+                }
+                if (e.choice != null && e.choice.Value == Choice.Cancel)
+                {
+                    return null;
                 }
             }
             return r;
@@ -201,7 +166,7 @@ namespace stonekart
 
         public override GameEvent[] pay(Card c, GameInterface gi, int[] i)
         {
-            return i.Select(n => new MoveCardEvent(gi.getCardById(n), LocationPile.GRAVEYARD)).ToArray();
+            return i.Select(n => new MoveCardEvent(gi.getCardById(n), to)).ToArray();
         }
     }
 

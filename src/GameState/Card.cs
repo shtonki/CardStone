@@ -534,7 +534,7 @@ namespace stonekart
                     basePower = 1;
                     baseToughness = 2;
 
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new DiscardCost(1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), true, LocationPile.FIELD, "Discard a card: Gain 3 life."));
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new MoveToCost(LocationPile.HAND, LocationPile.GRAVEYARD, 1)), new Effect(new GainLife(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3)), true, LocationPile.FIELD, "Discard a card: Gain 3 life."));
                         //triggeredAbilities.Add(new ActivatedAbility(this, new Cost(), ));
                         /*
                         Card c = fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.INHAND), LocationPile.GRAVEYARD)); //todo jasin: take cost of creature and put it in gainlife
@@ -840,7 +840,7 @@ namespace stonekart
                 case CardId.AberrantSacrifice:
                 {
                     blackCost = 2;
-                    castingCosts.Add(new SacrificeCost());
+                    castingCosts.Add(new MoveToCost(LocationPile.FIELD, LocationPile.GRAVEYARD, 1));
                     cardType = CardType.Sorcery;
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
                     castDescription = "As an additional cost to cast this card sacrifice a creature.\nDraw 2 cards.";
@@ -890,6 +890,30 @@ namespace stonekart
                         LocationPile.FIELD, 
                         "1BB: Exhaust target creature."
                         ));
+                } break;
+                #endregion
+                #region HauntedChapel
+                case CardId.HauntedChapel:
+                {
+                    blackCost = 2;
+                    whiteCost = 2;
+                    cardType = CardType.Relic;
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new MoveToCost(LocationPile.GRAVEYARD, LocationPile.EXILE, 1)),
+                        new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Spirit)),
+                        true,
+                        LocationPile.FIELD, 
+                        "E, Exile a card from your graveyard: Summon a Spirit token."
+                        ));
+                } break;
+                #endregion
+                #region Spirit
+                case CardId.Spirit:
+                {
+                    isToken = true;
+                    forceColour = Colour.WHITE;
+                    basePower = 1;
+                    baseToughness = 1;
                 } break;
                 #endregion
                 #region default
@@ -1347,6 +1371,7 @@ namespace stonekart
         MaleficentSpirit,
         Bubastis,
         HauntedChapel,
+        Spirit,
     }
     public enum CardType
     {

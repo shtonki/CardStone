@@ -558,6 +558,10 @@ namespace stonekart
                 xd.Clear();
                 foreach (var v in game.allCards)
                 {
+                    if (v.isToken && v.location.pile != LocationPile.FIELD)
+                    {
+                        pileFromLocation(v.location).remove(v);
+                    }
                     v.checkModifiers();
                 }
                 
