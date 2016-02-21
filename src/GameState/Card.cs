@@ -1315,6 +1315,7 @@ namespace stonekart
             rarities[(int)CardId.MaleficentSpirit] = Rarity.Common;
             rarities[(int)CardId.Bubastis] = Rarity.Legendair;
             rarities[(int)CardId.HauntedChapel] = Rarity.Ebin;
+            rarities[(int)CardId.Spirit] = Rarity.Token;
         }
     }
     public enum CardId
