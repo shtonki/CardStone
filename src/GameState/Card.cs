@@ -706,7 +706,7 @@ namespace stonekart
                     cardType = CardType.Creature;;
 
                     keyAbilities.Add(KeyAbility.Fervor);
-                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "dies and end of turn.",
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the end of turn sacrifice this creature.",
                         LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.GRAVEYARD)));
                 } break;
                 #endregion
