@@ -481,7 +481,7 @@ namespace stonekart
                             if (e.type != GameEventType.MOVECARD) return false;
                             MoveCardEvent mevent = (MoveCardEvent)e;
                             return mevent.from?.pile == LocationPile.FIELD && mevent.to?.pile == LocationPile.GRAVEYARD &&
-                                   mevent.card.owner.isHero && mevent.card.isCreature && mevent.card != this;
+                                   mevent.card.owner == owner && mevent.card.isCreature && mevent.card != this;
                         };
 
                     triggeredAbilities.Add(new TriggeredAbility(this, f, "Whenever a friendly creature dies this creature gets +1/+1.", LocationPile.FIELD, EventTiming.Post,
