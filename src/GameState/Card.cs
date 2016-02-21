@@ -604,7 +604,6 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                    break;
                 #region VikingMushroom
                 case CardId.VikingMushroom: //todo: seba review
                     {
@@ -862,6 +861,7 @@ namespace stonekart
                         (p) => p.deck.cards.ToArray()), 
                             LocationPile.HAND));
                         fx.Add(new Shuffle(new ResolveTargetRule(ResolveTarget.CONTROLLER), false));
+
                     }
                     break;
                 #endregion

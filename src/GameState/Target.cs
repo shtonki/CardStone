@@ -265,7 +265,7 @@ namespace stonekart
 
         public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
-            return xd?.resolveCastTargets(ginterface, gstate, cancellable);
+            return xd?.resolveCastTargets(ginterface, gstate, cancellable) ?? new Target[] {};
         }
 
         public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
