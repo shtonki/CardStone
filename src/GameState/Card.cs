@@ -1085,7 +1085,7 @@ namespace stonekart
                     greenCost = 1;
                     cardType = CardType.Sorcery;
                     fx.Add(new GainBonusMana(new ResolveTargetRule(ResolveTarget.CONTROLLER), Colour.GREEN, Colour.GREEN, Colour.GREEN));
-                    castDescription = "Add GGG until end of step";
+                    castDescription = "Add GGG until end of step.";
                 } break;
                 #endregion
                 #region default
@@ -1488,6 +1488,7 @@ namespace stonekart
             rarities[(int)CardId.Bubastis] = Rarity.Legendair;
             rarities[(int)CardId.HauntedChapel] = Rarity.Ebin;
             rarities[(int)CardId.Spirit] = Rarity.Token;
+            rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
         }
     }
     public enum CardId

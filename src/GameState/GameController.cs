@@ -392,7 +392,7 @@ namespace stonekart
 
         private void attackersStep()
         {
-            if (game.herosTurn && game.hero.field.cards.Any(card => card.canAttack()))
+            if (game.herosTurn)
             {
                 if (game.hero.field.cards.Any(card => card.canAttack()))
                 {
