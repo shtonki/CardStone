@@ -71,6 +71,12 @@ namespace stonekart
                 {
                     return (@t => t.isCard && t.card.location.pile == LocationPile.STACK);
                 }
+
+                case FilterLambda.NONWHITE:
+                {
+                    return (@t => t.isCard && t.card.colour != Colour.WHITE);
+                }
+
                 default:
                     throw new Exception();
             }
@@ -221,12 +227,12 @@ namespace stonekart
                 }
                 break;
 
-
                 default:
                 {
                     throw new Exception("xd");
                 } break;
             }
+            targets = targets.Where(t => filter(t)).ToArray();
         }
         public override bool check(Target[] ts)
         {
@@ -238,6 +244,7 @@ namespace stonekart
     {
         private TargetRule showCardsTo;
         private TargetRule takePileFrom;
+        private TargetRule xd;
         private Func<Player, Card[]> selectCards;
         private int cardCount;
 
@@ -247,17 +254,18 @@ namespace stonekart
             this.takePileFrom = takePileFrom;
             this.selectCards = selectCards;
             this.cardCount = cardCount;
-            if (showCardsTo is Forcable) throw new Exception();
+            if (takePileFrom is Forcable) xd = takePileFrom;
+            if (showCardsTo is Forcable) xd = showCardsTo;
         }
 
         public void forceTargets(Target[] ts)
         {
-            (takePileFrom as Forcable)?.forceTargets(ts);
+            (xd as Forcable)?.forceTargets(ts);
         }
 
         public override Target[] resolveCastTargets(GameInterface ginterface, GameState gstate, bool cancellable)
         {
-            return takePileFrom.resolveCastTargets(ginterface, gstate, cancellable);
+            return xd?.resolveCastTargets(ginterface, gstate, cancellable);
         }
 
         public override void resolveResolveTargets(GameInterface ginterface, GameState gstate, Card resolving, Target[] last)
@@ -309,6 +317,8 @@ namespace stonekart
         ONFIELD,
         ONSTACK,
         INHAND,
+
+        NONWHITE,
         //ZAPPABLECREATURE, 
     }
 

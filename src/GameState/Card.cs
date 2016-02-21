@@ -542,8 +542,7 @@ namespace stonekart
                     greyCost = 1;
                     cardType = CardType.Sorcery;
                     castDescription = "Deal 3 damage to all creatures.";
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 3, crd => true));
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 3, crd => true));
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3));
                 } break;
                 #endregion
                 #region FuryOfTheRighteous
@@ -554,8 +553,7 @@ namespace stonekart
                     greyCost = 2;
                     cardType = CardType.Sorcery;
                     castDescription = "Deal 2 damage to all non-white creatures";
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.OPPONENT), 2, crd => crd.colour != Colour.WHITE));
-                    fx.Add(new Pyro(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2, crd => crd.colour != Colour.WHITE));
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES, FilterLambda.NONWHITE), 2));
                 } break;
                 #endregion
                 #region Extinguish
@@ -839,6 +837,35 @@ namespace stonekart
                     cardType = CardType.Sorcery;
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
                     castDescription = "As an additional cost to cast this card sacrifice a creature.\nDraw 2 cards.";
+                } break;
+                #endregion
+                #region Spark
+                case CardId.Spark:
+                {
+                    redCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2));
+                    castDescription = "Deal 2 damage to target creature or player.";
+                } break;
+                #endregion
+                #region MaleficentSpirit:
+                case CardId.MaleficentSpirit:
+                {
+                    blackCost = 2;
+                    greyCost = 2;
+                    basePower = 3;
+                    baseToughness = 2;
+                    cardType = CardType.Creature;
+                    triggeredAbilities.Add(new TriggeredAbility(this,
+                        thisETB(this),
+                        thisETBDescription + "target player discards a card",
+                        LocationPile.FIELD, 
+                        EventTiming.Post,
+                        new Effect(new MoveTo(new SelectFromTargetRule(
+                            new FilterTargetRule(1, FilterLambda.PLAYER),
+                            new ResolveTargetRule(ResolveTarget.LAST), 
+                            p => p.hand.cards.ToArray()), LocationPile.GRAVEYARD)) 
+                        ));
                 } break;
                 #endregion
                 case CardId.X:
@@ -1247,6 +1274,9 @@ namespace stonekart
             rarities[(int)CardId.RockhandOgre] = Rarity.Common;
             rarities[(int)CardId.GrazingBison] = Rarity.Common;
             rarities[(int)CardId.SebasGambit] = Rarity.Ebin;
+            rarities[(int)CardId.Spark] = Rarity.Common;
+            rarities[(int)CardId.AberrantSacrifice] = Rarity.Uncommon;
+            rarities[(int)CardId.MaleficentSpirit] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1303,6 +1333,8 @@ namespace stonekart
         GrazingBison,
         SebasGambit,
         AberrantSacrifice,
+        Spark,
+        MaleficentSpirit,
         X,
     }
     public enum CardType

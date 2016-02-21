@@ -337,31 +337,4 @@ namespace stonekart
             return r;
         }
     }
-
-    public class Pyro : SubEffect
-    {
-        private int damage;
-        private Func<Card, bool> cardFilter;
-
-        public Pyro(TargetRule t, int damage, Func<Card, bool> cardFilter) : base(t)
-        {
-            this.damage = damage;
-            this.cardFilter = cardFilter;
-        }
-
-        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
-        {
-            Player p = t.player;
-            List<GameEvent> r = new List<GameEvent>(p.field.count);
-
-            foreach (Card c in p.field.cards)
-            {
-                if (c.hasPT() && cardFilter(c))
-                {
-                    r.Add(new DamageCreatureEvent(c, resolvingCard, damage));
-                }
-            }
-            return r.ToArray();
-        }
-    }
 }

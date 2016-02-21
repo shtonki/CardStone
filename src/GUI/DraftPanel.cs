@@ -21,12 +21,18 @@ namespace stonekart
             BackColor = Color.DodgerBlue;
 
             cards = new Pile(new Card[0]);
-            choices = new CardPanel(() => new CardButton(), new LayoutArgs(false, false), cards);
+            choices = new CardPanel(() => new CardButton(new FML(clicked
+                )), new LayoutArgs(false, false), cards);
             Controls.Add(choices);
 
             dealEm = new Button();
             dealEm.Click += (_, __) => dealm();
             Controls.Add(dealEm);
+        }
+
+        private void clicked(CardButton b)
+        {
+            //b.Card.attacking = !b.Card.attacking;
         }
 
         private void dealm()
