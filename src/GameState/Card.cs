@@ -112,7 +112,7 @@ namespace stonekart
         public bool canDefend => location.pile == LocationPile.FIELD && !exhausted;
         public bool isCreature => cardType == CardType.Creature;
         public bool isDummy => dummyFor != null;
-        public bool canExhaust => !exhausted && !_summoningSick;
+        public bool canExhaust => !exhausted && !summoningSick;
         public Ability dummyFor { get; private set; }
         public readonly bool isExperimental;
 
@@ -899,11 +899,11 @@ namespace stonekart
                     whiteCost = 2;
                     cardType = CardType.Relic;
                     activatedAbilities.Add(new ActivatedAbility(this,
-                        new Cost(new MoveToCost(LocationPile.GRAVEYARD, LocationPile.EXILE, 1)),
+                        new Cost(new ManaCost(1, 0, 1, 0, 0, 0), new MoveToCost(LocationPile.GRAVEYARD, LocationPile.EXILE, 1), new ExhaustCost(this)),
                         new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Spirit)),
                         true,
                         LocationPile.FIELD, 
-                        "E, Exile a card from your graveyard: Summon a Spirit token."
+                        "E, BW, Exile a card from your graveyard: Summon a Spirit token."
                         ));
                 } break;
                 #endregion
@@ -1314,6 +1314,7 @@ namespace stonekart
             rarities[(int)CardId.AberrantSacrifice] = Rarity.Uncommon;
             rarities[(int)CardId.MaleficentSpirit] = Rarity.Common;
             rarities[(int)CardId.Bubastis] = Rarity.Legendair;
+            rarities[(int)CardId.HauntedChapel] = Rarity.Ebin;
         }
     }
     public enum CardId
