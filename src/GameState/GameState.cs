@@ -54,6 +54,12 @@ namespace stonekart
             return cardFactory.getCardById(i);
         }
 
+        public void clearBonusMana()
+        {
+            hero.clearBonusMana();
+            villain.clearBonusMana();
+        }
+
         public void advanceStep()
         {
             currentStep = (Step)(((int)currentStep + 1) % (Enum.GetNames(typeof(Step))).Count());

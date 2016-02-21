@@ -29,6 +29,7 @@ namespace stonekart
         SHUFFLEDECK,
         COUNTERSPELL,
         EXHAUST,
+        GAINBONUSMANA,
     }
 
     /// <summary>
@@ -43,6 +44,16 @@ namespace stonekart
             this.type = type;
         }
         
+    }
+
+    class GainBonusManaEvent : PlayerEvent
+    {
+        public Colour colour { get; private set; }
+
+        public GainBonusManaEvent(Player plr, Colour colour) : base(plr, GameEventType.GAINBONUSMANA)
+        {
+            this.colour = colour;
+        }
     }
 
     class DrawEvent : PlayerEvent

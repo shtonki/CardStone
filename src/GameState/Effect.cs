@@ -108,6 +108,26 @@ namespace stonekart
         abstract protected GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard);
     }
 
+    public class GainBonusMana : SubEffect
+    {
+        private Colour[] colours;
+
+        public GainBonusMana(TargetRule t, params Colour[] colours) : base(t)
+        {
+            this.colours = colours;
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
+        {
+            GameEvent[] r = new GameEvent[colours.Length];
+            for (int i = 0; i < r.Length; i++)
+            {
+                r[i] = new GainBonusManaEvent(t.player, colours[i]);
+            }
+            return r;
+        }
+    }
+
     public class Exhaust : SubEffect
     {
         public Exhaust(TargetRule t) : base(t)

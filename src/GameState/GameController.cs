@@ -152,6 +152,7 @@ namespace stonekart
             addBaseHandler(GameEventType.SHUFFLEDECK, _shuffle);
             addBaseHandler(GameEventType.COUNTERSPELL, _counterspell);
             addBaseHandler(GameEventType.EXHAUST, _exhaust);
+            addBaseHandler(GameEventType.GAINBONUSMANA, _gainbonusmana);
         }
 
         private void addBaseHandler(GameEventType t, EventAction a)
@@ -159,6 +160,11 @@ namespace stonekart
             baseEventHandlers[(int)t] = new EventHandler(t, a);
         }
 
+        private void _gainbonusmana(GameEvent gevent)
+        {
+            GainBonusManaEvent e = (GainBonusManaEvent)gevent;
+            e.player.addBonusMana(e.colour, 1);
+        }
         private void _exhaust(GameEvent gevent)
         {
             ExhaustEvent e = (ExhaustEvent)gevent;
@@ -339,6 +345,7 @@ namespace stonekart
                 {
                     givePriorityx(game.currentStep == Step.MAIN1 || game.currentStep == Step.MAIN2);
                 }
+                game.clearBonusMana();
                 game.advanceStep();
             }
         }

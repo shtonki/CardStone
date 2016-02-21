@@ -11,7 +11,7 @@ namespace stonekart
     {
         public LocationPlayer side { get; private set; }
         public bool isHero => side == LocationPlayer.HERO;
-        public int totalMana => curMana.Sum(@v => v);
+        public int totalMana => curMana.Sum() + bonusMana.Sum();
         public Player opponent => isHero ? gameState.villain : gameState.hero;
 
         //todo(seba) move all these to props
@@ -41,6 +41,7 @@ namespace stonekart
 
             curMana = new int[5];
             maxMana = new int[5];
+            bonusMana = new int[5];
 
             health = 20;
         }
@@ -53,9 +54,9 @@ namespace stonekart
             notifyObservers();
         }
         
-        public int getCurrentMana(int color)
+        public int getCurrentMana(int colour)
         {
-            return curMana[color];
+            return curMana[colour] + bonusMana[colour];
         }
 
         public int getMaxMana(int color)
@@ -82,6 +83,11 @@ namespace stonekart
 
         public void spendMana(int color, int amount)
         {
+            while (bonusMana[color] > 0 && amount > 0)
+            {
+                bonusMana[color]--;
+                amount--;
+            }
             curMana[color] -= amount;
             notifyObservers();
         }
@@ -90,12 +96,23 @@ namespace stonekart
         {
             foreach (var v in i)
             {
-                curMana[v]--;
+                spendMana(v, 1);
             }
-
-            notifyObservers();
         }
 
+        public void addBonusMana(Colour colour, int amount)
+        {
+            bonusMana[(int)colour] += amount;
+        }
+
+        public void clearBonusMana()
+        {
+            for (int i = 0; i < bonusMana.Length; i++)
+            {
+                bonusMana[i] = 0;
+            }
+            notifyObservers();
+        }
 
         public void resetMana()
         {

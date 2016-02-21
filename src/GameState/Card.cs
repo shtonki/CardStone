@@ -888,7 +888,7 @@ namespace stonekart
                         basePower = 3;
 
                         keyAbilities.Add(KeyAbility.Fervor);
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.DRAW),
+                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.UNTOP),
                             "Opponent discards card every time he/she draws a card in the draw event",
                             LocationPile.FIELD, EventTiming.Post,
                             new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
@@ -1077,6 +1077,15 @@ namespace stonekart
                     forceColour = Colour.WHITE;
                     basePower = 1;
                     baseToughness = 1;
+                } break;
+                #endregion
+                #region OneWithNature
+                case CardId.OneWithNature:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Sorcery;
+                    fx.Add(new GainBonusMana(new ResolveTargetRule(ResolveTarget.CONTROLLER), Colour.GREEN, Colour.GREEN, Colour.GREEN));
+                    castDescription = "Add GGG until end of step";
                 } break;
                 #endregion
                 #region default
@@ -1543,6 +1552,7 @@ namespace stonekart
         SebasLament,
         IlatianFlutePlayer,
         Skeltal,
+        OneWithNature
         //Meseeks, duplicate at end of turn instead?
         //IlasBox,
 
