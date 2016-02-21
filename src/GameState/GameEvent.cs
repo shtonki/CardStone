@@ -28,6 +28,7 @@ namespace stonekart
         MODIFYCARD,
         SHUFFLEDECK,
         COUNTERSPELL,
+        EXHAUST,
     }
 
     /// <summary>
@@ -173,9 +174,17 @@ namespace stonekart
         }
     }
 
+
     class CounterSpellEvent : CardEvent
     {
         public CounterSpellEvent(Card c) : base(c, GameEventType.COUNTERSPELL)
+        {
+        }
+    }
+
+    class ExhaustEvent : CardEvent
+    {
+        public ExhaustEvent(Card card) : base(card, GameEventType.EXHAUST)
         {
         }
     }

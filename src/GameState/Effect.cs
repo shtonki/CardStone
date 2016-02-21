@@ -107,7 +107,19 @@ namespace stonekart
 
         abstract protected GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard);
     }
-    
+
+    public class Exhaust : SubEffect
+    {
+        public Exhaust(TargetRule t) : base(t)
+        {
+        }
+
+        protected override GameEvent[] resolve(GameInterface ginterface, Target t, Card resolvingCard)
+        {
+            Card c = t.card;
+            return new[] {new ExhaustEvent(c)};
+        }
+    }
 
     public class Timelapse : SubEffect
     {
