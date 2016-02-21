@@ -1088,6 +1088,34 @@ namespace stonekart
                     castDescription = "Add GGG until end of step.";
                 } break;
                 #endregion
+                #region MysteriousLilac
+                case CardId.MysteriousLilac:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Relic;
+                        triggeredAbilities.Add(new TriggeredAbility(this,
+                            thisETB(this),
+                            thisETBDescription + "draw 1 card.",
+                            LocationPile.FIELD, 
+                            EventTiming.Post,
+                            new Effect(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1))
+                            ));
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new ManaCost(0, 0, 0, 0, 0, 2)),
+                        new Effect(new GainBonusMana(new ResolveTargetRule(ResolveTarget.CONTROLLER), Colour.BLUE)),
+                        true,
+                        LocationPile.FIELD,
+                        "2: Gain U until end of step."
+                        ));
+                } break;
+                #endregion
+                case CardId.Overgrow:
+                {
+                    greenCost = 2;
+                    cardType = CardType.Instant;
+                    fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.RELIC, FilterLambda.ONFIELD), LocationPile.GRAVEYARD));
+                    castDescription = "Destroy target relic";
+                } break;
                 #region default
                 default:
                     {
@@ -1489,6 +1517,8 @@ namespace stonekart
             rarities[(int)CardId.HauntedChapel] = Rarity.Ebin;
             rarities[(int)CardId.Spirit] = Rarity.Token;
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
+            rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
+            rarities[(int)CardId.Overgrow] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1553,7 +1583,9 @@ namespace stonekart
         SebasLament,
         IlatianFlutePlayer,
         Skeltal,
-        OneWithNature
+        OneWithNature,
+        MysteriousLilac,
+        Overgrow,
         //Meseeks, duplicate at end of turn instead?
         //IlasBox,
 

@@ -58,6 +58,13 @@ namespace stonekart
                     {
                         return (@t => t.isCard && t.card.getType() == CardType.Creature);
                     } break;
+
+                case FilterLambda.RELIC:
+                    {
+                        return (@t => t.isCard && t.card.getType() == CardType.Relic);
+                    }
+                    break;
+
                 case FilterLambda.ONFIELD:
                     {
                         return (@t => t.isCard && !t.isPlayer && t.card.location.pile == LocationPile.FIELD);
@@ -313,7 +320,9 @@ namespace stonekart
         ANY,
         PLAYER,
         CREATURE,
+        RELIC,
         ZAPPABLE,
+
         ONFIELD,
         ONSTACK,
         INHAND,

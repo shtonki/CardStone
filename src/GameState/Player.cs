@@ -103,6 +103,7 @@ namespace stonekart
         public void addBonusMana(Colour colour, int amount)
         {
             bonusMana[(int)colour] += amount;
+            notifyObservers();
         }
 
         public void clearBonusMana()
