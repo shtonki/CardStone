@@ -1128,6 +1128,20 @@ namespace stonekart
                     }
                     break;
                 #endregion
+                case CardId.ElvenDruid:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 1;
+                    baseToughness = 1;
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new ExhaustCost(this)),
+                        new Effect(new GainBonusMana(new ResolveTargetRule(ResolveTarget.CONTROLLER), Colour.GREEN)),
+                        true,
+                        LocationPile.FIELD, 
+                        "E: Gain G until end of step." 
+                        ));
+                } break;
                 #region default
                 default:
                     {
@@ -1531,6 +1545,7 @@ namespace stonekart
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
+            rarities[(int)CardId.ElvenDruid] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1599,6 +1614,7 @@ namespace stonekart
         MysteriousLilac,
         Overgrow,
         Abolish,
+        ElvenDruid,
     }
     public enum CardType
     {
