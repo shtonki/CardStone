@@ -794,18 +794,19 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region SumHyenas
-                case CardId.SumHyenas:
-                    {
-                        greenCost = 1;
-                        cardType = CardType.Instant;
-                        fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Hyena, CardId.Hyena));
-                        castDescription = "Summon two hyenas. Grants +1/+1 to all other hyenas.";
-                    }
-                    break;
+                #region HourOfTheWolf
+                case CardId.HourOfTheWolf:
+                {
+                    name = "Hour of the Wolf";
+                    greenCost = 3;
+                    greyCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Wolf, CardId.Wolf));
+                    castDescription = "Summon two wolves. Wolves grant +1/+1 to all other wolves.";
+                } break;
                 #endregion
-                #region Hyena
-                case CardId.Hyena:
+                #region Wolf
+                case CardId.Wolf:
                     {
                         cardType = CardType.Creature;
                         isToken = true;
@@ -813,17 +814,38 @@ namespace stonekart
                         basePower = 2;
                         forceColour = Colour.GREEN;
                         Aura a = new Aura(
-                            (crd) => crd.cardId == CardId.Hyena && crd != this,
+                            (crd) => crd.cardId == CardId.Wolf && crd != this,
                             Modifiable.Power, 1,
-                            "Other hyenas get +1/+1");
+                            "Other wolves get +1/+1");
                         Aura aa = new Aura(
-                            (crd) => crd.cardId == CardId.Hyena && crd != this,
+                            (crd) => crd.cardId == CardId.Wolf && crd != this,
                             Modifiable.Toughness, 1,
                             "");
                         auras.Add(a);
                         auras.Add(aa);
                     }
                     break;
+                #endregion
+                #region LoneWolf
+                case CardId.LoneWolf:
+                {
+                    name = "Lone Wolf";
+                    greenCost = 3;
+                    baseToughness = 2;
+                    basePower = 2;
+                    cardType = CardType.Creature;
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) gevent;
+                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
+                               && mevent.card.cardId == CardId.Wolf && mevent.card.owner == controller;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly wolf dies this creature gains +1/+1",
+                        LocationPile.FIELD, EventTiming.Post, new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)));
+                }
+                break;
                 #endregion
                 #region GrazingBison
                 case CardId.GrazingBison:
@@ -897,35 +919,33 @@ namespace stonekart
                 #endregion
                 #region Reaper
                 case CardId.Reaper:
+                {
+                    cardType = CardType.Creature;
+                    blueCost = 1;
+                    baseToughness = 3;
+                    basePower = 3;
+                    EventFilter f = (gevent) =>
                     {
-                        cardType = CardType.Creature;
-                        blueCost = 1;
-                        baseToughness = 3;
-                        basePower = 3;
-                        EventFilter f = (gevent) =>
-                        {
-                            if (gevent.type != GameEventType.MOVECARD) return false;
-                            MoveCardEvent mevent = (MoveCardEvent)gevent;
-                            return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD &&
-                                   mevent.card == DefenderOf;
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f,
-                            "When this creature kills a creature, mill 1 card from opponent. Draw 1 card.",
-                            LocationPile.FIELD, EventTiming.Post,
-                            new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1),
-                            new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
-                    }
-                    break;
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent)gevent;
+                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD &&
+                                mevent.card == DefenderOf;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f,
+                        "When this creature kills a creature, mill 1 card from opponent. Draw 1 card.",
+                        LocationPile.FIELD, EventTiming.Post,
+                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1),
+                        new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
+                } break;
                 #endregion
-                #region DoubleEdgedCock
-                case CardId.DoubleEdgedCock:
-                    {
-                        blueCost = 1;
-                        cardType = CardType.Sorcery;
-                        fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 3));
-                        fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
-                    }
-                    break;
+                #region AlterFate
+                case CardId.AlterFate:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Sorcery;
+                    fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
+                    fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
+                } break;
                 #endregion
                 #region SebasLament
                 case CardId.SebasLament:
@@ -1521,6 +1541,10 @@ namespace stonekart
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
+            rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
+            rarities[(int)CardId.HourOfTheWolf] = Rarity.Ebin;
+            rarities[(int)CardId.Wolf] = Rarity.Token;
+            rarities[(int)CardId.LoneWolf] = Rarity.Uncommon;
         }
     }
     public enum CardId
@@ -1568,8 +1592,9 @@ namespace stonekart
         VikingMushroom,
         BelwasGambit,
         GreenFourDropThatDoesCoolShit,
-        SumHyenas,
-        Hyena,
+        LoneWolf,
+        Wolf,
+        HourOfTheWolf,
         RockhandOgre,
         GrazingBison,
         SebasGambit,
@@ -1581,7 +1606,7 @@ namespace stonekart
         Spirit,
         JasinsDrunkenCard,
         Reaper,
-        DoubleEdgedCock,
+        AlterFate,
         SebasLament,
         IlatianFlutePlayer,
         Skeltal,
