@@ -120,7 +120,7 @@ namespace stonekart
                 WaitFor<string> w = new WaitFor<string>();
                 DeckEditorPanel.loadDeckFromFile((s) => w.signal(s));
                 CardId[] ids = DeckEditorPanel.loadDeck(w.wait()).ToArray();
-                if (true || gameInterface.connection is DummyConnection || DeckEditorPanel.deckVerificationThing(ids)) return ids;
+                if (gameInterface.connection is DummyConnection || DeckEditorPanel.deckVerificationThing(ids)) return ids;
             }
         }
 
