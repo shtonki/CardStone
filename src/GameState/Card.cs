@@ -508,36 +508,6 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region ProtectiveSow
-                //todo seba: PHRASING
-                case CardId.ProtectiveSow: //todo fixa så att det bara kortet som summade cubsen dör och inte alla sows dör. och vise versa. Och översätt denna texten till engelska så att seba inte blir arg
-                    {
-                        name = "Protective Sow";
-                        greenCost = 1;
-                        cardType = CardType.Creature;
-                        basePower = 2;
-                        baseToughness = 4;
-                        triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + " summon two cubs. If a cub dies: give +2/0 to this card. If this card dies: cubs die.",
-                            LocationPile.FIELD, EventTiming.Post, () => true, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Cub, CardId.Cub)));
-                        //add kill cubs deathrattle thingy
-                    }
-                    break;
-                #endregion
-                #region Cub
-                case CardId.Cub:
-                    {
-                        cardType = CardType.Creature;
-                        //cardType = CardType.Token;
-                        forceColour = Colour.GREEN;
-                        baseToughness = 1;
-                        basePower = 1;
-
-                        //todo jaseba: fix my targetrule, so that it actually targets protective sow and now whatever its targeting right now
-                        triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this), thisDiesDescription + " give +2/0 to protective sow.",
-                                LocationPile.GRAVEYARD, EventTiming.Post, () => owner.field.cards.All(sow => sow.cardId == CardId.ProtectiveSow), new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Power, never, 2)));//new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
-                    }
-                    break;
-                #endregion
                 #region RiderOfDeath
                 case CardId.RiderOfDeath:
                     {
@@ -601,17 +571,6 @@ namespace stonekart
                         castDescription = "Kill target creature.";
                         flavourText = "Be gone!";
                         fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD));
-                    }
-                    break;
-                #endregion
-                #region VikingMushroom
-                case CardId.VikingMushroom: //todo: seba review
-                    {
-                        redCost = 2;
-                        cardType = CardType.Sorcery;
-                        castDescription = "Give target creature Fervor and +2/+0, deal 1 damage to it.";
-                        fx.Add(new ModifyUntil(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), Modifiable.Power, never, 2));
-                        fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.LAST), 1));
                     }
                     break;
                 #endregion
@@ -781,72 +740,7 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region GreenFourDropThatDoesCoolShit
-                //todo balance and name and stuff and flavor and stuff
-                case CardId.GreenFourDropThatDoesCoolShit:
-                    {
-                        greenCost = 1;
-                        cardType = CardType.Creature;
-                        triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
-                            thisETBDescription + " heal target creature for 3hp",
-                            LocationPile.FIELD, EventTiming.Post,
-                            new Ping(new FilterTargetRule(1, FilterLambda.ONFIELD), -3)));
-                    }
-                    break;
-                #endregion
-                #region HourOfTheWolf
-                case CardId.HourOfTheWolf:
-                {
-                    name = "Hour of the Wolf";
-                    greenCost = 3;
-                    greyCost = 1;
                     cardType = CardType.Sorcery;
-                    fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Wolf, CardId.Wolf));
-                    castDescription = "Summon two wolves. Wolves grant +1/+1 to all other wolves.";
-                } break;
-                #endregion
-                #region Wolf
-                case CardId.Wolf:
-                    {
-                        cardType = CardType.Creature;
-                        isToken = true;
-                        baseToughness = 2;
-                        basePower = 2;
-                        forceColour = Colour.GREEN;
-                        Aura a = new Aura(
-                            (crd) => crd.cardId == CardId.Wolf && crd != this,
-                            Modifiable.Power, 1,
-                            "Other wolves get +1/+1");
-                        Aura aa = new Aura(
-                            (crd) => crd.cardId == CardId.Wolf && crd != this,
-                            Modifiable.Toughness, 1,
-                            "");
-                        auras.Add(a);
-                        auras.Add(aa);
-                    }
-                    break;
-                #endregion
-                #region LoneWolf
-                case CardId.LoneWolf:
-                {
-                    name = "Lone Wolf";
-                    greenCost = 3;
-                    baseToughness = 2;
-                    basePower = 2;
-                    cardType = CardType.Creature;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent) gevent;
-                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                               && mevent.card.cardId == CardId.Wolf && mevent.card.owner == controller;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly wolf dies this creature gains +1/+1",
-                        LocationPile.FIELD, EventTiming.Post, new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)));
-                }
-                break;
-                #endregion
                 #region GrazingBison
                 case CardId.GrazingBison:
                     {
@@ -900,44 +794,6 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region JasinsDrunkenCard
-                case CardId.JasinsDrunkenCard:
-                    {
-                        name = "Jasin's Drunken Card";
-                        cardType = CardType.Creature;
-                        blackCost = 1;
-                        baseToughness = 3;
-                        basePower = 3;
-
-                        keyAbilities.Add(KeyAbility.Fervor);
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.UNTOP),
-                            "Opponent discards card every time he/she draws a card in the draw event",
-                            LocationPile.FIELD, EventTiming.Post,
-                            new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
-                    }
-                    break;
-                #endregion
-                #region Reaper
-                case CardId.Reaper:
-                {
-                    cardType = CardType.Creature;
-                    blueCost = 1;
-                    baseToughness = 3;
-                    basePower = 3;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent)gevent;
-                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD &&
-                                mevent.card == DefenderOf;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f,
-                        "When this creature kills a creature, mill 1 card from opponent. Draw 1 card.",
-                        LocationPile.FIELD, EventTiming.Post,
-                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1),
-                        new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
-                } break;
-                #endregion
                 #region AlterFate
                 case CardId.AlterFate:
                 {
@@ -946,78 +802,6 @@ namespace stonekart
                     fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
                 } break;
-                #endregion
-                #region SebasLament
-                case CardId.SebasLament:
-                    {
-                        cardType = CardType.Creature;
-                        blueCost = 1;
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END),
-                            "At the end of turn, realise you forgot the towel and reshuffle into deck.",
-                            LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.DECK)));
-                    }
-                    break;
-                #endregion
-                #region Meseeks
-                /* fix resolvetarget.last to the summoned creature
-                case CardId.Meseeks:
-                {
-                    blackCost = 1;
-                    baseToughness = 3;
-                    basePower = 3;
-                    cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,1,0,0,0)), 
-                        new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.SELF), cardId),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST),Modifiable.Power, never, 
-                         currentPower),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never,
-                         currentToughness)),
-                        true, LocationPile.FIELD, "2BB: place copy of this card on your field."));
-                } break;
-                */
-                #endregion
-                #region IlasBox
-                /*
-                case CardId.IlasBox: //make active?
-                {
-                    blackCost = 5;
-                    cardType = CardType.Relic;
-
-                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END),
-                        "Take last owned creature that died from graveyard and put in field", 
-                        LocationPile.FIELD, EventTiming.Post, new MoveTo(new , )));
-                } break;
-                */
-                #endregion
-                #region IlatianFlutePlayer
-                case CardId.IlatianFlutePlayer:
-                    {
-                        blackCost = 1;
-                        cardType = CardType.Creature;
-                        baseToughness = 1;
-                        basePower = 2;
-                        EventFilter f = (gevent) =>
-                        {
-                            if (gevent.type != GameEventType.MOVECARD) return false;
-                            MoveCardEvent mevent = (MoveCardEvent)gevent;
-                            return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                   && mevent.card.owner == controller && mevent.card.hasPT();
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
-                            LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
-                    }
-                    break;
-                #endregion
-                #region Skeltal
-                case CardId.Skeltal:
-                    {
-                        cardType = CardType.Creature;
-                        isToken = true;
-                        baseToughness = 1;
-                        basePower = 1;
-                        forceColour = Colour.BLACK;
-                    }
-                    break;
                 #endregion
                 #region AberrantSacrifice
                 case CardId.AberrantSacrifice:
@@ -1565,10 +1349,7 @@ namespace stonekart
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
-            rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
-            rarities[(int)CardId.HourOfTheWolf] = Rarity.Ebin;
-            rarities[(int)CardId.Wolf] = Rarity.Token;
-            rarities[(int)CardId.LoneWolf] = Rarity.Uncommon;
+            rarities[(int)CardId.AlterFate] = Rarity.Common;
         }
     }
     public enum CardId
@@ -1610,15 +1391,8 @@ namespace stonekart
         ElderTreeant,
         Counterspell,
         Infiltrator,
-        ProtectiveSow,
-        Cub,
         IlatianWineMerchant,
-        VikingMushroom,
         BelwasGambit,
-        GreenFourDropThatDoesCoolShit,
-        LoneWolf,
-        Wolf,
-        HourOfTheWolf,
         RockhandOgre,
         GrazingBison,
         SebasGambit,
@@ -1628,17 +1402,12 @@ namespace stonekart
         Bubastis,
         HauntedChapel,
         Spirit,
-        JasinsDrunkenCard,
-        Reaper,
-        AlterFate,
-        SebasLament,
-        IlatianFlutePlayer,
-        Skeltal,
         OneWithNature,
         MysteriousLilac,
         Overgrow,
         Abolish,
         ElvenDruid,
+        AlterFate,
     }
     public enum CardType
     {
