@@ -269,7 +269,7 @@ namespace stonekart
                 xd.Text = name;
                 xd.Location = new Point(X, Y);
                 Y += xd.Height;
-                if (c%5 == 0)
+                if (c%8 == 0)
                 {
                     X += 80;
                     Y = 0;
@@ -404,6 +404,7 @@ namespace stonekart
                 if (myDeckIsHard[i].cardId == id)
                 {
                     myDeckIsHard.remove(myDeckIsHard[i]);
+                    cardCount.Text = "Count: " + myDeckIsHard.count;
                     return true;
                 }
             }
