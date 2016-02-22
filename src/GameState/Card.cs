@@ -800,7 +800,7 @@ namespace stonekart
                     name = "Hour of the Wolf";
                     greenCost = 3;
                     greyCost = 1;
-                    cardType = CardType.Instant;
+                    cardType = CardType.Sorcery;
                     fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Wolf, CardId.Wolf));
                     castDescription = "Summon two wolves. Wolves grant +1/+1 to all other wolves.";
                 } break;
