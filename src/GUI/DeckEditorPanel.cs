@@ -172,7 +172,6 @@ namespace stonekart
                 Controls.Add(sortButtons[i]);
             }
 
-            
 
             tb = new TextBox();
             Controls.Add(cardCount);

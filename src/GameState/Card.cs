@@ -838,7 +838,7 @@ namespace stonekart
                     {
                         if (gevent.type != GameEventType.MOVECARD) return false;
                         MoveCardEvent mevent = (MoveCardEvent) gevent;
-                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
+                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
                                && mevent.card.cardId == CardId.Wolf && mevent.card.owner == controller;
                     };
                     triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly wolf dies this creature gains +1/+1",
@@ -1148,6 +1148,7 @@ namespace stonekart
                     }
                     break;
                 #endregion
+                #region ElvenDruid
                 case CardId.ElvenDruid:
                 {
                     greenCost = 1;
@@ -1162,14 +1163,63 @@ namespace stonekart
                         "E: Gain G until end of step." 
                         ));
                 } break;
+                #endregion
+                #region LoneRanger
+                case CardId.LoneRanger:
+                {
+                    //better if it isnt when summoned, instead it should be dynamic when no other creatures are on board?
+                    //filter doesn't account for relics on board
+                    blueCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 2;
+                    baseToughness = 2;
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) gevent;
+                        //ask seba why mevent.from.pile == Location.Hand doesnt work, even with the '?'
+                        return mevent.to.pile == LocationPile.FIELD && mevent.card.controller.field.count == 0;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, 
+                        "Gains +3/+3 if you have no creatures on board when summoned.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 3), 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 3)));
+                } break;
+                #endregion
+                #region SoothingRhapsode
+                case CardId.SoothingRhapsode:
+                {
+                    cardType = CardType.Creature;
+                    blueCost = 1;
+                    basePower = 2;
+                    baseToughness = 1;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), 
+                        "When Soothing Rhapsod enters the battlefield all creatures gets exhausted.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new Exhaust(new ResolveTargetRule(ResolveTarget.FIELDCREATURES))));
+                } break;
+                #endregion
+                #region Hypnotist
+                case CardId.Hypnotist:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 2;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)), 
+                        new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.ONFIELD, FilterLambda.CREATURE))),
+                        true, LocationPile.FIELD, "E: Exhaust target creature."));
+                } break;
+                #endregion
                 #region default
                 default:
                     {
                         throw new Exception("pls no" + c.ToString());
                     }
-                    #endregion
+                #endregion
             }
-
+            #region idontknow
             if (basePower != null)
             {
                 power = new Modifiable<int>(add, sub);
@@ -1229,7 +1279,7 @@ namespace stonekart
                 colour = Colour.MULTI;
             }
         }
-
+        #endregion
 
 
         #region commonEventFilters
@@ -1566,9 +1616,6 @@ namespace stonekart
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
             rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
-            rarities[(int)CardId.HourOfTheWolf] = Rarity.Ebin;
-            rarities[(int)CardId.Wolf] = Rarity.Token;
-            rarities[(int)CardId.LoneWolf] = Rarity.Uncommon;
         }
     }
     public enum CardId
@@ -1639,6 +1686,9 @@ namespace stonekart
         Overgrow,
         Abolish,
         ElvenDruid,
+        LoneRanger,
+        SoothingRhapsode,
+        Hypnotist,
     }
     public enum CardType
     {
