@@ -84,6 +84,11 @@ namespace stonekart
                     return (@t => t.isCard && t.card.colour != Colour.WHITE);
                 }
 
+                case FilterLambda.EXHAUSTED:
+                {
+                    return (t => t.isCard && t.card.exhausted);
+                }
+
                 default:
                     throw new Exception();
             }
@@ -326,6 +331,8 @@ namespace stonekart
         ONFIELD,
         ONSTACK,
         INHAND,
+
+        EXHAUSTED,
 
         NONWHITE,
         //ZAPPABLECREATURE, 

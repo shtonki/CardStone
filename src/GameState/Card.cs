@@ -518,7 +518,7 @@ namespace stonekart
                         basePower = 5;
                         baseToughness = 4;
                         triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), thisETBDescription + "kill target creature.",
-                            LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND)));
+                            LocationPile.FIELD, EventTiming.Post, () => true, new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.GRAVEYARD)));
                     }
                     break;
                 #endregion
@@ -878,6 +878,7 @@ namespace stonekart
                 case CardId.Spirit:
                 {
                     isToken = true;
+                    keyAbilities.Add(KeyAbility.Flying);
                     forceColour = Colour.WHITE;
                     basePower = 1;
                     baseToughness = 1;
@@ -932,6 +933,7 @@ namespace stonekart
                     }
                     break;
                 #endregion
+                #region ElvenDruid
                 case CardId.ElvenDruid:
                 {
                     greenCost = 1;
@@ -946,6 +948,56 @@ namespace stonekart
                         "E: Gain G until end of step." 
                         ));
                 } break;
+                #endregion
+                #region ChromaticUnicorn
+                case CardId.ChromaticUnicorn:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 1;
+                    baseToughness = 1;
+                    auras.Add(new DynamicAura(crd => this == crd,
+                        Modifiable.Power, 
+                        () => owner.getMaxMana((int)Colour.RED) > 0 ? 2 : 0,
+                        "This creature gets +2/+0 as long as you have a red mana orb." 
+                        ));
+                    auras.Add(new DynamicAura(crd => this == crd,
+                        Modifiable.Toughness, 
+                        () => owner.getMaxMana((int)Colour.WHITE) > 0 ? 2 : 0,
+                        "This creature gets +0/+2 as long as you have a white mana orb."
+                        ));
+                    } break;
+                #endregion
+                #region Flamemane
+                case CardId.Flamemane:
+                {
+                    redCost = 3;
+                    greyCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 4;
+                    baseToughness = 4;
+                    keyAbilities.Add(KeyAbility.Flying);
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new ManaCost(0, 0, 0, 2, 0, 0)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 1)),
+                        true,
+                        LocationPile.FIELD, 
+                        "RR: Deal 1 damage to target creature or player."
+                        ));
+                } break;
+                #endregion
+                #region CoupDeGrace
+                case CardId.CoupDeGrace:
+                {
+                    whiteCost = 1;
+                    cardType = CardType.Instant;
+                    fx.Add(
+                        new MoveTo(
+                            new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD, FilterLambda.EXHAUSTED),
+                            LocationPile.GRAVEYARD));
+                    castDescription = "Destroy target exhausted creature.";
+                } break;
+                #endregion
                 #region default
                 default:
                     {
@@ -1349,7 +1401,12 @@ namespace stonekart
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
-            rarities[(int)CardId.AlterFate] = Rarity.Common;
+            //rarities[(int)CardId.AlterFate] = Rarity.Common;
+            rarities[(int)CardId.ElvenDruid] = Rarity.Common;
+            rarities[(int)CardId.ChromaticUnicorn] = Rarity.Uncommon;
+            rarities[(int)CardId.Flamemane] = Rarity.Uncommon;
+            rarities[(int)CardId.Abolish] = Rarity.Common;
+            rarities[(int)CardId.CoupDeGrace] = Rarity.Ebin;
         }
     }
     public enum CardId
@@ -1408,6 +1465,9 @@ namespace stonekart
         Abolish,
         ElvenDruid,
         AlterFate,
+        ChromaticUnicorn,
+        Flamemane,
+        CoupDeGrace,
     }
     public enum CardType
     {
@@ -1440,6 +1500,7 @@ namespace stonekart
     public enum KeyAbility
     {
         Fervor,
+        Flying,
     }
 
     public enum Modifiable

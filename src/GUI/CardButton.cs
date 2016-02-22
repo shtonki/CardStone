@@ -244,7 +244,7 @@ namespace stonekart
             TextLocationX =     (int)Math.Round(CardHeight * 0.075f);
             TextLocationY =     (int)Math.Round(CardHeight * 0.646428571428571f);
             TextWidth =         (int)Math.Round(CardHeight * 0.464285714285714f);
-            TextHeight =        (int)Math.Round(CardHeight * 0.192142857142857f);
+            TextHeight =        (int)Math.Round(CardHeight * 0.212142857142857f);
             ManaOrbLocationX =  (int)Math.Round(CardHeight * 0.55f);
             ManaOrbLocationY =  (int)Math.Round(CardHeight * 0.025f);
             ManaOrbSize =       (int)Math.Round(CardHeight * 0.0392857142857143f);
