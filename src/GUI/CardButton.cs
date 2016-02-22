@@ -199,6 +199,10 @@ namespace stonekart
             {
                 borderColor = Color.Red;
             }
+            else if (card.defenderOf != null)
+            {
+                borderColor = Color.Blue;
+            }
             else
             {
                 borderColor = null;
@@ -212,6 +216,10 @@ namespace stonekart
             }
 
             targets = card.stackWrapper?.targets ?? (IEnumerable<Target>)notahack;
+            if (card.defenderOf != null)
+            {
+                targets = targets.Concat(new [] {new Target(card.defenderOf)});
+            }
 
             Invalidate();
         }

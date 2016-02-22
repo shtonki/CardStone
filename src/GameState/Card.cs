@@ -1129,7 +1129,7 @@ namespace stonekart
                         ));
                 } break;
                 #endregion
-                #region OverGrow
+                #region Overgrow
                 case CardId.Overgrow:
                 {
                     greenCost = 2;
@@ -1138,6 +1138,30 @@ namespace stonekart
                     castDescription = "Destroy target relic";
                 } break;
                 #endregion
+                #region Abolish
+                case CardId.Abolish:
+                    {
+                        whiteCost = 2;
+                        cardType = CardType.Instant;
+                        fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.RELIC, FilterLambda.ONFIELD), LocationPile.GRAVEYARD));
+                        castDescription = "Destroy target relic";
+                    }
+                    break;
+                #endregion
+                case CardId.ElvenDruid:
+                {
+                    greenCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 1;
+                    baseToughness = 1;
+                    activatedAbilities.Add(new ActivatedAbility(this,
+                        new Cost(new ExhaustCost(this)),
+                        new Effect(new GainBonusMana(new ResolveTargetRule(ResolveTarget.CONTROLLER), Colour.GREEN)),
+                        true,
+                        LocationPile.FIELD, 
+                        "E: Gain G until end of step." 
+                        ));
+                } break;
                 #region default
                 default:
                     {
@@ -1510,7 +1534,7 @@ namespace stonekart
             rarities[(int)CardId.Unmake] = Rarity.Common;
             rarities[(int)CardId.EnragedDragon] = Rarity.Uncommon;
             rarities[(int)CardId.SteamBolt] = Rarity.Uncommon;
-            rarities[(int)CardId.IlasGravekeeper] = Rarity.Ebin;
+            rarities[(int)CardId.IlasGravekeeper] = Rarity.Uncommon;
             rarities[(int)CardId.FuryOfTheRighteous] = Rarity.Uncommon;
             rarities[(int)CardId.MeteorRain] = Rarity.Uncommon;
             rarities[(int)CardId.RiderOfDeath] = Rarity.Legendair;
@@ -1528,7 +1552,7 @@ namespace stonekart
             rarities[(int)CardId.ElderTreeant] = Rarity.Uncommon;
             rarities[(int)CardId.Counterspell] = Rarity.Common;
             rarities[(int)CardId.Infiltrator] = Rarity.Uncommon;
-            rarities[(int)CardId.IlatianWineMerchant] = Rarity.Uncommon;
+            rarities[(int)CardId.IlatianWineMerchant] = Rarity.Common;
             rarities[(int)CardId.RockhandOgre] = Rarity.Common;
             rarities[(int)CardId.GrazingBison] = Rarity.Uncommon;
             rarities[(int)CardId.SebasGambit] = Rarity.Ebin;
@@ -1613,9 +1637,8 @@ namespace stonekart
         OneWithNature,
         MysteriousLilac,
         Overgrow,
-        //Meseeks, duplicate at end of turn instead?
-        //IlasBox,
-
+        Abolish,
+        ElvenDruid,
     }
     public enum CardType
     {
