@@ -1129,9 +1129,10 @@ namespace stonekart
                         true, LocationPile.FIELD, "E: Exhaust target creature."));
                 } break;
                 #endregion
-                #region Pyromaster
-                case CardId.Pyromaster:
+                #region NerosDisciple
+                case CardId.NerosDisciple:
                 {
+                    name = "Nero's Disciple";
                     cardType = CardType.Creature;
                     baseToughness = 1;
                     basePower = 1;
@@ -1140,6 +1141,24 @@ namespace stonekart
                     activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
                         new Effect(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2)),
                         true, LocationPile.FIELD, "E: deal 2 damage to target creature or player"));
+                } break;
+                #endregion
+                #region Nero
+                case CardId.Nero:
+                {
+                    cardType = CardType.Creature;
+                    redCost = 6;
+                    baseToughness = 5;
+                    basePower = 2;
+                    //todo jasin: add destruction of relics.
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
+                        "When Nero enters the battlefield: deal 3 damage to all creatures and destroy all relics.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3)));
+                    
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.PLAYER), 4)), true,
+                        LocationPile.FIELD, "E: deal 4 damage to a player."));
                 } break;
                 #endregion
                 #region DecayingZombie
@@ -1632,8 +1651,9 @@ namespace stonekart
         LoneRanger,
         SoothingRhapsode,
         Hypnotist,
-        Pyromaster,
+        NerosDisciple,
         DecayingZombie,
+        Nero,
     }
     public enum CardType
     {
