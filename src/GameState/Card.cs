@@ -782,7 +782,6 @@ namespace stonekart
                     break;
                 #endregion
                 #region GreenFourDropThatDoesCoolShit
-                //todo balance and name and stuff and flavor and stuff
                 case CardId.GreenFourDropThatDoesCoolShit:
                     {
                         greenCost = 1;
@@ -1212,6 +1211,33 @@ namespace stonekart
                         true, LocationPile.FIELD, "E: Exhaust target creature."));
                 } break;
                 #endregion
+                #region Pyromaster
+                case CardId.Pyromaster:
+                {
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 1;
+                    redCost = 2;
+                    
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2)),
+                        true, LocationPile.FIELD, "E: deal 2 damage to target creature or player"));
+                } break;
+                #endregion
+                #region DecayingZombie
+                case CardId.DecayingZombie:
+                {
+                    cardType = CardType.Creature;
+                    blackCost = 1;
+                    basePower = 3;
+                    baseToughness = 3;
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 at end step",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
+                    race = Race.Zombie;
+                } break;
+                #endregion
                 #region default
                 default:
                     {
@@ -1339,16 +1365,18 @@ namespace stonekart
             };
         }
 
-        //todo add description
-        private static EventFilter stepFilter(Step step)
+        //todo enable specifying which players step (not just a bool)
+        private static EventFilter stepFilter(Step step, bool onlyOwner = false)
         {
             return @e =>
             {
                 if (e.type != GameEventType.STEP) return false;
                 StepEvent stepEvent = (StepEvent)e;
+                if (onlyOwner) return stepEvent.step == step && stepEvent.activePlayer.isHero;
                 return stepEvent.step == step;
             };
         }
+
 
         private const string timelapseReminder1 = "(Look at the top card of your deck, you may shuffle your deck)";
         private const string timelapseReminder2 = "(Look at the top two cards of your deck, you may shuffle your deck)";
@@ -1689,6 +1717,8 @@ namespace stonekart
         LoneRanger,
         SoothingRhapsode,
         Hypnotist,
+        Pyromaster,
+        DecayingZombie,
     }
     public enum CardType
     {

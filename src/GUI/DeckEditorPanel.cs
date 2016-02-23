@@ -255,6 +255,7 @@ namespace stonekart
         {
             var deckNames = Directory.GetFiles(".").Where(x => x.EndsWith(".jas")).Select(x => x.Substring(2)).ToArray();
             Panel deckAsker = new Panel();
+            
             deckAsker.Size = new Size(500, 200);
             //deckAsker.Location = new Point(Size.Width / 2, (Size.Height / 3) * 2);
             int Y = 0;
