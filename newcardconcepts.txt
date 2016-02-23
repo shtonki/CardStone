@@ -124,36 +124,7 @@ Meteor rain: deal 3 damage to all creatures on board and face
                 } break;
                 */
                 #endregion
-                #region IlatianFlutePlayer
-                case CardId.IlatianFlutePlayer:
-                    {
-                        blackCost = 1;
-                        cardType = CardType.Creature;
-                        baseToughness = 1;
-                        basePower = 2;
-                        EventFilter f = (gevent) =>
-                        {
-                            if (gevent.type != GameEventType.MOVECARD) return false;
-                            MoveCardEvent mevent = (MoveCardEvent)gevent;
-                            return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                   && mevent.card.owner == controller && mevent.card.hasPT();
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
-                            LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
-                    }
-                    break;
-                #endregion
-                #region Skeltal
-                case CardId.Skeltal:
-                    {
-                        cardType = CardType.Creature;
-                        isToken = true;
-                        baseToughness = 1;
-                        basePower = 1;
-                        forceColour = Colour.BLACK;
-                    }
-                    break;
-                #endregion
+
 
                 #region JasinsDrunkenCard
                 case CardId.JasinsDrunkenCard:

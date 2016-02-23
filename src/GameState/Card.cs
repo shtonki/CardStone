@@ -899,44 +899,6 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                #region JasinsDrunkenCard
-                case CardId.JasinsDrunkenCard:
-                    {
-                        name = "Jasin's Drunken Card";
-                        cardType = CardType.Creature;
-                        blackCost = 1;
-                        baseToughness = 3;
-                        basePower = 3;
-
-                        keyAbilities.Add(KeyAbility.Fervor);
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.UNTOP),
-                            "Opponent discards card every time he/she draws a card in the draw event",
-                            LocationPile.FIELD, EventTiming.Post,
-                            new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
-                    }
-                    break;
-                #endregion
-                #region Reaper
-                case CardId.Reaper:
-                {
-                    cardType = CardType.Creature;
-                    blueCost = 1;
-                    baseToughness = 3;
-                    basePower = 3;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent)gevent;
-                        return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD &&
-                                mevent.card == DefenderOf;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f,
-                        "When this creature kills a creature, mill 1 card from opponent. Draw 1 card.",
-                        LocationPile.FIELD, EventTiming.Post,
-                        new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 1),
-                        new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1)));
-                } break;
-                #endregion
                 #region AlterFate
                 case CardId.AlterFate:
                 {
@@ -945,78 +907,34 @@ namespace stonekart
                     fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
                 } break;
-                #endregion
-                #region SebasLament
-                case CardId.SebasLament:
-                    {
-                        cardType = CardType.Creature;
-                        blueCost = 1;
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END),
-                            "At the end of turn, realise you forgot the towel and reshuffle into deck.",
-                            LocationPile.FIELD, EventTiming.Post, new MoveTo(new ResolveTargetRule(ResolveTarget.SELF), LocationPile.DECK)));
-                    }
-                    break;
-                #endregion
-                #region Meseeks
-                /* fix resolvetarget.last to the summoned creature
-                case CardId.Meseeks:
-                {
-                    blackCost = 1;
-                    baseToughness = 3;
-                    basePower = 3;
-                    cardType = CardType.Creature;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,1,0,0,0)), 
-                        new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.SELF), cardId),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST),Modifiable.Power, never, 
-                         currentPower),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.LAST), Modifiable.Toughness, never,
-                         currentToughness)),
-                        true, LocationPile.FIELD, "2BB: place copy of this card on your field."));
-                } break;
-                */
-                #endregion
-                #region IlasBox
-                /*
-                case CardId.IlasBox: //make active?
-                {
-                    blackCost = 5;
-                    cardType = CardType.Relic;
-
-                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END),
-                        "Take last owned creature that died from graveyard and put in field", 
-                        LocationPile.FIELD, EventTiming.Post, new MoveTo(new , )));
-                } break;
-                */
-                #endregion
+                #endregion       
                 #region IlatianFlutePlayer
                 case CardId.IlatianFlutePlayer:
+                {
+                    blackCost = 1;
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 2;
+                    EventFilter f = (gevent) =>
                     {
-                        blackCost = 1;
-                        cardType = CardType.Creature;
-                        baseToughness = 1;
-                        basePower = 2;
-                        EventFilter f = (gevent) =>
-                        {
-                            if (gevent.type != GameEventType.MOVECARD) return false;
-                            MoveCardEvent mevent = (MoveCardEvent)gevent;
-                            return mevent.from.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                   && mevent.card.owner == controller && mevent.card.hasPT();
-                        };
-                        triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
-                            LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
-                    }
-                    break;
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent)gevent;
+                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
+                                && mevent.card.owner == controller && mevent.card.hasPT();
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
+                        LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
+                } break;
                 #endregion
                 #region Skeltal
                 case CardId.Skeltal:
-                    {
-                        cardType = CardType.Creature;
-                        isToken = true;
-                        baseToughness = 1;
-                        basePower = 1;
-                        forceColour = Colour.BLACK;
-                    }
-                    break;
+                {
+                    cardType = CardType.Creature;
+                    isToken = true;
+                    baseToughness = 1;
+                    basePower = 1;
+                    forceColour = Colour.BLACK;
+                } break;
                 #endregion
                 #region AberrantSacrifice
                 case CardId.AberrantSacrifice:
@@ -1231,7 +1149,7 @@ namespace stonekart
                     blackCost = 1;
                     basePower = 3;
                     baseToughness = 3;
-                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 at end step",
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 on your end step",
                         LocationPile.FIELD, EventTiming.Post, 
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
