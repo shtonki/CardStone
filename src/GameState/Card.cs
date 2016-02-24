@@ -740,7 +740,6 @@ namespace stonekart
                     }
                     break;
                 #endregion
-                    cardType = CardType.Sorcery;
                 #region GrazingBison
                 case CardId.GrazingBison:
                     {
@@ -801,6 +800,34 @@ namespace stonekart
                     cardType = CardType.Sorcery;
                     fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
+                } break;
+                #endregion       
+                #region IlatianFlutePlayer
+                case CardId.IlatianFlutePlayer:
+                {
+                    blackCost = 1;
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 2;
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent)gevent;
+                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
+                                && mevent.card.owner == controller && mevent.card.hasPT();
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
+                        LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
+                } break;
+                #endregion
+                #region Skeltal
+                case CardId.Skeltal:
+                {
+                    cardType = CardType.Creature;
+                    isToken = true;
+                    baseToughness = 1;
+                    basePower = 1;
+                    forceColour = Colour.BLACK;
                 } break;
                 #endregion
                 #region AberrantSacrifice
@@ -996,6 +1023,103 @@ namespace stonekart
                             new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD, FilterLambda.EXHAUSTED),
                             LocationPile.GRAVEYARD));
                     castDescription = "Destroy target exhausted creature.";
+                }
+                    break;
+
+                    #endregion
+                #region LoneRanger
+                case CardId.LoneRanger:
+                {
+                    //better if it isnt when summoned, instead it should be dynamic when no other creatures are on board?
+                    //filter doesn't account for relics on board
+                    blueCost = 1;
+                    cardType = CardType.Creature;
+                    basePower = 2;
+                    baseToughness = 2;
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent) gevent;
+                        //ask seba why mevent.from.pile == Location.Hand doesnt work, even with the '?'
+                        return mevent.to.pile == LocationPile.FIELD && mevent.card.controller.field.count == 0;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, 
+                        "Gains +3/+3 if you have no creatures on board when summoned.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 3), 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 3)));
+                } break;
+                #endregion
+                #region SoothingRhapsode
+                case CardId.SoothingRhapsode:
+                {
+                    cardType = CardType.Creature;
+                    blueCost = 1;
+                    basePower = 2;
+                    baseToughness = 1;
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), 
+                        "When Soothing Rhapsod enters the battlefield all creatures gets exhausted.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new Exhaust(new ResolveTargetRule(ResolveTarget.FIELDCREATURES))));
+                } break;
+                #endregion
+                #region Hypnotist
+                case CardId.Hypnotist:
+                {
+                    blueCost = 1;
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 2;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)), 
+                        new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.ONFIELD, FilterLambda.CREATURE))),
+                        true, LocationPile.FIELD, "E: Exhaust target creature."));
+                } break;
+                #endregion
+                #region NerosDisciple
+                case CardId.NerosDisciple:
+                {
+                    name = "Nero's Disciple";
+                    cardType = CardType.Creature;
+                    baseToughness = 1;
+                    basePower = 1;
+                    redCost = 2;
+                    
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2)),
+                        true, LocationPile.FIELD, "E: deal 2 damage to target creature or player"));
+                } break;
+                #endregion
+                #region Nero
+                case CardId.Nero:
+                {
+                    cardType = CardType.Creature;
+                    redCost = 6;
+                    baseToughness = 5;
+                    basePower = 2;
+
+                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
+                        "When Nero enters the battlefield: deal 3 damage to all creatures and destroy all relics.",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3),
+                        new MoveTo(new ResolveTargetRule(ResolveTarget.FIELDRELICS), LocationPile.GRAVEYARD)));
+                    
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.PLAYER), 4)), true,
+                        LocationPile.FIELD, "E: deal 4 damage to a player."));
+                } break;
+                #endregion
+                #region DecayingZombie
+                case CardId.DecayingZombie:
+                {
+                    cardType = CardType.Creature;
+                    blackCost = 1;
+                    basePower = 3;
+                    baseToughness = 3;
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 on your end step",
+                        LocationPile.FIELD, EventTiming.Post, 
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
+                    race = Race.Zombie;
                 } break;
                 #endregion
                 #region default
@@ -1003,9 +1127,9 @@ namespace stonekart
                     {
                         throw new Exception("pls no" + c.ToString());
                     }
-                    #endregion
+                #endregion
             }
-
+            #region idontknow
             if (basePower != null)
             {
                 power = new Modifiable<int>(add, sub);
@@ -1065,7 +1189,7 @@ namespace stonekart
                 colour = Colour.MULTI;
             }
         }
-
+        #endregion
 
 
         #region commonEventFilters
@@ -1125,16 +1249,18 @@ namespace stonekart
             };
         }
 
-        //todo add description
-        private static EventFilter stepFilter(Step step)
+        //todo enable specifying which players step (not just a bool)
+        private static EventFilter stepFilter(Step step, bool onlyOwnersTurn = false)
         {
             return @e =>
             {
                 if (e.type != GameEventType.STEP) return false;
                 StepEvent stepEvent = (StepEvent)e;
+                if (onlyOwnersTurn) return stepEvent.step == step && stepEvent.activePlayer.isHero;
                 return stepEvent.step == step;
             };
         }
+
 
         private const string timelapseReminder1 = "(Look at the top card of your deck, you may shuffle your deck)";
         private const string timelapseReminder2 = "(Look at the top two cards of your deck, you may shuffle your deck)";
@@ -1407,6 +1533,7 @@ namespace stonekart
             rarities[(int)CardId.Flamemane] = Rarity.Uncommon;
             rarities[(int)CardId.Abolish] = Rarity.Common;
             rarities[(int)CardId.CoupDeGrace] = Rarity.Ebin;
+            rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
         }
     }
     public enum CardId
@@ -1459,15 +1586,23 @@ namespace stonekart
         Bubastis,
         HauntedChapel,
         Spirit,
+        IlatianFlutePlayer,
+        Skeltal,
         OneWithNature,
         MysteriousLilac,
         Overgrow,
         Abolish,
         ElvenDruid,
-        AlterFate,
         ChromaticUnicorn,
         Flamemane,
         CoupDeGrace,
+        LoneRanger,
+        SoothingRhapsode,
+        Hypnotist,
+        NerosDisciple,
+        DecayingZombie,
+        Nero,
+        AlterFate,
     }
     public enum CardType
     {
