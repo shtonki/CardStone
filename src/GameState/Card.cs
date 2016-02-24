@@ -1112,9 +1112,9 @@ namespace stonekart
                 case CardId.DecayingZombie:
                 {
                     cardType = CardType.Creature;
-                    blackCost = 1;
-                    basePower = 3;
-                    baseToughness = 3;
+                    blackCost = 2;
+                    basePower = 4;
+                    baseToughness = 4;
                     triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 on your end step",
                         LocationPile.FIELD, EventTiming.Post, 
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
@@ -1527,7 +1527,6 @@ namespace stonekart
             rarities[(int)CardId.OneWithNature] = Rarity.Ebin;
             rarities[(int)CardId.MysteriousLilac] = Rarity.Uncommon;
             rarities[(int)CardId.Overgrow] = Rarity.Common;
-            //rarities[(int)CardId.AlterFate] = Rarity.Common;
             rarities[(int)CardId.ElvenDruid] = Rarity.Common;
             rarities[(int)CardId.ChromaticUnicorn] = Rarity.Uncommon;
             rarities[(int)CardId.Flamemane] = Rarity.Uncommon;
