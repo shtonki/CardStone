@@ -806,7 +806,7 @@ namespace stonekart
                 #region IlatianFlutePlayer
                 case CardId.IlatianFlutePlayer:
                 {
-                    blackCost = 1;
+                    blackCost = 4;
                     cardType = CardType.Creature;
                     baseToughness = 1;
                     basePower = 2;
@@ -815,15 +815,16 @@ namespace stonekart
                         if (gevent.type != GameEventType.MOVECARD) return false;
                         MoveCardEvent mevent = (MoveCardEvent)gevent;
                         return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                && mevent.card.owner == controller && mevent.card.hasPT();
+                                && mevent.card.owner == controller && mevent.card.hasPT() && mevent.card.isToken == false;
                     };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly non-token creature dies spawn a 1/1 skeltal.",
                         LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
                 } break;
                 #endregion
                 #region Skeltal
                 case CardId.Skeltal:
                 {
+                    //should be exiled when dies
                     cardType = CardType.Creature;
                     isToken = true;
                     baseToughness = 1;
