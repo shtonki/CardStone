@@ -1150,15 +1150,16 @@ namespace stonekart
                     redCost = 6;
                     baseToughness = 5;
                     basePower = 2;
-                    //todo jasin: add destruction of relics.
+
                     triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
                         "When Nero enters the battlefield: deal 3 damage to all creatures and destroy all relics.",
                         LocationPile.FIELD, EventTiming.Post, 
-                        new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3)));
+                        new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3),
+                        new MoveTo(new ResolveTargetRule(ResolveTarget.FIELDRELICS), LocationPile.GRAVEYARD)));
                     
                     activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
                         new Effect(new Ping(new FilterTargetRule(1, FilterLambda.PLAYER), 4)), true,
-                        LocationPile.FIELD, "E: deal 4 damage to a player."));
+                        LocationPile.FIELD, "E: deal 4 damage to a player.\n"));
                 } break;
                 #endregion
                 #region DecayingZombie
@@ -1303,13 +1304,13 @@ namespace stonekart
         }
 
         //todo enable specifying which players step (not just a bool)
-        private static EventFilter stepFilter(Step step, bool onlyOwner = false)
+        private static EventFilter stepFilter(Step step, bool onlyOwnersTurn = false)
         {
             return @e =>
             {
                 if (e.type != GameEventType.STEP) return false;
                 StepEvent stepEvent = (StepEvent)e;
-                if (onlyOwner) return stepEvent.step == step && stepEvent.activePlayer.isHero;
+                if (onlyOwnersTurn) return stepEvent.step == step && stepEvent.activePlayer.isHero;
                 return stepEvent.step == step;
             };
         }

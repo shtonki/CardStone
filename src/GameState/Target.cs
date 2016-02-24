@@ -223,6 +223,11 @@ namespace stonekart
                     targets = gstate.allCards.Where(card => card.isCreature && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
                 } break;
 
+                case ResolveTarget.FIELDRELICS:
+                {
+                    targets = gstate.allCards.Where(card => card.getType() == CardType.Relic && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
+                } break;
+
                 case ResolveTarget.ACTIVE:
                 {
                     targets[0] = new Target(gstate.activePlayer);
@@ -338,6 +343,7 @@ namespace stonekart
         LAST,
         OPPONENT,
         FIELDCREATURES,
+        FIELDRELICS,
         ACTIVE, 
         INACTIVE,
     }
