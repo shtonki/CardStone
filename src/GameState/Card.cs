@@ -595,6 +595,7 @@ namespace stonekart
                     {
                         name = "Essence of Demise";
                         blackCost = 3;
+                        greyCost = 1;
                         cardType = CardType.Relic;
                         auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
                         auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
