@@ -800,6 +800,7 @@ namespace stonekart
                     cardType = CardType.Sorcery;
                     fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
                     fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
+                    castDescription = "Every opponent mills 6 cards then draws 2 cards.";
                 } break;
                 #endregion       
                 #region IlatianFlutePlayer
@@ -1032,23 +1033,19 @@ namespace stonekart
                 {
                     //better if it isnt when summoned, instead it should be dynamic when no other creatures are on board?
                     //filter doesn't account for relics on board
-                    blueCost = 1;
+                    greenCost = 2;
                     cardType = CardType.Creature;
                     basePower = 2;
                     baseToughness = 2;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent) gevent;
-                        //ask seba why mevent.from.pile == Location.Hand doesnt work, even with the '?'
-                        return mevent.to.pile == LocationPile.FIELD && mevent.card.controller.field.count == 0;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, 
-                        "Gains +3/+3 if you have no creatures on board when summoned.",
-                        LocationPile.FIELD, EventTiming.Post, 
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 3), 
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 3)));
-                } break;
+                    auras.Add(new DynamicAura(crd => crd == this,
+                        Modifiable.Power,
+                        () => owner.field.cards.Count() == 1 ? 1 : 0,
+                        "This creature gains +1/+2 as long as you control no other permanents."));
+                    auras.Add(new DynamicAura(crd => crd == this,
+                        Modifiable.Toughness,
+                        () => owner.field.cards.Count() == 1 ? 2 : 0,
+                        ""));
+                    } break;
                 #endregion
                 #region SoothingRhapsode
                 case CardId.SoothingRhapsode:
@@ -1066,13 +1063,15 @@ namespace stonekart
                 #region Hypnotist
                 case CardId.Hypnotist:
                 {
-                    blueCost = 1;
+                    blueCost = 2;
+                    greyCost = 1;
                     cardType = CardType.Creature;
                     baseToughness = 1;
                     basePower = 2;
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)), 
+                    activatedAbilities.Add(new ActivatedAbility(this, 
+                        new Cost(new ManaCost(0, 1, 0, 0, 0, 0), new ExhaustCost(this)), 
                         new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.ONFIELD, FilterLambda.CREATURE))),
-                        true, LocationPile.FIELD, "E: Exhaust target creature."));
+                        true, LocationPile.FIELD, "E, U: Exhaust target creature."));
                 } break;
                 #endregion
                 #region NerosDisciple
@@ -1114,8 +1113,8 @@ namespace stonekart
                     cardType = CardType.Creature;
                     blackCost = 2;
                     basePower = 4;
-                    baseToughness = 4;
-                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "Gains -1/-1 on your end step",
+                    baseToughness = 5;
+                    triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END, true), "At the beginning of your endstep this creature gains -1/-1.",
                         LocationPile.FIELD, EventTiming.Post, 
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
@@ -1196,7 +1195,6 @@ namespace stonekart
                     }
                 #endregion
             }
-            #region idontknow
             if (basePower != null)
             {
                 power = new Modifiable<int>(add, sub);
@@ -1256,7 +1254,6 @@ namespace stonekart
                 colour = Colour.MULTI;
             }
         }
-        #endregion
 
 
         #region commonEventFilters
@@ -1600,6 +1597,9 @@ namespace stonekart
             rarities[(int)CardId.Abolish] = Rarity.Common;
             rarities[(int)CardId.CoupDeGrace] = Rarity.Ebin;
             rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
+            rarities[(int)CardId.DecayingZombie] = Rarity.Ebin;
+            rarities[(int)CardId.Hypnotist] = Rarity.Common;
+            rarities[(int)CardId.LoneRanger] = Rarity.Uncommon;
         }
     }
     public enum CardId
