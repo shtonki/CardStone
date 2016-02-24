@@ -1159,7 +1159,7 @@ namespace stonekart
                     
                     activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
                         new Effect(new Ping(new FilterTargetRule(1, FilterLambda.PLAYER), 4)), true,
-                        LocationPile.FIELD, "E: deal 4 damage to a player.\n"));
+                        LocationPile.FIELD, "E: deal 4 damage to a player."));
                 } break;
                 #endregion
                 #region DecayingZombie
@@ -1174,6 +1174,19 @@ namespace stonekart
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
                     race = Race.Zombie;
+                } break;
+                #endregion
+                #region NaturesAttendant
+                //todo jasin: heal isnt really heal as much as its target gains hp. creature can get more than maxhp
+                case CardId.NaturesAttendant:
+                {
+                    greenCost = 1;
+                    baseToughness = 3;
+                    basePower = 1;
+                    cardType = CardType.Creature;
+                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.CREATURE), -2)), true,
+                        LocationPile.FIELD, "E: Heal target creature for 2 health."));
                 } break;
                 #endregion
                 #region default
@@ -1655,6 +1668,7 @@ namespace stonekart
         NerosDisciple,
         DecayingZombie,
         Nero,
+        NaturesAttendant, //pls no lawsuit
     }
     public enum CardType
     {
