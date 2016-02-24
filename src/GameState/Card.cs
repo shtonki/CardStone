@@ -1122,6 +1122,73 @@ namespace stonekart
                     race = Race.Zombie;
                 } break;
                 #endregion
+                #region HourOfTheWolf
+                case CardId.HourOfTheWolf:
+                {
+                    name = "Hour of the Wolf";
+                    greenCost = 3;
+                    greyCost = 1;
+                    cardType = CardType.Sorcery;
+                    fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Wolf, CardId.Wolf));
+                    castDescription = "Summon two wolves. Wolves grant +1/+1 to all other wolves.";
+                } break;
+                #endregion
+                #region Wolf
+                case CardId.Wolf:
+                {
+                        //todo make wolf a subtype of creatures, so that all wolves gain buff not only identical cards
+                    cardType = CardType.Creature;
+                    isToken = true;
+                    baseToughness = 2;
+                    basePower = 2;
+                    forceColour = Colour.GREEN;
+                    Aura a = new Aura(
+                        (crd) => crd.cardId == CardId.Wolf && crd != this,
+                        Modifiable.Power, 1,
+                        "Other wolves get +1/+1");
+                    Aura aa = new Aura(
+                        (crd) => crd.cardId == CardId.Wolf && crd != this,
+                        Modifiable.Toughness, 1,
+                        "");
+                    auras.Add(a);
+                    auras.Add(aa);
+                } break;
+                #endregion
+                #region LoneWolf
+                case CardId.LoneWolf:
+                {
+                    name = "Lone Wolf";
+                    greenCost = 3;
+                    baseToughness = 2;
+                    basePower = 2;
+                    cardType = CardType.Creature;
+                    EventFilter f = (gevent) =>
+                    {
+                        if (gevent.type != GameEventType.MOVECARD) return false;
+                        MoveCardEvent mevent = (MoveCardEvent)gevent;
+                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
+                                && mevent.card.cardId == CardId.Wolf && mevent.card.owner == controller;
+                    };
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly wolf dies this creature gains +1/+1",
+                        LocationPile.FIELD, EventTiming.Post, new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
+                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)));
+                }
+                break;
+                #endregion
+                #region NaturesAttendant
+                //todo jasin: heal isnt really heal as much as its target gains hp. creature can get more than maxhp
+                case CardId.NaturesAttendant:
+                    {
+                        greenCost = 1;
+                        baseToughness = 3;
+                        basePower = 1;
+                        cardType = CardType.Creature;
+                        activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
+                            new Effect(new Ping(new FilterTargetRule(1, FilterLambda.CREATURE), -2)), true,
+                            LocationPile.FIELD, "E: Heal target creature for 2 health."));
+                    }
+                    break;
+                #endregion
                 #region default
                 default:
                     {
@@ -1602,6 +1669,11 @@ namespace stonekart
         DecayingZombie,
         Nero,
         AlterFate,
+        LoneWolf,
+        Wolf,
+        HourOfTheWolf,
+        NaturesAttendant,
+
     }
     public enum CardType
     {
