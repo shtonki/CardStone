@@ -816,18 +816,19 @@ namespace stonekart
                         return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
                                 && mevent.card.owner == controller && mevent.card.hasPT();
                     };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 skeltal.",
-                        LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly creature dies spawn a 1/1 Possessed Zombie.",
+                        LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.PossessedZombie)));
                 } break;
                 #endregion
-                #region Skeltal
-                case CardId.Skeltal:
+                #region PossessedZombie
+                case CardId.PossessedZombie:
                 {
                     cardType = CardType.Creature;
                     isToken = true;
                     baseToughness = 1;
                     basePower = 1;
                     forceColour = Colour.BLACK;
+                    race = Race.Zombie;
                 } break;
                 #endregion
                 #region AberrantSacrifice
@@ -1003,6 +1004,7 @@ namespace stonekart
                     cardType = CardType.Creature;
                     basePower = 4;
                     baseToughness = 4;
+                    
                     keyAbilities.Add(KeyAbility.Flying);
                     activatedAbilities.Add(new ActivatedAbility(this,
                         new Cost(new ManaCost(0, 0, 0, 2, 0, 0)),
@@ -1120,6 +1122,25 @@ namespace stonekart
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, -1),
                         new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, -1)));
                     race = Race.Zombie;
+                } break;
+                #endregion
+                #region ParasiticInfestation
+                case CardId.ParasiticInfestation:
+                {
+                    cardType = CardType.Sorcery;
+                    blackCost = 1;
+                    //when target creature dies spawn maggots or someth
+                } break;
+                #endregion
+                #region InfestingMaggot
+                case CardId.InfestingMaggot:
+                {
+                    cardType = CardType.Creature;
+                    blackCost = 1;
+                    greyCost = 1;
+                    //activatedAbilities.Add(new ActivatedAbility(this, 
+                        //new Cost(new MoveThisCost(LocationPile.FIELD, LocationPile.EXILE, 1, this)),
+                        //new Effect(new  ), ));
                 } break;
                 #endregion
                 #region default
@@ -1586,7 +1607,7 @@ namespace stonekart
         HauntedChapel,
         Spirit,
         IlatianFlutePlayer,
-        Skeltal,
+        PossessedZombie,
         OneWithNature,
         MysteriousLilac,
         Overgrow,
@@ -1602,6 +1623,8 @@ namespace stonekart
         DecayingZombie,
         Nero,
         AlterFate,
+        ParasiticInfestation,
+        InfestingMaggot
     }
     public enum CardType
     {
@@ -1635,6 +1658,7 @@ namespace stonekart
     {
         Fervor,
         Flying,
+        Infest,
     }
 
     public enum Modifiable

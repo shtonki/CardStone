@@ -32,14 +32,24 @@ namespace stonekart
         private const int paddingX = 8;
         private const int paddingY = 8;
         private const int CARDS_PER_ROW = 6;
+        private int currentPage;
+        private const int cardsPerPage = 8;
         private Colour currentSortingColor;
+        private List<Func<Card, bool>> filters;
+
+        private Func<Card, bool> isRed;
+        private Func<Card, bool> isBlue;
+        private Func<Card, bool> isGreen;
+        private Func<Card, bool> isBlack;
+        private Func<Card, bool> isWhite;
+        private Func<Card, bool> isGrey;
+        private Func<Card, bool> isMulti;
         public DeckEditorPanel()
         {
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
-            int currentPage = 0;
-            int cardsPerPage = 8;
+            currentPage = 0;
             cards = new CardButton[nrOfCards];
             sortedIds = new List<Card>();
             myDeckIsHard = new Pile(new Card[] { });
@@ -54,6 +64,17 @@ namespace stonekart
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
             cardCount = new Label();
+
+            //todo jasin: dont use color, use mana instead, otherwise it wont work with cards that are multicolored
+            filters = new List<Func<Card, bool>>();
+            isRed = c => c.colour == Colour.RED;
+            isBlue = c => c.colour == Colour.BLUE;
+            isGreen = c => c.colour == Colour.GREEN;
+            isBlack = c => c.colour == Colour.BLACK;
+            isWhite = c => c.colour == Colour.WHITE;
+            isGrey = c => c.colour == Colour.GREY;
+            isMulti = c => c.colour == Colour.MULTI;
+            //addFilters(isWhite, isBlue, isBlack, isRed, isGreen, isGrey, isMulti);
 
 
             for (int i = 0; i < nrOfCards; i++)
@@ -87,15 +108,17 @@ namespace stonekart
             //todo: you need to double press if you scroll one way then the other. 
             scrollLeftButton.MouseDown += (_, __) =>
             {
-                if (currentPage > 0) currentPage--;
-                int cardSlotNr = cardsPerPage-1;
-                for (int i = currentPage*cardsPerPage+cardsPerPage-1; i > currentPage*cardsPerPage-1; i--)
+                if (currentPage > 0)
                 {
-                    cardSlot[cardSlotNr].Visible = true;
-                    cardSlot[cardSlotNr].notifyObserver(new Card(sortedIds[i].cardId), null);
-                    cardSlotNr--;
+                    currentPage--;
+                    int cardSlotNr = cardsPerPage - 1;
+                    for (int i = currentPage*cardsPerPage + cardsPerPage - 1; i > currentPage*cardsPerPage - 1; i--)
+                    {
+                        cardSlot[cardSlotNr].Visible = true;
+                        cardSlot[cardSlotNr].notifyObserver(new Card(sortedIds[i].cardId), null);
+                        cardSlotNr--;
+                    }
                 }
-                Console.WriteLine(currentPage);
             };
             scrollRightButton.MouseDown += (_, __) =>
             {
@@ -152,9 +175,9 @@ namespace stonekart
                 }
             };
 
-            sortButtons = new Button[6];
+            sortButtons = new Button[7];
             //todo use images or something, instead of solid colors
-            Color[] colors = new Color[6] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green, Color.Gray};
+            Color[] colors = new Color[7] {Color.White, Color.Blue, Color.Black, Color.Red, Color.Green, Color.Gray, Color.Brown};
             for(int i = 0; i < sortButtons.Count(); i++)
             {
                 //todo ask seba why i0 is needed
@@ -163,7 +186,6 @@ namespace stonekart
                 sortButtons[i] = new Button();
                 sortButtons[i].Tag = (Colour)i;
                 sortButtons[i].BackColor = colors[i];
-                sortButtons[i].Location = new Point(Size.Width / 2 + 50 * i, 50);
                 sortButtons[i].Size = new Size(50, 50); 
                 sortButtons[i].MouseDown += (_, __) =>
                 {
@@ -181,6 +203,14 @@ namespace stonekart
             Controls.Add(tb);
             Controls.Add(p);
             Controls.Add(backToMainMenuButton);
+        }
+
+        private void addFilters(params Func<Card, bool>[] funcs)
+        {
+            foreach (var f in funcs)
+            {
+                filters.Add(f);
+            }
         }
 
         public static bool deckVerificationThing(CardId[] ids)
@@ -219,26 +249,53 @@ namespace stonekart
         
         private void sortAfterColor(Colour colour)
         {
-            if (currentSortingColor == colour) currentSortingColor = Colour.MULTI;
-            else currentSortingColor = colour;
-
-            foreach (Card id in ids)
+            //seba if youre reading this its too late, code is too far gone
+            //please dont judge
+            
+            switch (colour)
             {
-                if (id.colour != currentSortingColor && currentSortingColor != Colour.MULTI)
-                {
-                    sortedIds.Remove(id);
-                }
-                else if(!sortedIds.Contains(id))
-                {
-                    sortedIds.Add(id);
-                }
+                case Colour.BLACK:
+                    if (filters.Contains(isBlack)) filters.Remove(isBlack);
+                    else filters.Add(isBlack);
+                    break;
+                case Colour.BLUE:
+                    if (filters.Contains(isBlue)) filters.Remove(isBlue);
+                    else filters.Add(isBlue);
+                    break;
+                case Colour.GREEN:
+                    if (filters.Contains(isGreen)) filters.Remove(isGreen);
+                    else filters.Add(isGreen);
+                    break;
+                case Colour.GREY:
+                    if (filters.Contains(isGrey)) filters.Remove(isGrey);
+                    else filters.Add(isGrey);
+                    break;
+                case Colour.MULTI:
+                    if (filters.Contains(isMulti)) filters.Remove(isMulti);
+                    else filters.Add(isMulti);
+                    break;
+                case Colour.RED:
+                    if (filters.Contains(isRed)) filters.Remove(isRed);
+                    else filters.Add(isRed);
+                    break;
+                case Colour.WHITE:
+                    if (filters.Contains(isWhite)) filters.Remove(isWhite);
+                    else filters.Add(isWhite);
+                    break;
             }
             
-            for (int i = 0; i < sortedIds.Count % 8; i++)
+            sortedIds.Clear(); 
+            sortedIds = ids.Where(d => filters.All(filter => filter(d))).ToList();
+            currentPage = 0;
+            for (int i = 0; i < cardsPerPage; i++)
             {
-                cardSlot[i].notifyObserver(new Card(sortedIds[i].cardId), null);
+                if (sortedIds.ElementAtOrDefault(i) == null) cardSlot[i].Visible = false;
+                else
+                {
+                    cardSlot[i].Visible = true;
+                    cardSlot[i].notifyObserver(new Card(sortedIds[i].cardId), null);
+                }
             }
-            //drawTheseButtons(cardSlot.ToArray());
         }
         private void saveDeck()
         {
