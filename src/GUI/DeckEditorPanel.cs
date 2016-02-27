@@ -32,11 +32,10 @@ namespace stonekart
         private const int paddingX = 8;
         private const int paddingY = 8;
         private const int CARDS_PER_ROW = 6;
+        private const int scrollButtonWidth = 80;
         private int currentPage;
         private const int cardsPerPage = 8;
-        private Colour currentSortingColor;
         private List<Func<Card, bool>> filters;
-
         private Func<Card, bool> isRed;
         private Func<Card, bool> isBlue;
         private Func<Card, bool> isGreen;
@@ -47,7 +46,6 @@ namespace stonekart
         public DeckEditorPanel()
         {
             BackColor = Color.Beige;
-            currentSortingColor = Colour.GREY;
             int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             currentPage = 0;
             cards = new CardButton[nrOfCards];
@@ -284,7 +282,12 @@ namespace stonekart
                     break;
             }
             
-            sortedIds.Clear(); 
+            refreshCardSlots();
+        }
+
+        private void refreshCardSlots()
+        {
+            sortedIds.Clear();
             sortedIds = ids.Where(d => filters.All(filter => filter(d))).ToList();
             currentPage = 0;
             for (int i = 0; i < cardsPerPage; i++)
@@ -389,14 +392,11 @@ namespace stonekart
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            scrollLeftButton.Location = new Point(250, Size.Height/8);
-            scrollRightButton.Location = new Point(Size.Width-250, Size.Height/8);
 
-            //todo jasin: fix 8 to something else, so we can change it easier MAYBE? coach??
             int currentXPosition = Width / 5;
             int currentYPosition = Size.Height/4;
             
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < cardsPerPage; i++)
             {
                 //location
                 cardSlot[i].Location = new Point(currentXPosition, currentYPosition);
@@ -432,6 +432,11 @@ namespace stonekart
 
             cardInfo.Size = new Size(cardSlot[0].Width*2, cardSlot[0].Height*2 + 250);
             cardInfo.Location = new Point(Size.Width - cardInfo.Size.Width - 5, Size.Height/5);
+
+            scrollLeftButton.Location = new Point(cardSlot[0].Location.X - scrollButtonWidth, cardSlot[0].Location.Y);
+            scrollLeftButton.Size = new Size(scrollButtonWidth, cardSlot[0].Height*2);
+            scrollRightButton.Location = new Point(cardSlot[3].Location.X+cardSlot[3].Width, cardSlot[3].Location.Y);
+            scrollRightButton.Size = new Size(scrollButtonWidth, cardSlot[3].Height*2);
         }
 
         private void drawTheseButtons(CardButton[] cards)
@@ -449,7 +454,17 @@ namespace stonekart
         private bool addToDeck(CardId id)
         {
             if (myDeckIsHard.cards.Count(card => card.cardId == id) == maxOf(Card.rarityOf(id))) return false;
-            myDeckIsHard.add(new Card(id));
+            Card c = new Card(id);
+            myDeckIsHard.add(c);
+            Button b = new Button();
+            b.MouseClick += (_, __) =>
+            {
+                if (__.Button == MouseButtons.Right)
+                {
+                    myDeckIsHard.remove(c);
+                }
+            };
+            Controls.Add(b);
             cardCount.Text = "Count: " + myDeckIsHard.count;
             return true;
         }
