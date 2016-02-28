@@ -455,16 +455,16 @@ namespace stonekart
         {
             if (myDeckIsHard.cards.Count(card => card.cardId == id) == maxOf(Card.rarityOf(id))) return false;
             Card c = new Card(id);
+            CardButton cc = new CardButton();
             myDeckIsHard.add(c);
-            Button b = new Button();
-            b.MouseClick += (_, __) =>
+            cc.Location = new Point(400,200);
+            cc.Size = new Size(500,500);
+            Controls.Add(cc);
+            cc.MouseClick += (_, __) =>
             {
                 if (__.Button == MouseButtons.Right)
-                {
                     myDeckIsHard.remove(c);
-                }
             };
-            Controls.Add(b);
             cardCount.Text = "Count: " + myDeckIsHard.count;
             return true;
         }
