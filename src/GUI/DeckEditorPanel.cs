@@ -134,7 +134,7 @@ namespace stonekart
                     cardSlotNr++;
                 }
             };
-
+            
             backToMainMenuButton = new Button();
             backToMainMenuButton.Size = new Size(120, 40);
             backToMainMenuButton.Text = "back to main menu";
@@ -151,7 +151,7 @@ namespace stonekart
             noDeckName.Visible = false;
             noDeckName.Size = new Size(250, 25);
             noDeckName.BackColor = Color.Red;
-
+            myDeckIsHard.cards.Where(d => d.isToken).Any(g => true).ToString().Intersect(Text.Replace('a', 'b'));
             loadButton = new Button();
             loadButton.Image = ImageLoader.getStepImage("load", new Size(60, 60));
             loadButton.Size = loadButton.Image.Size;
