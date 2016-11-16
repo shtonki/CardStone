@@ -223,12 +223,12 @@ namespace stonekart
                     targets[0] = new Target(resolving.owner.opponent);
                 } break;
 
-                case ResolveTarget.FIELDCREATURES:
+                case ResolveTarget.ALLCREATURES:
                 {
                     targets = gstate.allCards.Where(card => card.isCreature && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
                 } break;
 
-                case ResolveTarget.FIELDRELICS:
+                case ResolveTarget.ALLRELICS:
                 {
                     targets = gstate.allCards.Where(card => card.getType() == CardType.Relic && card.location.pile == LocationPile.FIELD).Select(card => new Target(card)).ToArray();
                 } break;
@@ -241,8 +241,12 @@ namespace stonekart
                 case ResolveTarget.INACTIVE:
                 {
                     targets[0] = new Target(gstate.inactivePlayer);
-                }
-                break;
+                } break;
+
+                case ResolveTarget.OPPONENTCREATURES:
+                {
+                    targets = gstate.allCards.Where(card => card.isCreature && card.location.pile == LocationPile.FIELD && card.owner != resolving.owner).Select(card => new Target(card)).ToArray();
+                } break;
 
                 default:
                 {
@@ -340,6 +344,7 @@ namespace stonekart
         EXHAUSTED,
 
         NONWHITE,
+
         //ZAPPABLECREATURE, 
     }
 
@@ -349,8 +354,9 @@ namespace stonekart
         CONTROLLER,
         LAST,
         OPPONENT,
-        FIELDCREATURES,
-        FIELDRELICS,
+        ALLCREATURES,
+        OPPONENTCREATURES,
+        ALLRELICS,
         ACTIVE, 
         INACTIVE,
     }

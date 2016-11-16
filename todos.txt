@@ -10,10 +10,4 @@
 * show which creatures are blocking which
 * implement move hack whatever
 * fix doubleblocking
-* show blocking with arrows
-
----------------ICUT4SANTA--------------
-* fix my shit for me dear papa santa
-*
-*
-*
+* print key abilities at the top

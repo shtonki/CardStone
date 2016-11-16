@@ -243,7 +243,7 @@ namespace stonekart
                         blueCost = 2;
                         cardType = CardType.Sorcery;
                         fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.CONTROLLER), 2));
-                        castDescription = "Draw 2 cards";
+                        castDescription = "Draw 2 cards.";
                     }
                     break;
                 #endregion
@@ -341,7 +341,7 @@ namespace stonekart
                             (crd) => crd.controller == this.controller && crd.colour == Colour.WHITE && crd != this,
                             Modifiable.Power,
                             1,
-                            "Other white creatures you control get +1/+0");
+                            "Other white creatures you control get +1/+0.");
                         auras.Add(a);
                     }
                     break;
@@ -420,7 +420,7 @@ namespace stonekart
                         blueCost = 1;
                         cardType = CardType.Instant;
                         fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.ZAPPABLE, FilterLambda.CREATURE), LocationPile.HAND));
-                        castDescription = "Return target creature to its owners hand";
+                        castDescription = "Return target creature to its owners hand.";
                     }
                     break;
                 #endregion
@@ -503,7 +503,7 @@ namespace stonekart
                             DamagePlayerEvent devent = (DamagePlayerEvent)e;
                             return devent.source == this;
                         };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "Whenever this creature deals damage to a player that player mills 3", LocationPile.FIELD, EventTiming.Post,
+                    triggeredAbilities.Add(new TriggeredAbility(this, f, "Whenever this creature deals damage to a player that player Mills 3.", LocationPile.FIELD, EventTiming.Post,
                         new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 3)));
                     }
                     break;
@@ -547,7 +547,7 @@ namespace stonekart
                         greyCost = 1;
                         cardType = CardType.Sorcery;
                         castDescription = "Deal 3 damage to all creatures.";
-                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3));
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.ALLCREATURES), 3));
                     }
                     break;
                 #endregion
@@ -558,8 +558,8 @@ namespace stonekart
                         whiteCost = 2;
                         greyCost = 2;
                         cardType = CardType.Sorcery;
-                        castDescription = "Deal 2 damage to all non-white creatures";
-                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES, FilterLambda.NONWHITE), 2));
+                        castDescription = "Deal 2 damage to all creatures your opponent controls.";
+                    fx.Add(new Ping(new ResolveTargetRule(ResolveTarget.OPPONENTCREATURES), 2));
                     }
                     break;
                 #endregion
@@ -585,7 +585,7 @@ namespace stonekart
                     activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ManaCost(0,0,0,0,2,1)),
                             new Effect(new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
                             new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)), true,
-                        LocationPile.FIELD, "1GG: gain +1/+1"));
+                        LocationPile.FIELD, "1GG: Gain +1/+1."));
                     }
                     break;
                 #endregion
@@ -597,7 +597,7 @@ namespace stonekart
                         blackCost = 3;
                         greyCost = 1;
                         cardType = CardType.Relic;
-                        auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1"));
+                        auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Power, -1, "All creatures get -1/-1."));
                         auras.Add(new Aura((crd) => crd.isCreature, Modifiable.Toughness, -1, ""));
                     }
                     break;
@@ -621,7 +621,7 @@ namespace stonekart
                         greyCost = 1;
                         cardType = CardType.Relic;
 
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to both players.",
+                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step deal 1 damage to all players.",
                             LocationPile.FIELD, EventTiming.Post, new Ping(new ResolveTargetRule(ResolveTarget.CONTROLLER), 1), new Ping(new ResolveTargetRule(ResolveTarget.OPPONENT), 1)));
                     }
                     break;
@@ -634,7 +634,7 @@ namespace stonekart
                         greyCost = 1;
                         cardType = CardType.Relic;
 
-                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each end step the active player draws a card.",
+                        triggeredAbilities.Add(new TriggeredAbility(this, stepFilter(Step.END), "At the beginning of each player's end step that player draws a card.",
                             LocationPile.FIELD, EventTiming.Post, new Draw(new ResolveTargetRule(ResolveTarget.ACTIVE), 1)));
                     }
                     break;
@@ -771,7 +771,7 @@ namespace stonekart
                         blackCost = 2;
                         greyCost = 1;
                         cardType = CardType.Sorcery;
-                        castDescription = "Search your deck for a card and move it to your hand. Shuffle your deck.";
+                        castDescription = "Search your deck for a card and put it to your hand. Shuffle your deck.";
                         fx.Add(new MoveTo(
                             new SelectFromTargetRule(new ResolveTargetRule(ResolveTarget.CONTROLLER), new ResolveTargetRule(ResolveTarget.LAST),
                         (p) => p.deck.cards.ToArray()), 
@@ -793,46 +793,7 @@ namespace stonekart
                         fx.Add(new CounterSpell(new FilterTargetRule(1, FilterLambda.ONSTACK)));
                     }
                     break;
-                #endregion
-                #region AlterFate
-                case CardId.AlterFate:
-                {
-                    blueCost = 1;
-                    cardType = CardType.Sorcery;
-                    fx.Add(new Mill(new ResolveTargetRule(ResolveTarget.OPPONENT), 6));
-                    fx.Add(new Draw(new ResolveTargetRule(ResolveTarget.OPPONENT), 2));
-                    castDescription = "Every opponent mills 6 cards then draws 2 cards.";
-                } break;
-                #endregion       
-                #region IlatianFlutePlayer
-                case CardId.IlatianFlutePlayer:
-                {
-                    blackCost = 4;
-                    cardType = CardType.Creature;
-                    baseToughness = 1;
-                    basePower = 2;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent)gevent;
-                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                && mevent.card.owner == controller && mevent.card.hasPT() && mevent.card.isToken == false;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly non-token creature dies spawn a 1/1 skeltal.",
-                        LocationPile.FIELD, EventTiming.Post, new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Skeltal)));
-                } break;
-                #endregion
-                #region Skeltal
-                case CardId.Skeltal:
-                {
-                    //should be exiled when dies
-                    cardType = CardType.Creature;
-                    isToken = true;
-                    baseToughness = 1;
-                    basePower = 1;
-                    forceColour = Colour.BLACK;
-                } break;
-                #endregion
+                #endregion      
                 #region AberrantSacrifice
                 case CardId.AberrantSacrifice:
                 {
@@ -862,7 +823,7 @@ namespace stonekart
                     cardType = CardType.Creature;
                     triggeredAbilities.Add(new TriggeredAbility(this,
                         thisETB(this),
-                        thisETBDescription + "target player discards a card",
+                        thisETBDescription + "target player discards a card.",
                         LocationPile.FIELD, 
                         EventTiming.Post,
                         new Effect(new MoveTo(new SelectFromTargetRule(
@@ -885,7 +846,7 @@ namespace stonekart
                         new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.CREATURE, FilterLambda.ONFIELD))),
                         true,
                         LocationPile.FIELD, 
-                        "1BB: Exhaust target creature."
+                        "1UU: Exhaust target creature."
                         ));
                 } break;
                 #endregion
@@ -900,7 +861,7 @@ namespace stonekart
                         new Effect(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Spirit)),
                         true,
                         LocationPile.FIELD, 
-                        "E, BW, Exile a card from your graveyard: Summon a Spirit token."
+                        "E, BW, Exile a card from your graveyard: Put a 1/1 white Spirit token with flying onto the battlefield."
                         ));
                 } break;
                 #endregion
@@ -950,7 +911,7 @@ namespace stonekart
                     greenCost = 2;
                     cardType = CardType.Instant;
                     fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.RELIC, FilterLambda.ONFIELD), LocationPile.GRAVEYARD));
-                    castDescription = "Destroy target relic";
+                    castDescription = "Destroy target relic.";
                 } break;
                 #endregion
                 #region Abolish
@@ -959,7 +920,7 @@ namespace stonekart
                         whiteCost = 2;
                         cardType = CardType.Instant;
                         fx.Add(new MoveTo(new FilterTargetRule(1, FilterLambda.RELIC, FilterLambda.ONFIELD), LocationPile.GRAVEYARD));
-                        castDescription = "Destroy target relic";
+                        castDescription = "Destroy target relic.";
                     }
                     break;
                 #endregion
@@ -1049,66 +1010,6 @@ namespace stonekart
                         ""));
                     } break;
                 #endregion
-                #region SoothingRhapsode
-                case CardId.SoothingRhapsode:
-                {
-                    cardType = CardType.Creature;
-                    blueCost = 1;
-                    basePower = 2;
-                    baseToughness = 1;
-                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this), 
-                        "When Soothing Rhapsod enters the battlefield all creatures gets exhausted.",
-                        LocationPile.FIELD, EventTiming.Post, 
-                        new Exhaust(new ResolveTargetRule(ResolveTarget.FIELDCREATURES))));
-                } break;
-                #endregion
-                #region Hypnotist
-                case CardId.Hypnotist:
-                {
-                    blueCost = 2;
-                    greyCost = 1;
-                    cardType = CardType.Creature;
-                    baseToughness = 1;
-                    basePower = 2;
-                    activatedAbilities.Add(new ActivatedAbility(this, 
-                        new Cost(new ManaCost(0, 1, 0, 0, 0, 0), new ExhaustCost(this)), 
-                        new Effect(new Exhaust(new FilterTargetRule(1, FilterLambda.ONFIELD, FilterLambda.CREATURE))),
-                        true, LocationPile.FIELD, "E, U: Exhaust target creature."));
-                } break;
-                #endregion
-                #region NerosDisciple
-                case CardId.NerosDisciple:
-                {
-                    name = "Nero's Disciple";
-                    cardType = CardType.Creature;
-                    baseToughness = 1;
-                    basePower = 1;
-                    redCost = 2;
-                    
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
-                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.ZAPPABLE), 2)),
-                        true, LocationPile.FIELD, "E: deal 2 damage to target creature or player"));
-                } break;
-                #endregion
-                #region Nero
-                case CardId.Nero:
-                {
-                    cardType = CardType.Creature;
-                    redCost = 6;
-                    baseToughness = 5;
-                    basePower = 2;
-
-                    triggeredAbilities.Add(new TriggeredAbility(this, thisETB(this),
-                        "When Nero enters the battlefield: deal 3 damage to all creatures and destroy all relics.",
-                        LocationPile.FIELD, EventTiming.Post, 
-                        new Ping(new ResolveTargetRule(ResolveTarget.FIELDCREATURES), 3),
-                        new MoveTo(new ResolveTargetRule(ResolveTarget.FIELDRELICS), LocationPile.GRAVEYARD)));
-                    
-                    activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
-                        new Effect(new Ping(new FilterTargetRule(1, FilterLambda.PLAYER), 4)), true,
-                        LocationPile.FIELD, "E: deal 4 damage to a player."));
-                } break;
-                #endregion
                 #region DecayingZombie
                 case CardId.DecayingZombie:
                 {
@@ -1123,72 +1024,20 @@ namespace stonekart
                     race = Race.Zombie;
                 } break;
                 #endregion
-                #region HourOfTheWolf
-                case CardId.HourOfTheWolf:
+
+                #region AsylumWarden
+                case CardId.AsylumWarden:
                 {
-                    name = "Hour of the Wolf";
-                    greenCost = 3;
-                    greyCost = 1;
-                    cardType = CardType.Sorcery;
-                    fx.Add(new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Wolf, CardId.Wolf));
-                    castDescription = "Summon two wolves. Wolves grant +1/+1 to all other wolves.";
-                } break;
-                #endregion
-                #region Wolf
-                case CardId.Wolf:
-                {
-                        //todo make wolf a subtype of creatures, so that all wolves gain buff not only identical cards
                     cardType = CardType.Creature;
-                    isToken = true;
-                    baseToughness = 2;
+                    blackCost = 1;
+                    whiteCost = 1;
                     basePower = 2;
-                    forceColour = Colour.GREEN;
-                    Aura a = new Aura(
-                        (crd) => crd.cardId == CardId.Wolf && crd != this,
-                        Modifiable.Power, 1,
-                        "Other wolves get +1/+1");
-                    Aura aa = new Aura(
-                        (crd) => crd.cardId == CardId.Wolf && crd != this,
-                        Modifiable.Toughness, 1,
-                        "");
-                    auras.Add(a);
-                    auras.Add(aa);
-                } break;
-                #endregion
-                #region LoneWolf
-                case CardId.LoneWolf:
-                {
-                    name = "Lone Wolf";
-                    greenCost = 3;
                     baseToughness = 2;
-                    basePower = 2;
-                    cardType = CardType.Creature;
-                    EventFilter f = (gevent) =>
-                    {
-                        if (gevent.type != GameEventType.MOVECARD) return false;
-                        MoveCardEvent mevent = (MoveCardEvent)gevent;
-                        return mevent.from?.pile == LocationPile.FIELD && mevent.to.pile == LocationPile.GRAVEYARD
-                                && mevent.card.cardId == CardId.Wolf && mevent.card.owner == controller;
-                    };
-                    triggeredAbilities.Add(new TriggeredAbility(this, f, "When a friendly wolf dies this creature gains +1/+1",
-                        LocationPile.FIELD, EventTiming.Post, new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Power, never, 1),
-                        new ModifyUntil(new ResolveTargetRule(ResolveTarget.SELF), Modifiable.Toughness, never, 1)));
-                }
-                break;
-                #endregion
-                #region NaturesAttendant
-                //todo jasin: heal isnt really heal as much as its target gains hp. creature can get more than maxhp
-                case CardId.NaturesAttendant:
-                    {
-                        greenCost = 1;
-                        baseToughness = 3;
-                        basePower = 1;
-                        cardType = CardType.Creature;
-                        activatedAbilities.Add(new ActivatedAbility(this, new Cost(new ExhaustCost(this)),
-                            new Effect(new Ping(new FilterTargetRule(1, FilterLambda.CREATURE), -2)), true,
-                            LocationPile.FIELD, "E: Heal target creature for 2 health."));
-                    }
-                    break;
+                        triggeredAbilities.Add(new TriggeredAbility(this, thisDies(this),
+                                thisDiesDescription + "put a 1/1 white Spirit token with flying onto the battlefield.",
+                                LocationPile.GRAVEYARD, EventTiming.Post,
+                                new SummonTokens(new ResolveTargetRule(ResolveTarget.CONTROLLER), CardId.Spirit)));
+                    } break;
                 #endregion
                 #region default
                 default:
@@ -1303,7 +1152,7 @@ namespace stonekart
             };
         }
 
-        private const string thisDiesDescription = "Whenever this card enters a graveyard from the battlefield, ";
+        private const string thisDiesDescription = "Whenever this creature dies, ";
         private static EventFilter thisDies(Card c)
         {
             return @e =>
@@ -1598,10 +1447,9 @@ namespace stonekart
             rarities[(int)CardId.Flamemane] = Rarity.Uncommon;
             rarities[(int)CardId.Abolish] = Rarity.Common;
             rarities[(int)CardId.CoupDeGrace] = Rarity.Ebin;
-            rarities[(int)CardId.AlterFate] = Rarity.Uncommon;
             rarities[(int)CardId.DecayingZombie] = Rarity.Ebin;
-            rarities[(int)CardId.Hypnotist] = Rarity.Common;
             rarities[(int)CardId.LoneRanger] = Rarity.Uncommon;
+            rarities[(int)CardId.AsylumWarden] = Rarity.Uncommon;
         }
     }
     public enum CardId
@@ -1654,8 +1502,6 @@ namespace stonekart
         Bubastis,
         HauntedChapel,
         Spirit,
-        IlatianFlutePlayer,
-        Skeltal,
         OneWithNature,
         MysteriousLilac,
         Overgrow,
@@ -1665,17 +1511,8 @@ namespace stonekart
         Flamemane,
         CoupDeGrace,
         LoneRanger,
-        SoothingRhapsode,
-        Hypnotist,
-        NerosDisciple,
         DecayingZombie,
-        Nero,
-        AlterFate,
-        LoneWolf,
-        Wolf,
-        HourOfTheWolf,
-        NaturesAttendant,
-
+        AsylumWarden,
     }
     public enum CardType
     {
