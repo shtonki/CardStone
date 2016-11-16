@@ -37,16 +37,15 @@ namespace stonekart
         {
             BackColor = Color.Beige;
             currentSortingColor = Colour.GREY;
-            int nrOfCards = Enum.GetValues(typeof(CardId)).Length;
             int currentPage = 0;
             int cardsPerPage = 8;
-            cards = new CardButton[nrOfCards];
             sortedIds = new List<Card>();
             myDeckIsHard = new Pile(new Card[] { });
             p = new CardPanel(new Func<CardButton>(() => new CardButton()), new LayoutArgs(true, true));
             myDeckIsHard.addObserver(p);
             ids =
                 ((CardId[])Enum.GetValues(typeof (CardId))).Select(id => new Card(id))
+                    .Where(c => c.rarity != Rarity.Token)
                     .OrderBy(card => card.colour)
                     .ToArray();
             cardInfo = new CardInfoPanel();
@@ -54,6 +53,9 @@ namespace stonekart
             Controls.Add(cardInfo);
             cardSlot = new CardButton[8];
             cardCount = new Label();
+
+            int nrOfCards = ids.Length;
+            cards = new CardButton[nrOfCards];
 
 
             for (int i = 0; i < nrOfCards; i++)
